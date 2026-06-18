@@ -1,12 +1,14 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import '../../data/content_store.dart';
+import 'chapter_navigation_footer.dart';
 
 class FlowingParagraphView extends StatefulWidget {
   final List<Verse> verses;
   final Set<int> selectedVerses;
   final Map<int, String> savedHighlights;
   final ValueChanged<int> onVerseTap;
+  final bool showFooter;
 
   const FlowingParagraphView({
     super.key,
@@ -14,6 +16,7 @@ class FlowingParagraphView extends StatefulWidget {
     required this.selectedVerses,
     required this.savedHighlights,
     required this.onVerseTap,
+    this.showFooter = true,
   });
 
   @override
@@ -58,48 +61,56 @@ class _FlowingParagraphViewState extends State<FlowingParagraphView> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 32.0),
-      child: Text.rich(
-        TextSpan(
-          children: widget.verses.asMap().entries.map((entry) {
-            final index = entry.key;
-            final verse = entry.value;
-            final isSelected = widget.selectedVerses.contains(verse.verse);
-            final highlightHex = widget.savedHighlights[verse.verse];
-            final highlightColor = highlightHex != null 
-                ? Color(int.parse(highlightHex.replaceFirst('#', '0xFF'))) 
-                : null;
-            
-            final bgColor = isSelected 
-                ? Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.6)
-                : highlightColor?.withValues(alpha: 0.4);
-            final recognizer = _recognizers[index];
+    final spans = widget.verses.asMap().entries.map((entry) {
+      final index = entry.key;
+      final verse = entry.value;
+      final isSelected = widget.selectedVerses.contains(verse.verse);
+      final highlightHex = widget.savedHighlights[verse.verse];
+      final highlightColor = highlightHex != null 
+          ? Color(int.parse(highlightHex.replaceFirst('#', '0xFF'))) 
+          : null;
+      
+      final bgColor = isSelected 
+          ? Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.6)
+          : highlightColor?.withValues(alpha: 0.4);
+      final recognizer = _recognizers[index];
 
-            return TextSpan(
-              children: [
-                TextSpan(
-                  text: '${verse.verse} ',
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.bold,
-                        fontFeatures: const [FontFeature.superscripts()],
-                        backgroundColor: bgColor,
-                      ),
-                  recognizer: recognizer,
+      return TextSpan(
+        children: [
+          TextSpan(
+            text: '${verse.verse} ',
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                  fontFeatures: const [FontFeature.superscripts()],
+                  backgroundColor: bgColor,
                 ),
-                TextSpan(
-                  text: '${verse.textContent} ',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        height: 1.8,
-                        backgroundColor: bgColor,
-                      ),
-                  recognizer: recognizer,
+            recognizer: recognizer,
+          ),
+          TextSpan(
+            text: '${verse.textContent} ',
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  height: 1.8,
+                  backgroundColor: bgColor,
                 ),
-              ],
-            );
-          }).toList(),
-        ),
+            recognizer: recognizer,
+          ),
+        ],
+      );
+    }).toList();
+
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 32.0),
+            child: Text.rich(
+              TextSpan(children: spans),
+            ),
+          ),
+          if (widget.showFooter) const ChapterNavigationFooter(),
+        ],
       ),
     );
   }

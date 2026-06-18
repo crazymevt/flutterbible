@@ -54,6 +54,16 @@ void main() {
       )
     );
 
+    // Insert Genesis for KJV
+    final genesisBookId = await db.into(db.books).insert(
+      BooksCompanion.insert(
+        versionId: 'KJV',
+        name: 'Genesis',
+        bookOrder: 1,
+        testament: 'OT',
+      )
+    );
+
     // Insert Verses
     final segments1 = [
       {"text": "In the beginning the Word already existed. The Word was with God, and the Word was God."},
@@ -130,6 +140,32 @@ void main() {
         verse: 3,
         textContent: "All things were made by him; and without him was not any thing made that was made.",
         segments: jsonEncode(kjvSeg3),
+      )
+    );
+
+    final genSeg1 = [
+      {"text": "In the beginning God created the heaven and the earth."},
+    ];
+
+    await db.into(db.verses).insert(
+      VersesCompanion.insert(
+        bookId: genesisBookId,
+        chapter: 1,
+        verse: 1,
+        textContent: "In the beginning God created the heaven and the earth.",
+        segments: jsonEncode(genSeg1),
+      )
+    );
+
+    // Insert Cross References
+    await db.into(db.crossReferences).insert(
+      CrossReferencesCompanion.insert(
+        sourceBookName: 'John',
+        sourceChapter: 1,
+        sourceVerse: 1,
+        targetBookName: 'Genesis',
+        targetChapter: 1,
+        targetVerse: 1,
       )
     );
 

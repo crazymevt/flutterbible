@@ -48,6 +48,5 @@ class SelectedVersesNotifier extends Notifier<Set<int>> {
     state = <int>{};
   }
 }
+
 final selectedVersesProvider = NotifierProvider<SelectedVersesNotifier, Set<int>>(() => SelectedVersesNotifier());
-
-

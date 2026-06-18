@@ -9,6 +9,7 @@ import 'flowing_paragraph_view.dart';
 import 'parallel_view.dart';
 import 'verse_action_bar.dart';
 import 'study_pane.dart';
+import 'book_chooser_sheet.dart';
 
 class ReaderScreen extends ConsumerStatefulWidget {
   const ReaderScreen({super.key});
@@ -60,7 +61,27 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('$bookName $chapter'),
+        title: InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: () {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              builder: (_) => const BookChooserSheet(),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('$bookName $chapter'),
+                const Icon(Icons.arrow_drop_down),
+              ],
+            ),
+          ),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.sync),
@@ -114,10 +135,11 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
             return const Center(child: Text('No verses found.'));
           }
 
+          Widget content;
           if (activeVersions.length == 1) {
             final versionId = activeVersions.first;
             final verses = versesMap[versionId] ?? [];
-            return _isFlowing
+            content = _isFlowing
                 ? FlowingParagraphView(
                     verses: verses,
                     selectedVerses: selectedVerses,
@@ -131,7 +153,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                     onVerseTap: (verseId) => ref.read(selectedVersesProvider.notifier).toggle(verseId),
                   );
           } else {
-            return ParallelView(
+            content = ParallelView(
               versesMap: versesMap,
               isFlowing: _isFlowing,
               selectedVerses: selectedVerses,
@@ -139,11 +161,23 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
               onVerseTap: (verseId) => ref.read(selectedVersesProvider.notifier).toggle(verseId),
             );
           }
+
+          return Stack(
+            children: [
+              Positioned.fill(child: content),
+              if (selectedVerses.isNotEmpty)
+                const Positioned(
+                  bottom: 32,
+                  left: 0,
+                  right: 0,
+                  child: Center(child: VerseActionBar()),
+                ),
+            ],
+          );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(child: Text('Error: $err')),
       ),
-      bottomNavigationBar: selectedVerses.isNotEmpty ? const VerseActionBar() : null,
     );
   }
 }

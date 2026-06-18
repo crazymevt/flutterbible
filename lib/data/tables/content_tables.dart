@@ -29,3 +29,15 @@ class Verses extends Table {
   TextColumn get textContent => text()(); // Plain text for search
   TextColumn get segments => text()(); // JSON string with rich segments
 }
+
+@DataClassName('CrossReference')
+class CrossReferences extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get sourceBookName => text()();
+  IntColumn get sourceChapter => integer()();
+  IntColumn get sourceVerse => integer()();
+  
+  TextColumn get targetBookName => text()();
+  IntColumn get targetChapter => integer()();
+  IntColumn get targetVerse => integer()();
+}

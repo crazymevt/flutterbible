@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'ui/reader/reader_screen.dart';
+import 'ui/main_shell.dart';
 
-void main() {
+void main() async {
   runApp(const ProviderScope(child: StudyBibleApp()));
 }
 
@@ -29,7 +29,7 @@ class StudyBibleApp extends StatelessWidget {
         useMaterial3: true,
       ),
       themeMode: ThemeMode.system,
-      home: const ReaderScreen(),
+      home: const MainShell(),
     );
   }
 }

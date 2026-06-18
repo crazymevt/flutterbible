@@ -1068,17 +1068,509 @@ class VersesCompanion extends UpdateCompanion<Verse> {
   }
 }
 
+class $CrossReferencesTable extends CrossReferences
+    with TableInfo<$CrossReferencesTable, CrossReference> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CrossReferencesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _sourceBookNameMeta = const VerificationMeta(
+    'sourceBookName',
+  );
+  @override
+  late final GeneratedColumn<String> sourceBookName = GeneratedColumn<String>(
+    'source_book_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sourceChapterMeta = const VerificationMeta(
+    'sourceChapter',
+  );
+  @override
+  late final GeneratedColumn<int> sourceChapter = GeneratedColumn<int>(
+    'source_chapter',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sourceVerseMeta = const VerificationMeta(
+    'sourceVerse',
+  );
+  @override
+  late final GeneratedColumn<int> sourceVerse = GeneratedColumn<int>(
+    'source_verse',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _targetBookNameMeta = const VerificationMeta(
+    'targetBookName',
+  );
+  @override
+  late final GeneratedColumn<String> targetBookName = GeneratedColumn<String>(
+    'target_book_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _targetChapterMeta = const VerificationMeta(
+    'targetChapter',
+  );
+  @override
+  late final GeneratedColumn<int> targetChapter = GeneratedColumn<int>(
+    'target_chapter',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _targetVerseMeta = const VerificationMeta(
+    'targetVerse',
+  );
+  @override
+  late final GeneratedColumn<int> targetVerse = GeneratedColumn<int>(
+    'target_verse',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    sourceBookName,
+    sourceChapter,
+    sourceVerse,
+    targetBookName,
+    targetChapter,
+    targetVerse,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cross_references';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CrossReference> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('source_book_name')) {
+      context.handle(
+        _sourceBookNameMeta,
+        sourceBookName.isAcceptableOrUnknown(
+          data['source_book_name']!,
+          _sourceBookNameMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceBookNameMeta);
+    }
+    if (data.containsKey('source_chapter')) {
+      context.handle(
+        _sourceChapterMeta,
+        sourceChapter.isAcceptableOrUnknown(
+          data['source_chapter']!,
+          _sourceChapterMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceChapterMeta);
+    }
+    if (data.containsKey('source_verse')) {
+      context.handle(
+        _sourceVerseMeta,
+        sourceVerse.isAcceptableOrUnknown(
+          data['source_verse']!,
+          _sourceVerseMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceVerseMeta);
+    }
+    if (data.containsKey('target_book_name')) {
+      context.handle(
+        _targetBookNameMeta,
+        targetBookName.isAcceptableOrUnknown(
+          data['target_book_name']!,
+          _targetBookNameMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_targetBookNameMeta);
+    }
+    if (data.containsKey('target_chapter')) {
+      context.handle(
+        _targetChapterMeta,
+        targetChapter.isAcceptableOrUnknown(
+          data['target_chapter']!,
+          _targetChapterMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_targetChapterMeta);
+    }
+    if (data.containsKey('target_verse')) {
+      context.handle(
+        _targetVerseMeta,
+        targetVerse.isAcceptableOrUnknown(
+          data['target_verse']!,
+          _targetVerseMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_targetVerseMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CrossReference map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CrossReference(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      sourceBookName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source_book_name'],
+      )!,
+      sourceChapter: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}source_chapter'],
+      )!,
+      sourceVerse: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}source_verse'],
+      )!,
+      targetBookName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}target_book_name'],
+      )!,
+      targetChapter: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}target_chapter'],
+      )!,
+      targetVerse: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}target_verse'],
+      )!,
+    );
+  }
+
+  @override
+  $CrossReferencesTable createAlias(String alias) {
+    return $CrossReferencesTable(attachedDatabase, alias);
+  }
+}
+
+class CrossReference extends DataClass implements Insertable<CrossReference> {
+  final int id;
+  final String sourceBookName;
+  final int sourceChapter;
+  final int sourceVerse;
+  final String targetBookName;
+  final int targetChapter;
+  final int targetVerse;
+  const CrossReference({
+    required this.id,
+    required this.sourceBookName,
+    required this.sourceChapter,
+    required this.sourceVerse,
+    required this.targetBookName,
+    required this.targetChapter,
+    required this.targetVerse,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['source_book_name'] = Variable<String>(sourceBookName);
+    map['source_chapter'] = Variable<int>(sourceChapter);
+    map['source_verse'] = Variable<int>(sourceVerse);
+    map['target_book_name'] = Variable<String>(targetBookName);
+    map['target_chapter'] = Variable<int>(targetChapter);
+    map['target_verse'] = Variable<int>(targetVerse);
+    return map;
+  }
+
+  CrossReferencesCompanion toCompanion(bool nullToAbsent) {
+    return CrossReferencesCompanion(
+      id: Value(id),
+      sourceBookName: Value(sourceBookName),
+      sourceChapter: Value(sourceChapter),
+      sourceVerse: Value(sourceVerse),
+      targetBookName: Value(targetBookName),
+      targetChapter: Value(targetChapter),
+      targetVerse: Value(targetVerse),
+    );
+  }
+
+  factory CrossReference.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CrossReference(
+      id: serializer.fromJson<int>(json['id']),
+      sourceBookName: serializer.fromJson<String>(json['sourceBookName']),
+      sourceChapter: serializer.fromJson<int>(json['sourceChapter']),
+      sourceVerse: serializer.fromJson<int>(json['sourceVerse']),
+      targetBookName: serializer.fromJson<String>(json['targetBookName']),
+      targetChapter: serializer.fromJson<int>(json['targetChapter']),
+      targetVerse: serializer.fromJson<int>(json['targetVerse']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'sourceBookName': serializer.toJson<String>(sourceBookName),
+      'sourceChapter': serializer.toJson<int>(sourceChapter),
+      'sourceVerse': serializer.toJson<int>(sourceVerse),
+      'targetBookName': serializer.toJson<String>(targetBookName),
+      'targetChapter': serializer.toJson<int>(targetChapter),
+      'targetVerse': serializer.toJson<int>(targetVerse),
+    };
+  }
+
+  CrossReference copyWith({
+    int? id,
+    String? sourceBookName,
+    int? sourceChapter,
+    int? sourceVerse,
+    String? targetBookName,
+    int? targetChapter,
+    int? targetVerse,
+  }) => CrossReference(
+    id: id ?? this.id,
+    sourceBookName: sourceBookName ?? this.sourceBookName,
+    sourceChapter: sourceChapter ?? this.sourceChapter,
+    sourceVerse: sourceVerse ?? this.sourceVerse,
+    targetBookName: targetBookName ?? this.targetBookName,
+    targetChapter: targetChapter ?? this.targetChapter,
+    targetVerse: targetVerse ?? this.targetVerse,
+  );
+  CrossReference copyWithCompanion(CrossReferencesCompanion data) {
+    return CrossReference(
+      id: data.id.present ? data.id.value : this.id,
+      sourceBookName: data.sourceBookName.present
+          ? data.sourceBookName.value
+          : this.sourceBookName,
+      sourceChapter: data.sourceChapter.present
+          ? data.sourceChapter.value
+          : this.sourceChapter,
+      sourceVerse: data.sourceVerse.present
+          ? data.sourceVerse.value
+          : this.sourceVerse,
+      targetBookName: data.targetBookName.present
+          ? data.targetBookName.value
+          : this.targetBookName,
+      targetChapter: data.targetChapter.present
+          ? data.targetChapter.value
+          : this.targetChapter,
+      targetVerse: data.targetVerse.present
+          ? data.targetVerse.value
+          : this.targetVerse,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CrossReference(')
+          ..write('id: $id, ')
+          ..write('sourceBookName: $sourceBookName, ')
+          ..write('sourceChapter: $sourceChapter, ')
+          ..write('sourceVerse: $sourceVerse, ')
+          ..write('targetBookName: $targetBookName, ')
+          ..write('targetChapter: $targetChapter, ')
+          ..write('targetVerse: $targetVerse')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    sourceBookName,
+    sourceChapter,
+    sourceVerse,
+    targetBookName,
+    targetChapter,
+    targetVerse,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CrossReference &&
+          other.id == this.id &&
+          other.sourceBookName == this.sourceBookName &&
+          other.sourceChapter == this.sourceChapter &&
+          other.sourceVerse == this.sourceVerse &&
+          other.targetBookName == this.targetBookName &&
+          other.targetChapter == this.targetChapter &&
+          other.targetVerse == this.targetVerse);
+}
+
+class CrossReferencesCompanion extends UpdateCompanion<CrossReference> {
+  final Value<int> id;
+  final Value<String> sourceBookName;
+  final Value<int> sourceChapter;
+  final Value<int> sourceVerse;
+  final Value<String> targetBookName;
+  final Value<int> targetChapter;
+  final Value<int> targetVerse;
+  const CrossReferencesCompanion({
+    this.id = const Value.absent(),
+    this.sourceBookName = const Value.absent(),
+    this.sourceChapter = const Value.absent(),
+    this.sourceVerse = const Value.absent(),
+    this.targetBookName = const Value.absent(),
+    this.targetChapter = const Value.absent(),
+    this.targetVerse = const Value.absent(),
+  });
+  CrossReferencesCompanion.insert({
+    this.id = const Value.absent(),
+    required String sourceBookName,
+    required int sourceChapter,
+    required int sourceVerse,
+    required String targetBookName,
+    required int targetChapter,
+    required int targetVerse,
+  }) : sourceBookName = Value(sourceBookName),
+       sourceChapter = Value(sourceChapter),
+       sourceVerse = Value(sourceVerse),
+       targetBookName = Value(targetBookName),
+       targetChapter = Value(targetChapter),
+       targetVerse = Value(targetVerse);
+  static Insertable<CrossReference> custom({
+    Expression<int>? id,
+    Expression<String>? sourceBookName,
+    Expression<int>? sourceChapter,
+    Expression<int>? sourceVerse,
+    Expression<String>? targetBookName,
+    Expression<int>? targetChapter,
+    Expression<int>? targetVerse,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (sourceBookName != null) 'source_book_name': sourceBookName,
+      if (sourceChapter != null) 'source_chapter': sourceChapter,
+      if (sourceVerse != null) 'source_verse': sourceVerse,
+      if (targetBookName != null) 'target_book_name': targetBookName,
+      if (targetChapter != null) 'target_chapter': targetChapter,
+      if (targetVerse != null) 'target_verse': targetVerse,
+    });
+  }
+
+  CrossReferencesCompanion copyWith({
+    Value<int>? id,
+    Value<String>? sourceBookName,
+    Value<int>? sourceChapter,
+    Value<int>? sourceVerse,
+    Value<String>? targetBookName,
+    Value<int>? targetChapter,
+    Value<int>? targetVerse,
+  }) {
+    return CrossReferencesCompanion(
+      id: id ?? this.id,
+      sourceBookName: sourceBookName ?? this.sourceBookName,
+      sourceChapter: sourceChapter ?? this.sourceChapter,
+      sourceVerse: sourceVerse ?? this.sourceVerse,
+      targetBookName: targetBookName ?? this.targetBookName,
+      targetChapter: targetChapter ?? this.targetChapter,
+      targetVerse: targetVerse ?? this.targetVerse,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (sourceBookName.present) {
+      map['source_book_name'] = Variable<String>(sourceBookName.value);
+    }
+    if (sourceChapter.present) {
+      map['source_chapter'] = Variable<int>(sourceChapter.value);
+    }
+    if (sourceVerse.present) {
+      map['source_verse'] = Variable<int>(sourceVerse.value);
+    }
+    if (targetBookName.present) {
+      map['target_book_name'] = Variable<String>(targetBookName.value);
+    }
+    if (targetChapter.present) {
+      map['target_chapter'] = Variable<int>(targetChapter.value);
+    }
+    if (targetVerse.present) {
+      map['target_verse'] = Variable<int>(targetVerse.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CrossReferencesCompanion(')
+          ..write('id: $id, ')
+          ..write('sourceBookName: $sourceBookName, ')
+          ..write('sourceChapter: $sourceChapter, ')
+          ..write('sourceVerse: $sourceVerse, ')
+          ..write('targetBookName: $targetBookName, ')
+          ..write('targetChapter: $targetChapter, ')
+          ..write('targetVerse: $targetVerse')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$ContentStore extends GeneratedDatabase {
   _$ContentStore(QueryExecutor e) : super(e);
   $ContentStoreManager get managers => $ContentStoreManager(this);
   late final $VersionsTable versions = $VersionsTable(this);
   late final $BooksTable books = $BooksTable(this);
   late final $VersesTable verses = $VersesTable(this);
+  late final $CrossReferencesTable crossReferences = $CrossReferencesTable(
+    this,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [versions, books, verses];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+    versions,
+    books,
+    verses,
+    crossReferences,
+  ];
 }
 
 typedef $$VersionsTableCreateCompanionBuilder =
@@ -2078,6 +2570,256 @@ typedef $$VersesTableProcessedTableManager =
       Verse,
       PrefetchHooks Function({bool bookId})
     >;
+typedef $$CrossReferencesTableCreateCompanionBuilder =
+    CrossReferencesCompanion Function({
+      Value<int> id,
+      required String sourceBookName,
+      required int sourceChapter,
+      required int sourceVerse,
+      required String targetBookName,
+      required int targetChapter,
+      required int targetVerse,
+    });
+typedef $$CrossReferencesTableUpdateCompanionBuilder =
+    CrossReferencesCompanion Function({
+      Value<int> id,
+      Value<String> sourceBookName,
+      Value<int> sourceChapter,
+      Value<int> sourceVerse,
+      Value<String> targetBookName,
+      Value<int> targetChapter,
+      Value<int> targetVerse,
+    });
+
+class $$CrossReferencesTableFilterComposer
+    extends Composer<_$ContentStore, $CrossReferencesTable> {
+  $$CrossReferencesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sourceBookName => $composableBuilder(
+    column: $table.sourceBookName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sourceChapter => $composableBuilder(
+    column: $table.sourceChapter,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sourceVerse => $composableBuilder(
+    column: $table.sourceVerse,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get targetBookName => $composableBuilder(
+    column: $table.targetBookName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get targetChapter => $composableBuilder(
+    column: $table.targetChapter,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get targetVerse => $composableBuilder(
+    column: $table.targetVerse,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CrossReferencesTableOrderingComposer
+    extends Composer<_$ContentStore, $CrossReferencesTable> {
+  $$CrossReferencesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sourceBookName => $composableBuilder(
+    column: $table.sourceBookName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sourceChapter => $composableBuilder(
+    column: $table.sourceChapter,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sourceVerse => $composableBuilder(
+    column: $table.sourceVerse,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get targetBookName => $composableBuilder(
+    column: $table.targetBookName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get targetChapter => $composableBuilder(
+    column: $table.targetChapter,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get targetVerse => $composableBuilder(
+    column: $table.targetVerse,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CrossReferencesTableAnnotationComposer
+    extends Composer<_$ContentStore, $CrossReferencesTable> {
+  $$CrossReferencesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get sourceBookName => $composableBuilder(
+    column: $table.sourceBookName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get sourceChapter => $composableBuilder(
+    column: $table.sourceChapter,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get sourceVerse => $composableBuilder(
+    column: $table.sourceVerse,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get targetBookName => $composableBuilder(
+    column: $table.targetBookName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get targetChapter => $composableBuilder(
+    column: $table.targetChapter,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get targetVerse => $composableBuilder(
+    column: $table.targetVerse,
+    builder: (column) => column,
+  );
+}
+
+class $$CrossReferencesTableTableManager
+    extends
+        RootTableManager<
+          _$ContentStore,
+          $CrossReferencesTable,
+          CrossReference,
+          $$CrossReferencesTableFilterComposer,
+          $$CrossReferencesTableOrderingComposer,
+          $$CrossReferencesTableAnnotationComposer,
+          $$CrossReferencesTableCreateCompanionBuilder,
+          $$CrossReferencesTableUpdateCompanionBuilder,
+          (
+            CrossReference,
+            BaseReferences<
+              _$ContentStore,
+              $CrossReferencesTable,
+              CrossReference
+            >,
+          ),
+          CrossReference,
+          PrefetchHooks Function()
+        > {
+  $$CrossReferencesTableTableManager(
+    _$ContentStore db,
+    $CrossReferencesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CrossReferencesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CrossReferencesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CrossReferencesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> sourceBookName = const Value.absent(),
+                Value<int> sourceChapter = const Value.absent(),
+                Value<int> sourceVerse = const Value.absent(),
+                Value<String> targetBookName = const Value.absent(),
+                Value<int> targetChapter = const Value.absent(),
+                Value<int> targetVerse = const Value.absent(),
+              }) => CrossReferencesCompanion(
+                id: id,
+                sourceBookName: sourceBookName,
+                sourceChapter: sourceChapter,
+                sourceVerse: sourceVerse,
+                targetBookName: targetBookName,
+                targetChapter: targetChapter,
+                targetVerse: targetVerse,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String sourceBookName,
+                required int sourceChapter,
+                required int sourceVerse,
+                required String targetBookName,
+                required int targetChapter,
+                required int targetVerse,
+              }) => CrossReferencesCompanion.insert(
+                id: id,
+                sourceBookName: sourceBookName,
+                sourceChapter: sourceChapter,
+                sourceVerse: sourceVerse,
+                targetBookName: targetBookName,
+                targetChapter: targetChapter,
+                targetVerse: targetVerse,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CrossReferencesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ContentStore,
+      $CrossReferencesTable,
+      CrossReference,
+      $$CrossReferencesTableFilterComposer,
+      $$CrossReferencesTableOrderingComposer,
+      $$CrossReferencesTableAnnotationComposer,
+      $$CrossReferencesTableCreateCompanionBuilder,
+      $$CrossReferencesTableUpdateCompanionBuilder,
+      (
+        CrossReference,
+        BaseReferences<_$ContentStore, $CrossReferencesTable, CrossReference>,
+      ),
+      CrossReference,
+      PrefetchHooks Function()
+    >;
 
 class $ContentStoreManager {
   final _$ContentStore _db;
@@ -2088,4 +2830,6 @@ class $ContentStoreManager {
       $$BooksTableTableManager(_db, _db.books);
   $$VersesTableTableManager get verses =>
       $$VersesTableTableManager(_db, _db.verses);
+  $$CrossReferencesTableTableManager get crossReferences =>
+      $$CrossReferencesTableTableManager(_db, _db.crossReferences);
 }
