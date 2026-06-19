@@ -10,6 +10,7 @@ import 'parallel_view.dart';
 import 'verse_action_bar.dart';
 import 'book_chooser_sheet.dart';
 import 'study_pane.dart';
+import 'mobile_tools_drawer.dart';
 import 'audio_player_widget.dart';
 import '../app_drawer.dart';
 import '../../app/dashboard_providers.dart';
@@ -215,18 +216,27 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
               });
             },
           ),
-          Builder(
-            builder: (context) {
-              return IconButton(
-                icon: const Icon(Icons.menu_book),
-                tooltip: 'Study Pane',
+          if (MediaQuery.sizeOf(context).width <= 800)
+            Builder(
+              builder: (context) => IconButton(
+                icon: const Icon(Icons.build),
+                tooltip: 'Tools',
                 onPressed: () => Scaffold.of(context).openEndDrawer(),
-              );
-            }
-          ),
+              ),
+            )
+          else
+            Builder(
+              builder: (context) {
+                return IconButton(
+                  icon: const Icon(Icons.menu_book),
+                  tooltip: 'Study Pane',
+                  onPressed: () => Scaffold.of(context).openEndDrawer(),
+                );
+              }
+            ),
         ],
       ),
-      endDrawer: const StudyPane(),
+      endDrawer: MediaQuery.sizeOf(context).width <= 800 ? const MobileToolsDrawer() : const StudyPane(),
       body: parallelVersesAsync.when(
         data: (versesMap) {
           if (versesMap.isEmpty) {
