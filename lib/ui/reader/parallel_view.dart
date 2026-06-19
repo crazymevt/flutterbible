@@ -47,7 +47,11 @@ class _ParallelViewState extends ConsumerState<ParallelView> {
   void _checkScrollTarget() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final targetVerse = ref.read(targetVerseToScrollProvider);
-      if (targetVerse != null && itemScrollController.isAttached) {
+      if (targetVerse != null) {
+        if (!itemScrollController.isAttached) {
+          _checkScrollTarget();
+          return;
+        }
         final Set<int> allVerseNumbers = {};
         for (final verses in widget.versesMap.values) {
           allVerseNumbers.addAll(verses.map((v) => v.verse));
@@ -56,9 +60,9 @@ class _ParallelViewState extends ConsumerState<ParallelView> {
         final targetIndex = verseNumbers.indexOf(targetVerse);
         if (targetIndex != -1) {
           itemScrollController.jumpTo(index: targetIndex);
+          // Clear it so we don't jump again on rebuild
+          ref.read(targetVerseToScrollProvider.notifier).set(null);
         }
-        // Clear it so we don't jump again on rebuild
-        ref.read(targetVerseToScrollProvider.notifier).set(null);
       }
     });
   }
