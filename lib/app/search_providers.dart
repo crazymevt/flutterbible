@@ -1,16 +1,18 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:drift/drift.dart';
+import '../domain/importer/mybible_verse_parser.dart';
 import 'content_providers.dart';
 import 'user_providers.dart';
 
 class SearchResult {
   final String type; // 'verse', 'note', 'commentary', 'dictionary'
-  final int referenceId;
+  final String referenceId;
   final String textContent;
   final String title;
   final String? book;
   final int? chapter;
   final int? verse;
+  final String? selectedVerses;
   final int? bookOrder;
   final String? sourceName;
 
@@ -22,6 +24,7 @@ class SearchResult {
     this.book,
     this.chapter,
     this.verse,
+    this.selectedVerses,
     this.bookOrder,
     this.sourceName,
   });
@@ -82,7 +85,7 @@ final globalSearchResultsProvider = FutureProvider<List<SearchResult>>((
       .get();
   for (final row in contentRows) {
     final type = row.read<String>('type');
-    final refId = row.read<int>('reference_id');
+    final refId = row.read<int>('reference_id').toString();
     final text = row.read<String>('text_content');
 
     if (type == 'verse') {
@@ -90,11 +93,17 @@ final globalSearchResultsProvider = FutureProvider<List<SearchResult>>((
       final cNum = row.readNullable<int>('verse_chapter') ?? 1;
       final vNum = row.readNullable<int>('verse_num') ?? 1;
       final bOrder = row.readNullable<int>('verse_book_order') ?? 0;
+      
+      final cleanText = MyBibleVerseParser()
+          .parseVerse(text)
+          .map((s) => s.text + (s.footnoteText ?? ''))
+          .join('');
+
       results.add(
         SearchResult(
           type: type,
           referenceId: refId,
-          textContent: text,
+          textContent: cleanText,
           title: '$bName $cNum:$vNum',
           book: bName,
           chapter: cNum,
@@ -141,7 +150,7 @@ final globalSearchResultsProvider = FutureProvider<List<SearchResult>>((
       f.type, 
       f.reference_id, 
       f.text_content,
-      n.book_name as note_book, n.chapter as note_chapter, n.verse as note_verse
+      n.book_name as note_book, n.chapter as note_chapter, n.verse as note_verse, n.selected_verses as note_selected_verses
     FROM user_search f
     LEFT JOIN notes n ON f.type = 'note' AND f.reference_id = n.id
     WHERE user_search MATCH ?
@@ -159,22 +168,32 @@ final globalSearchResultsProvider = FutureProvider<List<SearchResult>>((
     for (final row in userRows) {
       final type = row.readNullable<String>('type');
       if (type == null) continue;
-      final refId = row.readNullable<int>('reference_id') ?? 0;
+      final refId = row.readNullable<String>('reference_id') ?? '';
       final text = row.readNullable<String>('text_content') ?? '';
 
       if (type == 'note') {
         final bName = row.readNullable<String>('note_book') ?? 'Unknown Book';
         final cNum = row.readNullable<int>('note_chapter') ?? 1;
         final vNum = row.readNullable<int>('note_verse');
-        final target = vNum != null ? '$bName $cNum:$vNum' : '$bName $cNum';
+        final sVerses = row.readNullable<String>('note_selected_verses');
+        
+        String targetStr = '$bName $cNum';
+        if (sVerses != null) {
+            targetStr += sVerses.contains(',') ? ':$sVerses' : ':$sVerses';
+        } else if (vNum != null) {
+            targetStr += ':$vNum';
+        }
+
         results.add(
           SearchResult(
             type: type,
             referenceId: refId,
             textContent: text,
-            title: 'Note: $target',
+            title: 'Note: $targetStr',
             book: bName,
             chapter: cNum,
+            verse: vNum,
+            selectedVerses: sVerses,
           ),
         );
       }

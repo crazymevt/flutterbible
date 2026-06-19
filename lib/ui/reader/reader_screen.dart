@@ -16,6 +16,7 @@ import 'commentary_panel.dart';
 import '../app_drawer.dart';
 import '../../app/dashboard_providers.dart';
 import 'dart:async';
+import 'package:flutter/services.dart';
 
 class ReaderScreen extends ConsumerStatefulWidget {
   const ReaderScreen({super.key});
@@ -154,17 +155,28 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
       _updateChapterTracking(bookName, chapter);
     }
 
-    return Scaffold(
-      drawer: const AppDrawer(),
-      appBar: AppBar(
-        title: Row(
-          children: [
-            IconButton(
-              icon: const Icon(Icons.chevron_left),
-              tooltip: 'Previous Chapter',
-              onPressed: () =>
-                  ref.read(navigationControllerProvider).previousChapter(),
-            ),
+    return Focus(
+      autofocus: true,
+      onKeyEvent: (node, event) {
+        if (event.logicalKey == LogicalKeyboardKey.escape) {
+          if (ref.read(selectedVersesProvider).isNotEmpty) {
+            ref.read(selectedVersesProvider.notifier).clear();
+            return KeyEventResult.handled;
+          }
+        }
+        return KeyEventResult.ignored;
+      },
+      child: Scaffold(
+        drawer: const AppDrawer(),
+        appBar: AppBar(
+          title: Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.chevron_left),
+                tooltip: 'Previous Chapter',
+                onPressed: () =>
+                    ref.read(navigationControllerProvider).previousChapter(),
+              ),
             InkWell(
               borderRadius: BorderRadius.circular(8),
               onTap: () {
@@ -340,6 +352,6 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(child: Text('Error: $err')),
       ),
-    );
+    ));
   }
 }

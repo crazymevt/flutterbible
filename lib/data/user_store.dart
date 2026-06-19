@@ -28,7 +28,7 @@ class UserStore extends _$UserStore {
   UserStore([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration {
@@ -40,7 +40,7 @@ class UserStore extends _$UserStore {
         ''');
         await customStatement('''
           CREATE TRIGGER IF NOT EXISTS notes_ai AFTER INSERT ON notes BEGIN
-            INSERT INTO user_search(rowid, type, reference_id, text_content) VALUES (new.id, 'note', new.id, new.content);
+            INSERT INTO user_search(type, reference_id, text_content) VALUES ('note', new.id, new.content);
           END;
         ''');
         await customStatement('''
@@ -67,7 +67,7 @@ class UserStore extends _$UserStore {
           ''');
           await customStatement('''
             CREATE TRIGGER IF NOT EXISTS notes_ai AFTER INSERT ON notes BEGIN
-              INSERT INTO user_search(rowid, type, reference_id, text_content) VALUES (new.id, 'note', new.id, new.content);
+              INSERT INTO user_search(type, reference_id, text_content) VALUES ('note', new.id, new.content);
             END;
           ''');
           await customStatement('''
@@ -97,6 +97,17 @@ class UserStore extends _$UserStore {
           await m.createTable(readingPlans);
           await m.createTable(readingPlanDays);
           await m.createTable(readingPlanItems);
+        }
+        if (from < 7) {
+          await m.addColumn(notes, notes.selectedVerses);
+        }
+        if (from < 8) {
+          await customStatement('DROP TRIGGER IF EXISTS notes_ai;');
+          await customStatement('''
+            CREATE TRIGGER IF NOT EXISTS notes_ai AFTER INSERT ON notes BEGIN
+              INSERT INTO user_search(type, reference_id, text_content) VALUES ('note', new.id, new.content);
+            END;
+          ''');
         }
       },
     );

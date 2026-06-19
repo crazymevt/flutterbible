@@ -7,6 +7,7 @@ import '../../app/app_state.dart';
 import '../../app/reader_state.dart';
 import 'dictionary_panel.dart';
 import 'commentary_panel.dart';
+import 'notes_panel.dart';
 
 class SearchPanel extends ConsumerStatefulWidget {
   const SearchPanel({super.key});
@@ -162,7 +163,26 @@ class _ResultsList extends ConsumerWidget {
                 if (item.chapter != null) {
                   ref.read(selectedChapterProvider.notifier).set(item.chapter!);
                 }
-                if (item.verse != null) {
+                
+                if (item.selectedVerses != null) {
+                  ref.read(selectedVersesProvider.notifier).clear();
+                  final versesToSelect = item.selectedVerses!
+                      .split(',')
+                      .map((e) => int.tryParse(e.trim()) ?? 0)
+                      .where((e) => e > 0)
+                      .toList();
+                  for (final v in versesToSelect) {
+                    ref.read(selectedVersesProvider.notifier).toggle(v);
+                  }
+                  if (versesToSelect.isNotEmpty) {
+                    ref
+                        .read(targetVerseToScrollProvider.notifier)
+                        .set(versesToSelect.first);
+                    ref
+                        .read(navigationControllerProvider)
+                        .recordHistory(verse: versesToSelect.first);
+                  }
+                } else if (item.verse != null) {
                   ref
                       .read(targetVerseToScrollProvider.notifier)
                       .set(item.verse!);
@@ -177,6 +197,27 @@ class _ResultsList extends ConsumerWidget {
 
                 if (MediaQuery.sizeOf(context).width <= 800) {
                   Navigator.of(context).pop();
+                }
+                
+                if (item.type == 'note') {
+                  if (MediaQuery.sizeOf(context).width > 800) {
+                    ref.read(activeToolProvider.notifier).setTool(ActiveTool.notes);
+                  } else {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (_) => Container(
+                        height: MediaQuery.sizeOf(context).height * 0.8,
+                        clipBehavior: Clip.antiAlias,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surface,
+                          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                        ),
+                        child: const NotesPanel(),
+                      ),
+                    );
+                  }
                 }
               }
             } else if (item.type == 'dictionary') {
