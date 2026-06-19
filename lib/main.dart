@@ -105,17 +105,17 @@ class _StudyBibleAppState extends ConsumerState<StudyBibleApp> with WindowListen
     final String? actualFontFamily = fontFamily == 'System Default' ? null : fontFamily;
 
     ThemeData buildTheme(Brightness brightness, Color seedColor) {
-      final baseTheme = ThemeData(
+      final typography = Typography.material2021(platform: defaultTargetPlatform);
+      final baseTextTheme = brightness == Brightness.light ? typography.black : typography.white;
+
+      return ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: seedColor,
           brightness: brightness,
         ),
         useMaterial3: true,
         fontFamily: actualFontFamily,
-      );
-
-      return baseTheme.copyWith(
-        textTheme: baseTheme.textTheme.apply(
+        textTheme: baseTextTheme.apply(
           fontFamily: actualFontFamily,
           fontSizeDelta: fontSizeDelta,
         ),
