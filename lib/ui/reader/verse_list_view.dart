@@ -14,6 +14,7 @@ class VerseListView extends ConsumerStatefulWidget {
   final Set<int> selectedVerses;
   final Map<int, String> savedHighlights;
   final Function(int) onVerseTap;
+  final ValueChanged<int>? onFootnoteTap;
   final ItemScrollController? externalScrollController;
   final ItemPositionsListener? externalPositionsListener;
   final bool showFooter;
@@ -24,6 +25,7 @@ class VerseListView extends ConsumerStatefulWidget {
     required this.selectedVerses,
     required this.savedHighlights,
     required this.onVerseTap,
+    this.onFootnoteTap,
     this.externalScrollController,
     this.externalPositionsListener,
     this.showFooter = true,
@@ -35,7 +37,8 @@ class VerseListView extends ConsumerStatefulWidget {
 
 class _VerseListViewState extends ConsumerState<VerseListView> {
   final ItemScrollController itemScrollController = ItemScrollController();
-  final ItemPositionsListener itemPositionsListener = ItemPositionsListener.create();
+  final ItemPositionsListener itemPositionsListener =
+      ItemPositionsListener.create();
 
   @override
   void initState() {
@@ -57,7 +60,9 @@ class _VerseListViewState extends ConsumerState<VerseListView> {
           _checkScrollTarget();
           return;
         }
-        final targetIndex = widget.verses.indexWhere((v) => v.verse == targetVerse);
+        final targetIndex = widget.verses.indexWhere(
+          (v) => v.verse == targetVerse,
+        );
         if (targetIndex != -1) {
           itemScrollController.jumpTo(index: targetIndex);
           ref.read(targetVerseToScrollProvider.notifier).set(null);
@@ -72,7 +77,7 @@ class _VerseListViewState extends ConsumerState<VerseListView> {
         TextSpan(
           text: verse.textContent,
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(height: 1.6),
-        )
+        ),
       ];
     }
     try {
@@ -85,20 +90,53 @@ class _VerseListViewState extends ConsumerState<VerseListView> {
           continue; // skip leading breaks
         }
         hasText = true;
-        
+
         if (seg.isParagraphBreak) {
           spans.add(const TextSpan(text: '\n\n'));
         } else if (seg.isLineBreak) {
           spans.add(const TextSpan(text: '\n'));
-        } else {
-          spans.add(TextSpan(
-            text: seg.text,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  height: 1.6,
-                  fontStyle: seg.isItalic ? FontStyle.italic : null,
-                  color: seg.isJesusWords ? Colors.red.shade700 : null,
+        } else if (seg.isFootnote) {
+          spans.add(
+            WidgetSpan(
+              alignment: PlaceholderAlignment.top,
+              child: GestureDetector(
+                onTap: () {
+                  widget.onVerseTap(verse.verse);
+                  widget.onFootnoteTap?.call(verse.verse);
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 2,
+                    vertical: 2,
+                  ),
+                  margin: const EdgeInsets.only(left: 2, right: 2),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    seg.footnoteText ?? 'f',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 10,
+                    ),
+                  ),
                 ),
-          ));
+              ),
+            ),
+          );
+        } else {
+          spans.add(
+            TextSpan(
+              text: seg.text,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                height: 1.6,
+                fontStyle: seg.isItalic ? FontStyle.italic : null,
+                color: seg.isJesusWords ? Colors.red.shade700 : null,
+              ),
+            ),
+          );
         }
       }
       return spans;
@@ -107,7 +145,7 @@ class _VerseListViewState extends ConsumerState<VerseListView> {
         TextSpan(
           text: verse.textContent,
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(height: 1.6),
-        )
+        ),
       ];
     }
   }
@@ -126,39 +164,41 @@ class _VerseListViewState extends ConsumerState<VerseListView> {
         final verse = widget.verses[index];
         final isSelected = widget.selectedVerses.contains(verse.verse);
         final highlightHex = widget.savedHighlights[verse.verse];
-        final highlightColor = highlightHex != null 
-            ? Color(int.parse(highlightHex.replaceFirst('#', '0xFF'))) 
+        final highlightColor = highlightHex != null
+            ? Color(int.parse(highlightHex.replaceFirst('#', '0xFF')))
             : null;
 
         final bgColor = isSelected
-            ? Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5)
+            ? Theme.of(
+                context,
+              ).colorScheme.primaryContainer.withValues(alpha: 0.5)
             : highlightColor?.withValues(alpha: 0.2);
 
-          final verseSpacing = ref.watch(appVerseSpacingProvider);
+        final verseSpacing = ref.watch(appVerseSpacingProvider);
 
-          return Padding(
-            padding: EdgeInsets.symmetric(vertical: verseSpacing / 2),
-            child: ListTile(
-              tileColor: bgColor,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
-              title: Text.rich(
-                TextSpan(
-                  children: [
-                    TextSpan(
-                      text: '${verse.verse} ',
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: Theme.of(context).colorScheme.primary,
-                            fontWeight: FontWeight.bold,
-                          ),
+        return Padding(
+          padding: EdgeInsets.symmetric(vertical: verseSpacing / 2),
+          child: ListTile(
+            tileColor: bgColor,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
+            title: Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: '${verse.verse} ',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.bold,
                     ),
-                    ..._buildVerseSpans(context, verse),
-                  ],
-                ),
+                  ),
+                  ..._buildVerseSpans(context, verse),
+                ],
               ),
-              onTap: () => widget.onVerseTap(verse.verse),
             ),
-          );
-        },
-      );
+            onTap: () => widget.onVerseTap(verse.verse),
+          ),
+        );
+      },
+    );
   }
 }

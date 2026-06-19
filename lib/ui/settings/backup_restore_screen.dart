@@ -12,7 +12,8 @@ class BackupRestoreScreen extends ConsumerStatefulWidget {
   const BackupRestoreScreen({super.key});
 
   @override
-  ConsumerState<BackupRestoreScreen> createState() => _BackupRestoreScreenState();
+  ConsumerState<BackupRestoreScreen> createState() =>
+      _BackupRestoreScreenState();
 }
 
 class _BackupRestoreScreenState extends ConsumerState<BackupRestoreScreen> {
@@ -66,7 +67,10 @@ class _BackupRestoreScreenState extends ConsumerState<BackupRestoreScreen> {
       if (mounted) {
         setState(() => _statusMessage = 'Error: $e');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Backup failed: $e'), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text('Backup failed: $e'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     } finally {
@@ -93,7 +97,10 @@ class _BackupRestoreScreenState extends ConsumerState<BackupRestoreScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Invalid backup file: $e'), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text('Invalid backup file: $e'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
       return;
@@ -124,7 +131,9 @@ class _BackupRestoreScreenState extends ConsumerState<BackupRestoreScreen> {
       );
 
       if (mounted) {
-        setState(() => _statusMessage = 'Restore complete! Please restart the app.');
+        setState(
+          () => _statusMessage = 'Restore complete! Please restart the app.',
+        );
         await showDialog(
           context: context,
           barrierDismissible: false,
@@ -148,7 +157,10 @@ class _BackupRestoreScreenState extends ConsumerState<BackupRestoreScreen> {
       if (mounted) {
         setState(() => _statusMessage = 'Error: $e');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Restore failed: $e'), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text('Restore failed: $e'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     } finally {
@@ -161,9 +173,7 @@ class _BackupRestoreScreenState extends ConsumerState<BackupRestoreScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Backup & Restore'),
-      ),
+      appBar: AppBar(title: const Text('Backup & Restore')),
       drawer: const AppDrawer(),
       body: Center(
         child: ConstrainedBox(
@@ -180,7 +190,11 @@ class _BackupRestoreScreenState extends ConsumerState<BackupRestoreScreen> {
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.backup, color: theme.colorScheme.primary, size: 28),
+                          Icon(
+                            Icons.backup,
+                            color: theme.colorScheme.primary,
+                            size: 28,
+                          ),
                           const SizedBox(width: 12),
                           Text(
                             'Create Backup',
@@ -235,7 +249,11 @@ class _BackupRestoreScreenState extends ConsumerState<BackupRestoreScreen> {
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.restore, color: theme.colorScheme.secondary, size: 28),
+                          Icon(
+                            Icons.restore,
+                            color: theme.colorScheme.secondary,
+                            size: 28,
+                          ),
                           const SizedBox(width: 12),
                           Text(
                             'Restore from Backup',
@@ -257,12 +275,18 @@ class _BackupRestoreScreenState extends ConsumerState<BackupRestoreScreen> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.errorContainer.withValues(alpha: 0.3),
+                          color: theme.colorScheme.errorContainer.withValues(
+                            alpha: 0.3,
+                          ),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Row(
                           children: [
-                            Icon(Icons.warning_amber_rounded, color: theme.colorScheme.error, size: 20),
+                            Icon(
+                              Icons.warning_amber_rounded,
+                              color: theme.colorScheme.error,
+                              size: 20,
+                            ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
@@ -362,12 +386,24 @@ class _RestoreConfirmDialog extends StatelessWidget {
             style: theme.textTheme.bodyMedium,
           ),
           const SizedBox(height: 16),
-          _InfoRow(label: 'Created', value: _formatDate(info.manifest.createdAt)),
+          _InfoRow(
+            label: 'Created',
+            value: _formatDate(info.manifest.createdAt),
+          ),
           _InfoRow(label: 'Size', value: _formatBytes(info.fileSizeBytes)),
-          _InfoRow(label: 'User data', value: info.hasUserDb ? 'Included' : 'Not included'),
-          _InfoRow(label: 'Downloaded content', value: info.hasContentDb ? 'Included' : 'Not included'),
+          _InfoRow(
+            label: 'User data',
+            value: info.hasUserDb ? 'Included' : 'Not included',
+          ),
+          _InfoRow(
+            label: 'Downloaded content',
+            value: info.hasContentDb ? 'Included' : 'Not included',
+          ),
           if (info.manifest.deviceId != null)
-            _InfoRow(label: 'Source device', value: info.manifest.deviceId!.substring(0, 8)),
+            _InfoRow(
+              label: 'Source device',
+              value: info.manifest.deviceId!.substring(0, 8),
+            ),
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(10),
@@ -377,7 +413,11 @@ class _RestoreConfirmDialog extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Icon(Icons.warning_amber_rounded, color: theme.colorScheme.error, size: 18),
+                Icon(
+                  Icons.warning_amber_rounded,
+                  color: theme.colorScheme.error,
+                  size: 18,
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -433,8 +473,18 @@ class _InfoRow extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey)),
-          Text(value, style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold)),
+          Text(
+            label,
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: Colors.grey),
+          ),
+          Text(
+            value,
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold),
+          ),
         ],
       ),
     );

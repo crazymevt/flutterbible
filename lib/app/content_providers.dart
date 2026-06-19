@@ -18,7 +18,10 @@ final versionsProvider = FutureProvider<List<Version>>((ref) {
   return store.select(store.versions).get();
 });
 
-final booksForVersionProvider = FutureProvider.family<List<Book>, String>((ref, versionId) {
+final booksForVersionProvider = FutureProvider.family<List<Book>, String>((
+  ref,
+  versionId,
+) {
   final store = ref.watch(contentStoreProvider);
   return (store.select(store.books)
         ..where((b) => b.versionId.equals(versionId))
@@ -26,69 +29,94 @@ final booksForVersionProvider = FutureProvider.family<List<Book>, String>((ref, 
       .get();
 });
 
-final chapterCountProvider = FutureProvider.family<int, int>((ref, bookId) async {
+final chapterCountProvider = FutureProvider.family<int, int>((
+  ref,
+  bookId,
+) async {
   final store = ref.watch(contentStoreProvider);
   final maxChapterExpr = store.verses.chapter.max();
   final query = store.selectOnly(store.verses)
     ..addColumns([maxChapterExpr])
     ..where(store.verses.bookId.equals(bookId));
-  
+
   final result = await query.getSingle();
   return result.read(maxChapterExpr) ?? 1;
 });
 
-final versesForChapterProvider = FutureProvider.family<List<Verse>, ({int bookId, int chapter})>((ref, args) {
-  final store = ref.watch(contentStoreProvider);
-  return (store.select(store.verses)..where((v) => v.bookId.equals(args.bookId) & v.chapter.equals(args.chapter))).get();
-});
+final versesForChapterProvider =
+    FutureProvider.family<List<Verse>, ({int bookId, int chapter})>((
+      ref,
+      args,
+    ) {
+      final store = ref.watch(contentStoreProvider);
+      return (store.select(store.verses)..where(
+            (v) =>
+                v.bookId.equals(args.bookId) & v.chapter.equals(args.chapter),
+          ))
+          .get();
+    });
 
-final bookByNameProvider = FutureProvider.family<Book?, ({String versionId, String name})>((ref, args) async {
-  final books = await ref.watch(booksForVersionProvider(args.versionId).future);
-  return books.where((b) {
-    final bName = b.name.toLowerCase();
-    final aName = args.name.toLowerCase();
-    if (bName == aName) return true;
-    if (bName == '${aName}s') return true;
-    if ('${bName}s' == aName) return true;
-    return false;
-  }).firstOrNull;
-});
-
+final bookByNameProvider =
+    FutureProvider.family<Book?, ({String versionId, String name})>((
+      ref,
+      args,
+    ) async {
+      final books = await ref.watch(
+        booksForVersionProvider(args.versionId).future,
+      );
+      return books.where((b) {
+        final bName = b.name.toLowerCase();
+        final aName = args.name.toLowerCase();
+        if (bName == aName) return true;
+        if (bName == '${aName}s') return true;
+        if ('${bName}s' == aName) return true;
+        return false;
+      }).firstOrNull;
+    });
 
 final validActiveVersionsProvider = FutureProvider<List<String>>((ref) async {
   final activeVersions = ref.watch(activeVersionsProvider);
   final installedVersions = await ref.watch(versionsProvider.future);
-  
+
   if (installedVersions.isEmpty) return [];
-  
-  final valid = activeVersions.where((av) => installedVersions.any((iv) => iv.id == av)).toList();
-  
+
+  final valid = activeVersions
+      .where((av) => installedVersions.any((iv) => iv.id == av))
+      .toList();
+
   List<String> finalVersions = valid;
   if (valid.isEmpty) {
     finalVersions = [installedVersions.first.id];
   }
 
-  if (finalVersions.length != activeVersions.length || !const IterableEquality().equals(finalVersions, activeVersions)) {
+  if (finalVersions.length != activeVersions.length ||
+      !const IterableEquality().equals(finalVersions, activeVersions)) {
     Future.microtask(() {
       if (ref.exists(activeVersionsProvider)) {
         ref.read(activeVersionsProvider.notifier).set(finalVersions);
       }
     });
   }
-  
+
   return finalVersions;
 });
 
-final parallelVersesProvider = FutureProvider<Map<String, List<Verse>>>((ref) async {
+final parallelVersesProvider = FutureProvider<Map<String, List<Verse>>>((
+  ref,
+) async {
   final versions = await ref.watch(validActiveVersionsProvider.future);
   final bookName = ref.watch(selectedBookNameProvider);
   final chapter = ref.watch(selectedChapterProvider);
 
   final map = <String, List<Verse>>{};
   for (final versionId in versions) {
-    final book = await ref.watch(bookByNameProvider((versionId: versionId, name: bookName)).future);
+    final book = await ref.watch(
+      bookByNameProvider((versionId: versionId, name: bookName)).future,
+    );
     if (book != null) {
-      final verses = await ref.watch(versesForChapterProvider((bookId: book.id, chapter: chapter)).future);
+      final verses = await ref.watch(
+        versesForChapterProvider((bookId: book.id, chapter: chapter)).future,
+      );
       map[versionId] = verses;
     } else {
       map[versionId] = [];
@@ -97,31 +125,48 @@ final parallelVersesProvider = FutureProvider<Map<String, List<Verse>>>((ref) as
   return map;
 });
 
-final crossReferencesProvider = FutureProvider.family<List<CrossReference>, int>((ref, verse) {
-  final store = ref.watch(contentStoreProvider);
-  final bookName = ref.watch(selectedBookNameProvider);
-  final chapter = ref.watch(selectedChapterProvider);
+final crossReferencesProvider =
+    FutureProvider.family<List<CrossReference>, int>((ref, verse) {
+      final store = ref.watch(contentStoreProvider);
+      final bookName = ref.watch(selectedBookNameProvider);
+      final chapter = ref.watch(selectedChapterProvider);
 
-  return (store.select(store.crossReferences)
-        ..where((c) => (c.sourceBookName.equals(bookName)) & (c.sourceChapter.equals(chapter)) & (c.sourceVerse.equals(verse))))
-      .get();
-});
+      return (store.select(store.crossReferences)..where(
+            (c) =>
+                (c.sourceBookName.equals(bookName)) &
+                (c.sourceChapter.equals(chapter)) &
+                (c.sourceVerse.equals(verse)),
+          ))
+          .get();
+    });
 
-final crossReferenceVerseProvider = FutureProvider.family<Verse?, CrossReference>((ref, xref) async {
-  final versions = ref.watch(activeVersionsProvider);
-  if (versions.isEmpty) return null;
-  final versionId = versions.first; // Primary version
+final crossReferenceVerseProvider =
+    FutureProvider.family<Verse?, CrossReference>((ref, xref) async {
+      final versions = ref.watch(activeVersionsProvider);
+      if (versions.isEmpty) return null;
+      final versionId = versions.first; // Primary version
 
-  final book = await ref.watch(bookByNameProvider((versionId: versionId, name: xref.targetBookName)).future);
-  if (book == null) return null;
+      final book = await ref.watch(
+        bookByNameProvider((
+          versionId: versionId,
+          name: xref.targetBookName,
+        )).future,
+      );
+      if (book == null) return null;
 
-  final store = ref.watch(contentStoreProvider);
-  return (store.select(store.verses)
-        ..where((v) => (v.bookId.equals(book.id)) & (v.chapter.equals(xref.targetChapter)) & (v.verse.equals(xref.targetVerse))))
-      .getSingleOrNull();
-});
+      final store = ref.watch(contentStoreProvider);
+      return (store.select(store.verses)..where(
+            (v) =>
+                (v.bookId.equals(book.id)) &
+                (v.chapter.equals(xref.targetChapter)) &
+                (v.verse.equals(xref.targetVerse)),
+          ))
+          .getSingleOrNull();
+    });
 
-final navigationControllerProvider = Provider((ref) => NavigationController(ref));
+final navigationControllerProvider = Provider(
+  (ref) => NavigationController(ref),
+);
 
 final commentariesProvider = FutureProvider<List<Commentary>>((ref) {
   final store = ref.watch(contentStoreProvider);
@@ -137,9 +182,13 @@ class ShowBookIntroNotifier extends Notifier<bool> {
   }
 }
 
-final showBookIntroProvider = NotifierProvider<ShowBookIntroNotifier, bool>(() => ShowBookIntroNotifier());
+final showBookIntroProvider = NotifierProvider<ShowBookIntroNotifier, bool>(
+  () => ShowBookIntroNotifier(),
+);
 
-final commentaryEntriesProvider = FutureProvider<List<CommentaryEntry>>((ref) async {
+final commentaryEntriesProvider = FutureProvider<List<CommentaryEntry>>((
+  ref,
+) async {
   final store = ref.watch(contentStoreProvider);
   final bookName = ref.watch(selectedBookNameProvider);
   final chapter = ref.watch(selectedChapterProvider);
@@ -150,22 +199,35 @@ final commentaryEntriesProvider = FutureProvider<List<CommentaryEntry>>((ref) as
   if (selectedCommentaryId == null) return [];
 
   if (showIntro) {
-    return (store.select(store.commentaryEntries)
-          ..where((c) => c.commentaryId.equals(selectedCommentaryId) & 
-                         c.bookName.equals(bookName) & 
-                         (c.chapter.equals(0) | c.chapter.isNull())))
+    return (store.select(store.commentaryEntries)..where(
+          (c) =>
+              c.commentaryId.equals(selectedCommentaryId) &
+              c.bookName.equals(bookName) &
+              (c.chapter.equals(0) | c.chapter.isNull()),
+        ))
         .get();
   }
 
   if (selectedVerses.isNotEmpty) {
     return (store.select(store.commentaryEntries)
-          ..where((c) => c.commentaryId.equals(selectedCommentaryId) & c.bookName.equals(bookName) & c.chapter.equals(chapter) & c.verse.isIn(selectedVerses))
+          ..where(
+            (c) =>
+                c.commentaryId.equals(selectedCommentaryId) &
+                c.bookName.equals(bookName) &
+                c.chapter.equals(chapter) &
+                c.verse.isIn(selectedVerses),
+          )
           ..orderBy([(c) => OrderingTerm.asc(c.verse)]))
         .get();
   } else {
     // Show all commentaries for the chapter
     return (store.select(store.commentaryEntries)
-          ..where((c) => c.commentaryId.equals(selectedCommentaryId) & c.bookName.equals(bookName) & c.chapter.equals(chapter))
+          ..where(
+            (c) =>
+                c.commentaryId.equals(selectedCommentaryId) &
+                c.bookName.equals(bookName) &
+                c.chapter.equals(chapter),
+          )
           ..orderBy([(c) => OrderingTerm.asc(c.verse)]))
         .get();
   }
@@ -186,28 +248,35 @@ class DictionarySearchQueryNotifier extends Notifier<String> {
   }
 }
 
-final dictionarySearchQueryProvider = NotifierProvider<DictionarySearchQueryNotifier, String>(() => DictionarySearchQueryNotifier());
-
-final dictionaryEntriesProvider = FutureProvider<List<DictionaryEntryWithDict>>((ref) async {
-  final store = ref.watch(contentStoreProvider);
-  final query = ref.watch(dictionarySearchQueryProvider);
-  if (query.trim().isEmpty) return [];
-
-  final search = '%${query.trim()}%';
-
-  final q = store.select(store.dictionaryEntries).join([
-    innerJoin(store.dictionaries, store.dictionaries.id.equalsExp(store.dictionaryEntries.dictionaryId)),
-  ])
-  ..where(store.dictionaryEntries.word.like(search));
-
-  final results = await q.get();
-  return results.map((row) {
-    return DictionaryEntryWithDict(
-      entry: row.readTable(store.dictionaryEntries),
-      dictionary: row.readTable(store.dictionaries),
+final dictionarySearchQueryProvider =
+    NotifierProvider<DictionarySearchQueryNotifier, String>(
+      () => DictionarySearchQueryNotifier(),
     );
-  }).toList();
-});
+
+final dictionaryEntriesProvider = FutureProvider<List<DictionaryEntryWithDict>>(
+  (ref) async {
+    final store = ref.watch(contentStoreProvider);
+    final query = ref.watch(dictionarySearchQueryProvider);
+    if (query.trim().isEmpty) return [];
+
+    final search = '%${query.trim()}%';
+
+    final q = store.select(store.dictionaryEntries).join([
+      innerJoin(
+        store.dictionaries,
+        store.dictionaries.id.equalsExp(store.dictionaryEntries.dictionaryId),
+      ),
+    ])..where(store.dictionaryEntries.word.like(search));
+
+    final results = await q.get();
+    return results.map((row) {
+      return DictionaryEntryWithDict(
+        entry: row.readTable(store.dictionaryEntries),
+        dictionary: row.readTable(store.dictionaries),
+      );
+    }).toList();
+  },
+);
 
 class NavigationController {
   final Ref ref;
@@ -219,15 +288,24 @@ class NavigationController {
     final bookName = ref.read(selectedBookNameProvider);
     final chapter = ref.read(selectedChapterProvider);
     final activeVersions = ref.read(activeVersionsProvider);
-    
+
     String? verseText;
-    
+
     // Only query text if a verse was explicitly provided and we have versions
     if (verse != null && activeVersions.isNotEmpty) {
       final versionId = activeVersions.first;
-      final book = await ref.read(bookByNameProvider((versionId: versionId, name: bookName)).future);
+      final book = await ref.read(
+        bookByNameProvider((versionId: versionId, name: bookName)).future,
+      );
       if (book != null) {
-        final v = await (store.select(store.verses)..where((v) => v.bookId.equals(book.id) & v.chapter.equals(chapter) & v.verse.equals(verse))).getSingleOrNull();
+        final v =
+            await (store.select(store.verses)..where(
+                  (v) =>
+                      v.bookId.equals(book.id) &
+                      v.chapter.equals(chapter) &
+                      v.verse.equals(verse),
+                ))
+                .getSingleOrNull();
         if (v != null) {
           verseText = v.textContent;
         }
@@ -239,10 +317,12 @@ class NavigationController {
     // Remove any existing entry with the same book/chapter/verse combo
     // so we don't get duplicates — the new entry becomes the most recent.
     final existingQuery = userStore.select(userStore.navigationHistories)
-      ..where((h) =>
-          h.bookName.equals(bookName) &
-          h.chapter.equals(chapter) &
-          h.deleted.equals(false));
+      ..where(
+        (h) =>
+            h.bookName.equals(bookName) &
+            h.chapter.equals(chapter) &
+            h.deleted.equals(false),
+      );
     if (verse != null) {
       existingQuery.where((h) => h.verse.equals(verse));
     } else {
@@ -250,12 +330,17 @@ class NavigationController {
     }
     final existing = await existingQuery.get();
     for (final old in existing) {
-      await userStore.into(userStore.navigationHistories).insert(
-        old.copyWith(deleted: true, updatedAt: DateTime.now().millisecondsSinceEpoch),
-        mode: InsertMode.replace,
-      );
+      await userStore
+          .into(userStore.navigationHistories)
+          .insert(
+            old.copyWith(
+              deleted: true,
+              updatedAt: DateTime.now().millisecondsSinceEpoch,
+            ),
+            mode: InsertMode.replace,
+          );
     }
-    
+
     final newEntry = NavigationHistory(
       id: const Uuid().v4(),
       updatedAt: DateTime.now().millisecondsSinceEpoch,
@@ -266,9 +351,11 @@ class NavigationController {
       verse: verse,
       verseText: verseText,
     );
-    
-    print('DEBUG: Saving history -> book: $bookName, chapter: $chapter, verse: $verse, text: $verseText');
-    
+
+    print(
+      'DEBUG: Saving history -> book: $bookName, chapter: $chapter, verse: $verse, text: $verseText',
+    );
+
     await userStore.into(userStore.navigationHistories).insert(newEntry);
   }
 
@@ -281,26 +368,30 @@ class NavigationController {
   Future<void> nextChapter() async {
     final activeVersions = ref.read(activeVersionsProvider);
     if (activeVersions.isEmpty) return;
-    
+
     final versionId = activeVersions.first;
     final books = await ref.read(booksForVersionProvider(versionId).future);
-    
+
     final currentBookName = ref.read(selectedBookNameProvider);
     final currentChapter = ref.read(selectedChapterProvider);
-    
+
     final bookIndex = books.indexWhere((b) => b.name == currentBookName);
     if (bookIndex == -1) return;
-    
+
     final currentBook = books[bookIndex];
-    final maxChapter = await ref.read(chapterCountProvider(currentBook.id).future);
-    
+    final maxChapter = await ref.read(
+      chapterCountProvider(currentBook.id).future,
+    );
+
     if (currentChapter < maxChapter) {
       ref.read(selectedChapterProvider.notifier).set(currentChapter + 1);
     } else if (bookIndex + 1 < books.length) {
-      ref.read(selectedBookNameProvider.notifier).set(books[bookIndex + 1].name);
+      ref
+          .read(selectedBookNameProvider.notifier)
+          .set(books[bookIndex + 1].name);
       ref.read(selectedChapterProvider.notifier).set(1);
     }
-    
+
     // Only record chapter history
     recordHistory();
   }
@@ -308,25 +399,27 @@ class NavigationController {
   Future<void> previousChapter() async {
     final activeVersions = ref.read(activeVersionsProvider);
     if (activeVersions.isEmpty) return;
-    
+
     final versionId = activeVersions.first;
     final books = await ref.read(booksForVersionProvider(versionId).future);
-    
+
     final currentBookName = ref.read(selectedBookNameProvider);
     final currentChapter = ref.read(selectedChapterProvider);
-    
+
     final bookIndex = books.indexWhere((b) => b.name == currentBookName);
     if (bookIndex == -1) return;
-    
+
     if (currentChapter > 1) {
       ref.read(selectedChapterProvider.notifier).set(currentChapter - 1);
     } else if (bookIndex > 0) {
       final prevBook = books[bookIndex - 1];
-      final maxChapter = await ref.read(chapterCountProvider(prevBook.id).future);
+      final maxChapter = await ref.read(
+        chapterCountProvider(prevBook.id).future,
+      );
       ref.read(selectedBookNameProvider.notifier).set(prevBook.name);
       ref.read(selectedChapterProvider.notifier).set(maxChapter);
     }
-    
+
     // Only record chapter history
     recordHistory();
   }

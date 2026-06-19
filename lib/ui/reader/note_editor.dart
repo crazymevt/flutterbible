@@ -26,10 +26,15 @@ class _NoteEditorDialogState extends ConsumerState<NoteEditorDialog> {
     final store = ref.read(userStoreProvider);
     final bookName = ref.read(selectedBookNameProvider);
     final chapter = ref.read(selectedChapterProvider);
-    
+
     final query = store.select(store.notes)
-      ..where((n) => (n.bookName.equals(bookName)) & (n.chapter.equals(chapter)) & (n.deleted.equals(false)));
-      
+      ..where(
+        (n) =>
+            (n.bookName.equals(bookName)) &
+            (n.chapter.equals(chapter)) &
+            (n.deleted.equals(false)),
+      );
+
     if (widget.verse != null) {
       query.where((n) => n.verse.equals(widget.verse!));
     } else {
@@ -45,7 +50,11 @@ class _NoteEditorDialogState extends ConsumerState<NoteEditorDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(widget.verse != null ? 'Note for Verse ${widget.verse}' : 'Chapter Note'),
+      title: Text(
+        widget.verse != null
+            ? 'Note for Verse ${widget.verse}'
+            : 'Chapter Note',
+      ),
       content: TextField(
         controller: _controller,
         autofocus: true,
@@ -63,7 +72,9 @@ class _NoteEditorDialogState extends ConsumerState<NoteEditorDialog> {
         FilledButton(
           onPressed: () async {
             if (_controller.text.isNotEmpty) {
-              await ref.read(noteActionProvider).saveNote(widget.verse, _controller.text);
+              await ref
+                  .read(noteActionProvider)
+                  .saveNote(widget.verse, _controller.text);
             }
             if (context.mounted) Navigator.pop(context);
           },

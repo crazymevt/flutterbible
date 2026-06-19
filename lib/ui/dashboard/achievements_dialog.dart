@@ -25,7 +25,10 @@ class AchievementsDialog extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Achievements', style: Theme.of(context).textTheme.headlineSmall),
+                Text(
+                  'Achievements',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
                 IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () => Navigator.of(context).pop(),
@@ -54,7 +57,9 @@ class AchievementsDialog extends StatelessWidget {
                     opacity: isUnlocked ? 1.0 : 0.5,
                     child: ListTile(
                       leading: CircleAvatar(
-                        backgroundColor: isUnlocked ? def.color.withOpacity(0.2) : Colors.grey.withOpacity(0.2),
+                        backgroundColor: isUnlocked
+                            ? def.color.withOpacity(0.2)
+                            : Colors.grey.withOpacity(0.2),
                         child: Icon(
                           isUnlocked ? def.icon : Icons.lock,
                           color: isUnlocked ? def.color : Colors.grey,
@@ -63,7 +68,9 @@ class AchievementsDialog extends StatelessWidget {
                       title: Text(
                         def.name,
                         style: TextStyle(
-                          fontWeight: isUnlocked ? FontWeight.bold : FontWeight.normal,
+                          fontWeight: isUnlocked
+                              ? FontWeight.bold
+                              : FontWeight.normal,
                         ),
                       ),
                       subtitle: Column(
@@ -76,7 +83,9 @@ class AchievementsDialog extends StatelessWidget {
                               child: Text(
                                 'Unlocked on ${DateFormat.yMMMd().format(DateTime.fromMillisecondsSinceEpoch(unlockedInfo.unlockedAt))}',
                                 style: TextStyle(
-                                  color: Theme.of(context).colorScheme.secondary,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.secondary,
                                   fontSize: 12,
                                 ),
                               ),

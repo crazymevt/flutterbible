@@ -5,7 +5,10 @@ import 'package:path/path.dart' as p;
 class ArchiveExtractor {
   /// Extracts a .zip or .zip.bz2 file to the target directory.
   /// Returns a list of extracted file paths.
-  static Future<List<File>> extractArchive(File archiveFile, Directory targetDir) async {
+  static Future<List<File>> extractArchive(
+    File archiveFile,
+    Directory targetDir,
+  ) async {
     final bytes = await archiveFile.readAsBytes();
     Archive? archive;
 
@@ -23,7 +26,9 @@ class ArchiveExtractor {
       try {
         archive = ZipDecoder().decodeBytes(bytes);
       } catch (e2) {
-        throw Exception('Failed to decode archive: Not a valid zip or bz2 file. ($e2)');
+        throw Exception(
+          'Failed to decode archive: Not a valid zip or bz2 file. ($e2)',
+        );
       }
     }
 
@@ -41,7 +46,9 @@ class ArchiveExtractor {
         await outFile.writeAsBytes(data);
         extractedFiles.add(outFile);
       } else {
-        await Directory(p.join(targetDir.path, filename)).create(recursive: true);
+        await Directory(
+          p.join(targetDir.path, filename),
+        ).create(recursive: true);
       }
     }
 

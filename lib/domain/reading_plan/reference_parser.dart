@@ -93,13 +93,13 @@ class ReferenceParser {
   static ParsedReference parse(String ref) {
     // 1. Separate book name from the chapters/verses.
     // Book names can have numbers ("1 Samuel", "1Samuel") and spaces.
-    // The reference part is always at the end and starts with a digit, 
+    // The reference part is always at the end and starts with a digit,
     // but we must be careful not to match the "1" in "1 Samuel".
-    
+
     // Find the last space that precedes a digit
     final regex = RegExp(r'^(.+?)\s+(\d.*)$');
     final match = regex.firstMatch(ref.trim());
-    
+
     String bookPart;
     String refPart;
 
@@ -110,12 +110,18 @@ class ReferenceParser {
       // It might be just a book name like "Obadiah" (though usually reading plans have chapters)
       // or "1Chronicles 1" without space: "1Chronicles1" (unlikely)
       // Let's fallback
-      final fallbackMatch = RegExp(r'^([a-zA-Z\s]+)(\d.*)$').firstMatch(ref.trim());
+      final fallbackMatch = RegExp(
+        r'^([a-zA-Z\s]+)(\d.*)$',
+      ).firstMatch(ref.trim());
       if (fallbackMatch != null) {
         bookPart = fallbackMatch.group(1)!;
         refPart = fallbackMatch.group(2)!;
       } else {
-        return ParsedReference(bookName: normalizeBookName(ref), startChapter: 1, endChapter: 1);
+        return ParsedReference(
+          bookName: normalizeBookName(ref),
+          startChapter: 1,
+          endChapter: 1,
+        );
       }
     }
 

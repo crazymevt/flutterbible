@@ -27,96 +27,104 @@ class VerseActionBar extends ConsumerWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-            const _ColorSwatch(color: Color(0xFFFBE083), hex: '#FBE083'),
-            const SizedBox(width: 8),
-            const _ColorSwatch(color: Color(0xFF98E2C6), hex: '#98E2C6'),
-            const SizedBox(width: 8),
-            const _ColorSwatch(color: Color(0xFFB5E2FA), hex: '#B5E2FA'),
-            const SizedBox(width: 8),
-            const _ColorSwatch(color: Color(0xFFF4A8C4), hex: '#F4A8C4'),
-            const SizedBox(width: 16),
-            Container(width: 1, height: 24, color: Colors.white24),
-            const SizedBox(width: 16),
-            _ActionIcon(
-              icon: Icons.edit_note,
-              label: 'Add Note',
-              onTap: () {
-                final selected = ref.read(selectedVersesProvider);
-                final verse = selected.isNotEmpty ? selected.first : null;
-                showDialog(
-                  context: context,
-                  builder: (_) => NoteEditorDialog(verse: verse),
-                );
-                ref.read(selectedVersesProvider.notifier).clear();
-              },
-            ),
-            const SizedBox(width: 12),
-            _ActionIcon(
-              icon: Icons.compare_arrows,
-              label: 'Cross-Reference',
-              onTap: () {
-                if (MediaQuery.sizeOf(context).width > 800) {
-                  ref.read(activeToolProvider.notifier).setTool(ActiveTool.crossReference);
-                } else {
-                  showModalBottomSheet(
+              const _ColorSwatch(color: Color(0xFFFBE083), hex: '#FBE083'),
+              const SizedBox(width: 8),
+              const _ColorSwatch(color: Color(0xFF98E2C6), hex: '#98E2C6'),
+              const SizedBox(width: 8),
+              const _ColorSwatch(color: Color(0xFFB5E2FA), hex: '#B5E2FA'),
+              const SizedBox(width: 8),
+              const _ColorSwatch(color: Color(0xFFF4A8C4), hex: '#F4A8C4'),
+              const SizedBox(width: 16),
+              Container(width: 1, height: 24, color: Colors.white24),
+              const SizedBox(width: 16),
+              _ActionIcon(
+                icon: Icons.edit_note,
+                label: 'Add Note',
+                onTap: () {
+                  final selected = ref.read(selectedVersesProvider);
+                  final verse = selected.isNotEmpty ? selected.first : null;
+                  showDialog(
                     context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    builder: (_) => Container(
-                      height: MediaQuery.sizeOf(context).height * 0.8,
-                      clipBehavior: Clip.antiAlias,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surface,
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                      ),
-                      child: const CrossReferencePanel(),
-                    ),
+                    builder: (_) => NoteEditorDialog(verse: verse),
                   );
-                }
-              },
-            ),
-            const SizedBox(width: 12),
-            _ActionIcon(
-              icon: Icons.menu_book,
-              label: 'Commentary',
-              onTap: () {
-                if (MediaQuery.sizeOf(context).width > 800) {
-                  ref.read(activeToolProvider.notifier).setTool(ActiveTool.commentaries);
-                } else {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    builder: (_) => Container(
-                      height: MediaQuery.sizeOf(context).height * 0.8,
-                      clipBehavior: Clip.antiAlias,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surface,
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  ref.read(selectedVersesProvider.notifier).clear();
+                },
+              ),
+              const SizedBox(width: 12),
+              _ActionIcon(
+                icon: Icons.compare_arrows,
+                label: 'Cross-Reference',
+                onTap: () {
+                  if (MediaQuery.sizeOf(context).width > 800) {
+                    ref
+                        .read(activeToolProvider.notifier)
+                        .setTool(ActiveTool.crossReference);
+                  } else {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (_) => Container(
+                        height: MediaQuery.sizeOf(context).height * 0.8,
+                        clipBehavior: Clip.antiAlias,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surface,
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(16),
+                          ),
+                        ),
+                        child: const CrossReferencePanel(),
                       ),
-                      child: const CommentaryPanel(),
-                    ),
-                  );
-                }
-              },
-            ),
-            const SizedBox(width: 12),
-            _ActionIcon(
-              icon: Icons.copy,
-              label: 'Copy',
-              onTap: () {
-                ref.read(selectedVersesProvider.notifier).clear();
-              },
-            ),
-            const SizedBox(width: 12),
-            _ActionIcon(
-              icon: Icons.close,
-              label: 'Deselect',
-              onTap: () => ref.read(selectedVersesProvider.notifier).clear(),
-            ),
-          ],
+                    );
+                  }
+                },
+              ),
+              const SizedBox(width: 12),
+              _ActionIcon(
+                icon: Icons.menu_book,
+                label: 'Commentary',
+                onTap: () {
+                  if (MediaQuery.sizeOf(context).width > 800) {
+                    ref
+                        .read(activeToolProvider.notifier)
+                        .setTool(ActiveTool.commentaries);
+                  } else {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (_) => Container(
+                        height: MediaQuery.sizeOf(context).height * 0.8,
+                        clipBehavior: Clip.antiAlias,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surface,
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(16),
+                          ),
+                        ),
+                        child: const CommentaryPanel(),
+                      ),
+                    );
+                  }
+                },
+              ),
+              const SizedBox(width: 12),
+              _ActionIcon(
+                icon: Icons.copy,
+                label: 'Copy',
+                onTap: () {
+                  ref.read(selectedVersesProvider.notifier).clear();
+                },
+              ),
+              const SizedBox(width: 12),
+              _ActionIcon(
+                icon: Icons.close,
+                label: 'Deselect',
+                onTap: () => ref.read(selectedVersesProvider.notifier).clear(),
+              ),
+            ],
+          ),
         ),
-      ),
       ),
     );
   }
@@ -127,7 +135,11 @@ class _ActionIcon extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  const _ActionIcon({required this.icon, required this.label, required this.onTap});
+  const _ActionIcon({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -171,10 +183,7 @@ class _ColorSwatch extends ConsumerWidget {
       child: Container(
         width: 24,
         height: 24,
-        decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
-        ),
+        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
       ),
     );
   }

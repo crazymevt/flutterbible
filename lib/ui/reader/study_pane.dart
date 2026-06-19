@@ -28,16 +28,33 @@ class StudyPane extends ConsumerWidget {
                   _SectionHeader(title: 'Notes'),
                   notesAsync.when(
                     data: (notes) {
-                      if (notes.isEmpty) return const _EmptyItem(text: 'No notes for this chapter.');
+                      if (notes.isEmpty)
+                        return const _EmptyItem(
+                          text: 'No notes for this chapter.',
+                        );
                       return Column(
-                        children: notes.map((n) => ListTile(
-                          title: Text(n.verse != null ? 'Verse ${n.verse}' : 'Chapter Note'),
-                          subtitle: Text(n.content, maxLines: 2, overflow: TextOverflow.ellipsis),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete, size: 20),
-                            onPressed: () => ref.read(noteActionProvider).deleteNote(n.id),
-                          ),
-                        )).toList(),
+                        children: notes
+                            .map(
+                              (n) => ListTile(
+                                title: Text(
+                                  n.verse != null
+                                      ? 'Verse ${n.verse}'
+                                      : 'Chapter Note',
+                                ),
+                                subtitle: Text(
+                                  n.content,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                trailing: IconButton(
+                                  icon: const Icon(Icons.delete, size: 20),
+                                  onPressed: () => ref
+                                      .read(noteActionProvider)
+                                      .deleteNote(n.id),
+                                ),
+                              ),
+                            )
+                            .toList(),
                       );
                     },
                     loading: () => const CircularProgressIndicator(),
@@ -47,16 +64,25 @@ class StudyPane extends ConsumerWidget {
                   _SectionHeader(title: 'Bookmarks'),
                   bookmarksAsync.when(
                     data: (bookmarks) {
-                      if (bookmarks.isEmpty) return const _EmptyItem(text: 'No bookmarks for this chapter.');
+                      if (bookmarks.isEmpty)
+                        return const _EmptyItem(
+                          text: 'No bookmarks for this chapter.',
+                        );
                       return Column(
-                        children: bookmarks.map((b) => ListTile(
-                          title: Text('Verse ${b.verse}'),
-                          subtitle: Text(b.label),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete, size: 20),
-                            onPressed: () => ref.read(bookmarkActionProvider).deleteBookmark(b.id),
-                          ),
-                        )).toList(),
+                        children: bookmarks
+                            .map(
+                              (b) => ListTile(
+                                title: Text('Verse ${b.verse}'),
+                                subtitle: Text(b.label),
+                                trailing: IconButton(
+                                  icon: const Icon(Icons.delete, size: 20),
+                                  onPressed: () => ref
+                                      .read(bookmarkActionProvider)
+                                      .deleteBookmark(b.id),
+                                ),
+                              ),
+                            )
+                            .toList(),
                       );
                     },
                     loading: () => const CircularProgressIndicator(),

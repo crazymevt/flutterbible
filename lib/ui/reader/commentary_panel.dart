@@ -36,27 +36,42 @@ class CommentaryPanel extends ConsumerWidget {
                   children: [
                     Consumer(
                       builder: (context, ref, _) {
-                        final commentariesAsync = ref.watch(commentariesProvider);
-                        final selectedId = ref.watch(selectedCommentaryProvider);
-                        
+                        final commentariesAsync = ref.watch(
+                          commentariesProvider,
+                        );
+                        final selectedId = ref.watch(
+                          selectedCommentaryProvider,
+                        );
+
                         return commentariesAsync.when(
                           data: (commentaries) {
-                            if (commentaries.isEmpty) return const SizedBox.shrink();
-                            
+                            if (commentaries.isEmpty)
+                              return const SizedBox.shrink();
+
                             // Auto-select first if none selected
                             if (selectedId == null) {
-                              Future.microtask(() => ref.read(selectedCommentaryProvider.notifier).set(commentaries.first.id));
+                              Future.microtask(
+                                () => ref
+                                    .read(selectedCommentaryProvider.notifier)
+                                    .set(commentaries.first.id),
+                              );
                             }
-                            
+
                             return DropdownButton<int>(
                               value: selectedId ?? commentaries.first.id,
                               underline: const SizedBox(),
-                              items: commentaries.map((c) => DropdownMenuItem(
-                                value: c.id,
-                                child: Text(c.abbreviation),
-                              )).toList(),
+                              items: commentaries
+                                  .map(
+                                    (c) => DropdownMenuItem(
+                                      value: c.id,
+                                      child: Text(c.abbreviation),
+                                    ),
+                                  )
+                                  .toList(),
                               onChanged: (val) {
-                                ref.read(selectedCommentaryProvider.notifier).set(val);
+                                ref
+                                    .read(selectedCommentaryProvider.notifier)
+                                    .set(val);
                               },
                             );
                           },
@@ -68,8 +83,12 @@ class CommentaryPanel extends ConsumerWidget {
                     const SizedBox(width: 8),
                     IconButton(
                       icon: Icon(
-                        ref.watch(showBookIntroProvider) ? Icons.auto_stories : Icons.info_outline,
-                        color: ref.watch(showBookIntroProvider) ? Theme.of(context).colorScheme.primary : null,
+                        ref.watch(showBookIntroProvider)
+                            ? Icons.auto_stories
+                            : Icons.info_outline,
+                        color: ref.watch(showBookIntroProvider)
+                            ? Theme.of(context).colorScheme.primary
+                            : null,
                       ),
                       tooltip: 'Toggle Book Introduction',
                       onPressed: () {
@@ -107,13 +126,19 @@ class CommentaryPanel extends ConsumerWidget {
                       children: [
                         if (entry.verse != null && entry.verse! > 0)
                           Padding(
-                            padding: const EdgeInsets.only(top: 8.0, bottom: 4.0),
+                            padding: const EdgeInsets.only(
+                              top: 8.0,
+                              bottom: 4.0,
+                            ),
                             child: Text(
                               'Verse ${entry.verse}',
-                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
+                              style: Theme.of(context).textTheme.titleSmall
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                  ),
                             ),
                           ),
                         Padding(
@@ -124,66 +149,117 @@ class CommentaryPanel extends ConsumerWidget {
                             onTapUrl: (url) {
                               try {
                                 int? b, c, v;
-                                
+
                                 // Try query parameters first (e.g. b/?b=10&c=1&v=1)
                                 final uri = Uri.tryParse(url);
-                                if (uri != null && (uri.queryParameters.containsKey('b') || uri.queryParameters.containsKey('B'))) {
-                                  b = int.tryParse(uri.queryParameters['b'] ?? uri.queryParameters['B'] ?? '');
-                                  c = int.tryParse(uri.queryParameters['c'] ?? uri.queryParameters['C'] ?? '');
-                                  v = int.tryParse(uri.queryParameters['v'] ?? uri.queryParameters['V'] ?? '');
+                                if (uri != null &&
+                                    (uri.queryParameters.containsKey('b') ||
+                                        uri.queryParameters.containsKey('B'))) {
+                                  b = int.tryParse(
+                                    uri.queryParameters['b'] ??
+                                        uri.queryParameters['B'] ??
+                                        '',
+                                  );
+                                  c = int.tryParse(
+                                    uri.queryParameters['c'] ??
+                                        uri.queryParameters['C'] ??
+                                        '',
+                                  );
+                                  v = int.tryParse(
+                                    uri.queryParameters['v'] ??
+                                        uri.queryParameters['V'] ??
+                                        '',
+                                  );
                                 } else {
                                   // Try generic format with any non-digit delimiters (e.g. b:10/1/1 or B: 10 1 1)
-                                  final match = RegExp(r'^(?:b|bible):[^\d]*(\d+)(?:[^\d]+(\d+))?(?:[^\d]+(\d+))?', caseSensitive: false).firstMatch(url);
+                                  final match = RegExp(
+                                    r'^(?:b|bible):[^\d]*(\d+)(?:[^\d]+(\d+))?(?:[^\d]+(\d+))?',
+                                    caseSensitive: false,
+                                  ).firstMatch(url);
                                   if (match != null) {
-                                    b = match.group(1) != null ? int.tryParse(match.group(1)!) : null;
-                                    c = match.group(2) != null ? int.tryParse(match.group(2)!) : null;
-                                    v = match.group(3) != null ? int.tryParse(match.group(3)!) : null;
+                                    b = match.group(1) != null
+                                        ? int.tryParse(match.group(1)!)
+                                        : null;
+                                    c = match.group(2) != null
+                                        ? int.tryParse(match.group(2)!)
+                                        : null;
+                                    v = match.group(3) != null
+                                        ? int.tryParse(match.group(3)!)
+                                        : null;
                                   }
                                 }
 
-                                  if (b != null) {
-                                  final bookName = mybibleBookMap[b] ?? mybibleBookMap[b * 10]; // Fallback to * 10
+                                if (b != null) {
+                                  final bookName =
+                                      mybibleBookMap[b] ??
+                                      mybibleBookMap[b *
+                                          10]; // Fallback to * 10
                                   if (bookName != null) {
-                                    ref.read(selectedBookNameProvider.notifier).set(bookName);
+                                    ref
+                                        .read(selectedBookNameProvider.notifier)
+                                        .set(bookName);
                                     if (c != null && c > 0) {
-                                      ref.read(selectedChapterProvider.notifier).set(c);
+                                      ref
+                                          .read(
+                                            selectedChapterProvider.notifier,
+                                          )
+                                          .set(c);
                                     }
                                     if (v != null && v > 0) {
-                                      ref.read(selectedVersesProvider.notifier).clear();
-                                      ref.read(selectedVersesProvider.notifier).toggle(v);
+                                      ref
+                                          .read(selectedVersesProvider.notifier)
+                                          .clear();
+                                      ref
+                                          .read(selectedVersesProvider.notifier)
+                                          .toggle(v);
                                     }
-                                    
+
                                     // Record history
-                                    ref.read(navigationControllerProvider).recordHistory(verse: v);
-                                    
-                                    print('Navigated to $bookName $c:$v from URL $url');
-                                    
+                                    ref
+                                        .read(navigationControllerProvider)
+                                        .recordHistory(verse: v);
+
+                                    print(
+                                      'Navigated to $bookName $c:$v from URL $url',
+                                    );
+
                                     // Also close the tool panel so they can read the verse
-                                    ref.read(activeToolProvider.notifier).close();
+                                    ref
+                                        .read(activeToolProvider.notifier)
+                                        .close();
                                     if (Navigator.of(context).canPop()) {
                                       Navigator.of(context).pop();
                                     }
                                   } else {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('Unknown book number: $b from $url')),
+                                      SnackBar(
+                                        content: Text(
+                                          'Unknown book number: $b from $url',
+                                        ),
+                                      ),
                                     );
                                   }
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('Could not parse link: $url')),
+                                    SnackBar(
+                                      content: Text(
+                                        'Could not parse link: $url',
+                                      ),
+                                    ),
                                   );
                                 }
                               } catch (e) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Error parsing url $url: $e')),
+                                  SnackBar(
+                                    content: Text('Error parsing url $url: $e'),
+                                  ),
                                 );
                               }
                               return true;
                             },
                           ),
                         ),
-                        if (index < entries.length - 1)
-                          const Divider(),
+                        if (index < entries.length - 1) const Divider(),
                       ],
                     );
                   },

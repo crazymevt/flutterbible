@@ -20,13 +20,13 @@ class DashboardScreen extends ConsumerWidget {
     final timeData = ref.watch(timeAnalyticsProvider);
     final coverage = ref.watch(bibleCoverageProvider);
     final achievementsAsync = ref.watch(achievementsProvider);
-    
+
     int chaptersRead = 0;
     for (final chapters in coverage.values) {
       chaptersRead += chapters.length;
     }
     final double percent = (chaptersRead / 1189) * 100;
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dashboard'),
@@ -37,7 +37,9 @@ class DashboardScreen extends ConsumerWidget {
               icon: const Icon(Icons.menu_book),
               label: const Text('Read Bible'),
               onPressed: () {
-                ref.read(appModuleProvider.notifier).setModule(AppModule.reader);
+                ref
+                    .read(appModuleProvider.notifier)
+                    .setModule(AppModule.reader);
               },
             ),
           ),
@@ -63,13 +65,45 @@ class DashboardScreen extends ConsumerWidget {
                 if (isDesktop)
                   Row(
                     children: [
-                      Expanded(child: _buildPaceCard(context, 'Day Streak', pace['currentStreak'].toString(), Icons.local_fire_department, Colors.orange)),
+                      Expanded(
+                        child: _buildPaceCard(
+                          context,
+                          'Day Streak',
+                          pace['currentStreak'].toString(),
+                          Icons.local_fire_department,
+                          Colors.orange,
+                        ),
+                      ),
                       const SizedBox(width: 16),
-                      Expanded(child: _buildPaceCard(context, 'Longest Streak', pace['longestStreak'].toString(), Icons.emoji_events, Colors.amber)),
+                      Expanded(
+                        child: _buildPaceCard(
+                          context,
+                          'Longest Streak',
+                          pace['longestStreak'].toString(),
+                          Icons.emoji_events,
+                          Colors.amber,
+                        ),
+                      ),
                       const SizedBox(width: 16),
-                      Expanded(child: _buildPaceCard(context, 'Days Active', pace['daysActive'].toString(), Icons.calendar_today, Colors.blue)),
+                      Expanded(
+                        child: _buildPaceCard(
+                          context,
+                          'Days Active',
+                          pace['daysActive'].toString(),
+                          Icons.calendar_today,
+                          Colors.blue,
+                        ),
+                      ),
                       const SizedBox(width: 16),
-                      Expanded(child: _buildPaceCard(context, 'Chapters This Week', pace['chaptersThisWeek'].toString(), Icons.menu_book, Colors.green)),
+                      Expanded(
+                        child: _buildPaceCard(
+                          context,
+                          'Chapters This Week',
+                          pace['chaptersThisWeek'].toString(),
+                          Icons.menu_book,
+                          Colors.green,
+                        ),
+                      ),
                     ],
                   )
                 else
@@ -77,17 +111,49 @@ class DashboardScreen extends ConsumerWidget {
                     children: [
                       Row(
                         children: [
-                          Expanded(child: _buildPaceCard(context, 'Day Streak', pace['currentStreak'].toString(), Icons.local_fire_department, Colors.orange)),
+                          Expanded(
+                            child: _buildPaceCard(
+                              context,
+                              'Day Streak',
+                              pace['currentStreak'].toString(),
+                              Icons.local_fire_department,
+                              Colors.orange,
+                            ),
+                          ),
                           const SizedBox(width: 16),
-                          Expanded(child: _buildPaceCard(context, 'Longest Streak', pace['longestStreak'].toString(), Icons.emoji_events, Colors.amber)),
+                          Expanded(
+                            child: _buildPaceCard(
+                              context,
+                              'Longest Streak',
+                              pace['longestStreak'].toString(),
+                              Icons.emoji_events,
+                              Colors.amber,
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 16),
                       Row(
                         children: [
-                          Expanded(child: _buildPaceCard(context, 'Days Active', pace['daysActive'].toString(), Icons.calendar_today, Colors.blue)),
+                          Expanded(
+                            child: _buildPaceCard(
+                              context,
+                              'Days Active',
+                              pace['daysActive'].toString(),
+                              Icons.calendar_today,
+                              Colors.blue,
+                            ),
+                          ),
                           const SizedBox(width: 16),
-                          Expanded(child: _buildPaceCard(context, 'Chapters This Week', pace['chaptersThisWeek'].toString(), Icons.menu_book, Colors.green)),
+                          Expanded(
+                            child: _buildPaceCard(
+                              context,
+                              'Chapters This Week',
+                              pace['chaptersThisWeek'].toString(),
+                              Icons.menu_book,
+                              Colors.green,
+                            ),
+                          ),
                         ],
                       ),
                     ],
@@ -106,7 +172,12 @@ class DashboardScreen extends ConsumerWidget {
                           children: [
                             _buildVerseOfTheDayCard(context, ref),
                             const SizedBox(height: 16),
-                            _buildReadingProgressCard(context, percent, chaptersRead, coverage),
+                            _buildReadingProgressCard(
+                              context,
+                              percent,
+                              chaptersRead,
+                              coverage,
+                            ),
                             const SizedBox(height: 16),
                             _buildReadingPlansSection(context, ref),
                           ],
@@ -133,7 +204,12 @@ class DashboardScreen extends ConsumerWidget {
                     children: [
                       _buildVerseOfTheDayCard(context, ref),
                       const SizedBox(height: 16),
-                      _buildReadingProgressCard(context, percent, chaptersRead, coverage),
+                      _buildReadingProgressCard(
+                        context,
+                        percent,
+                        chaptersRead,
+                        coverage,
+                      ),
                       const SizedBox(height: 16),
                       _buildReadingPlansSection(context, ref),
                       const SizedBox(height: 16),
@@ -150,7 +226,12 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildReadingProgressCard(BuildContext context, double percent, int totalChapters, Map<String, List<int>> coverage) {
+  Widget _buildReadingProgressCard(
+    BuildContext context,
+    double percent,
+    int totalChapters,
+    Map<String, List<int>> coverage,
+  ) {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -170,11 +251,26 @@ class DashboardScreen extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Bible Progress', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                    Text(
+                      'Bible Progress',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     const SizedBox(height: 8),
-                    Text('$totalChapters / 1189 Chapters Read', style: const TextStyle(color: Colors.grey)),
+                    Text(
+                      '$totalChapters / 1189 Chapters Read',
+                      style: const TextStyle(color: Colors.grey),
+                    ),
                     const SizedBox(height: 16),
-                    const Text('Tap to view complete coverage details', style: TextStyle(color: Colors.blue, fontSize: 12, fontWeight: FontWeight.bold)),
+                    const Text(
+                      'Tap to view complete coverage details',
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -191,7 +287,12 @@ class DashboardScreen extends ConsumerWidget {
                       color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
-                  Text('${percent.toStringAsFixed(1)}%', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                  Text(
+                    '${percent.toStringAsFixed(1)}%',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -201,7 +302,11 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildTimeAnalyticsCard(BuildContext context, Map<String, int> timeData, WidgetRef ref) {
+  Widget _buildTimeAnalyticsCard(
+    BuildContext context,
+    Map<String, int> timeData,
+    WidgetRef ref,
+  ) {
     final thisWeekMins = (timeData['thisWeekMs'] ?? 0) ~/ 60000;
     final lastWeekMins = (timeData['lastWeekMs'] ?? 0) ~/ 60000;
     final yearAgoMins = (timeData['yearAgoMs'] ?? 0) ~/ 60000;
@@ -223,13 +328,22 @@ class DashboardScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Time in the Word', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+              Text(
+                'Time in the Word',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 24),
               _buildTimeRow('This Week', thisWeekMins, Colors.blue),
               const SizedBox(height: 16),
               _buildTimeRow('Last Week', lastWeekMins, Colors.grey),
               const SizedBox(height: 16),
-              _buildTimeRow('A Year Ago', yearAgoMins, Colors.grey.withAlpha(120)),
+              _buildTimeRow(
+                'A Year Ago',
+                yearAgoMins,
+                Colors.grey.withAlpha(120),
+              ),
             ],
           ),
         ),
@@ -240,7 +354,13 @@ class DashboardScreen extends ConsumerWidget {
   Widget _buildTimeRow(String label, int mins, Color color) {
     return Row(
       children: [
-        SizedBox(width: 80, child: Text(label, style: const TextStyle(fontWeight: FontWeight.w500))),
+        SizedBox(
+          width: 80,
+          child: Text(
+            label,
+            style: const TextStyle(fontWeight: FontWeight.w500),
+          ),
+        ),
         Expanded(
           child: ClipRRect(
             borderRadius: BorderRadius.circular(6),
@@ -253,12 +373,25 @@ class DashboardScreen extends ConsumerWidget {
           ),
         ),
         const SizedBox(width: 12),
-        SizedBox(width: 48, child: Text('${mins}m', textAlign: TextAlign.right, style: const TextStyle(fontWeight: FontWeight.bold))),
+        SizedBox(
+          width: 48,
+          child: Text(
+            '${mins}m',
+            textAlign: TextAlign.right,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
       ],
     );
   }
 
-  Widget _buildPaceCard(BuildContext context, String title, String value, IconData icon, Color color) {
+  Widget _buildPaceCard(
+    BuildContext context,
+    String title,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -287,9 +420,20 @@ class DashboardScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(value, style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold, color: color)),
+                  Text(
+                    value,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: color,
+                    ),
+                  ),
                   const SizedBox(height: 4),
-                  Text(title, style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w500)),
+                  Text(
+                    title,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -299,7 +443,10 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildAchievementsCard(BuildContext context, AsyncValue achievementsAsync) {
+  Widget _buildAchievementsCard(
+    BuildContext context,
+    AsyncValue achievementsAsync,
+  ) {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -309,7 +456,8 @@ class DashboardScreen extends ConsumerWidget {
           achievementsAsync.whenData((unlockedList) {
             showDialog(
               context: context,
-              builder: (_) => AchievementsDialog(unlockedAchievements: unlockedList),
+              builder: (_) =>
+                  AchievementsDialog(unlockedAchievements: unlockedList),
             );
           });
         },
@@ -318,13 +466,20 @@ class DashboardScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Achievements', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+              Text(
+                'Achievements',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 16),
               achievementsAsync.when(
                 data: (unlockedList) {
                   final totalCount = allAchievements.length;
                   final unlockedCount = unlockedList.length;
-                  final percent = totalCount > 0 ? (unlockedCount / totalCount) : 0.0;
+                  final percent = totalCount > 0
+                      ? (unlockedCount / totalCount)
+                      : 0.0;
 
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -332,8 +487,17 @@ class DashboardScreen extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('$unlockedCount / $totalCount Unlocked', style: const TextStyle(fontWeight: FontWeight.w500)),
-                          Text('${(percent * 100).toInt()}%', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.amber)),
+                          Text(
+                            '$unlockedCount / $totalCount Unlocked',
+                            style: const TextStyle(fontWeight: FontWeight.w500),
+                          ),
+                          Text(
+                            '${(percent * 100).toInt()}%',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.amber,
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 12),
@@ -348,7 +512,10 @@ class DashboardScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 20),
                       if (unlockedList.isEmpty)
-                        const Text('Keep reading to unlock badges!', style: TextStyle(color: Colors.grey))
+                        const Text(
+                          'Keep reading to unlock badges!',
+                          style: TextStyle(color: Colors.grey),
+                        )
                       else
                         Wrap(
                           spacing: 12,
@@ -371,9 +538,16 @@ class DashboardScreen extends ConsumerWidget {
                                 decoration: BoxDecoration(
                                   color: def.color.withAlpha(30),
                                   shape: BoxShape.circle,
-                                  border: Border.all(color: def.color.withAlpha(100), width: 1),
+                                  border: Border.all(
+                                    color: def.color.withAlpha(100),
+                                    width: 1,
+                                  ),
                                 ),
-                                child: Icon(def.icon, size: 24, color: def.color),
+                                child: Icon(
+                                  def.icon,
+                                  size: 24,
+                                  color: def.color,
+                                ),
                               ),
                             );
                           }).toList(),
@@ -381,7 +555,14 @@ class DashboardScreen extends ConsumerWidget {
                       if (unlockedList.length > 6)
                         Padding(
                           padding: const EdgeInsets.only(top: 12),
-                          child: Text('+${unlockedList.length - 6} more', style: const TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.bold)),
+                          child: Text(
+                            '+${unlockedList.length - 6} more',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                     ],
                   );
@@ -410,13 +591,22 @@ class DashboardScreen extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Reading Plans', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                Text(
+                  'Reading Plans',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                ),
                 IconButton(
                   icon: const Icon(Icons.arrow_forward, color: Colors.blue),
                   tooltip: 'Go to Reading Plans',
                   onPressed: () {
-                    ref.read(appModuleProvider.notifier).setModule(AppModule.reader);
-                    ref.read(activeToolProvider.notifier).setTool(ActiveTool.readingPlans);
+                    ref
+                        .read(appModuleProvider.notifier)
+                        .setModule(AppModule.reader);
+                    ref
+                        .read(activeToolProvider.notifier)
+                        .setTool(ActiveTool.readingPlans);
                   },
                 ),
               ],
@@ -433,12 +623,18 @@ class DashboardScreen extends ConsumerWidget {
                       border: Border.all(color: Colors.grey.withAlpha(50)),
                     ),
                     child: const Center(
-                      child: Text('No active reading plans. Create one in the Reader sidebar!', style: TextStyle(color: Colors.grey), textAlign: TextAlign.center),
+                      child: Text(
+                        'No active reading plans. Create one in the Reader sidebar!',
+                        style: TextStyle(color: Colors.grey),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   );
                 }
                 return Column(
-                  children: plans.map((plan) => _ReadingPlanProgressItem(plan: plan)).toList(),
+                  children: plans
+                      .map((plan) => _ReadingPlanProgressItem(plan: plan))
+                      .toList(),
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
@@ -465,7 +661,7 @@ class _ReadingPlanProgressItem extends ConsumerWidget {
       child: daysAsync.when(
         data: (days) {
           if (days.isEmpty) return const SizedBox.shrink();
-          
+
           final totalDays = days.length;
           final completedDays = days.where((d) => d.completed).length;
           final percent = totalDays > 0 ? completedDays / totalDays : 0.0;
@@ -512,7 +708,9 @@ class _ReadingPlanProgressItem extends ConsumerWidget {
 
 extension on DashboardScreen {
   Widget _buildVerseOfTheDayCard(BuildContext context, WidgetRef ref) {
-    final dayOfYear = DateTime.now().difference(DateTime(DateTime.now().year, 1, 1)).inDays;
+    final dayOfYear = DateTime.now()
+        .difference(DateTime(DateTime.now().year, 1, 1))
+        .inDays;
     final verse = versesOfTheDay[dayOfYear % versesOfTheDay.length];
 
     return Card(
@@ -524,75 +722,86 @@ extension on DashboardScreen {
           final reference = verse.reference;
           final lastSpaceIdx = reference.lastIndexOf(' ');
           if (lastSpaceIdx == -1) return;
-          
+
           final bookName = reference.substring(0, lastSpaceIdx);
           final chapterVerse = reference.substring(lastSpaceIdx + 1);
-          
+
           final colonIdx = chapterVerse.indexOf(':');
           if (colonIdx == -1) return;
-          
+
           final chapterStr = chapterVerse.substring(0, colonIdx);
           final chapter = int.tryParse(chapterStr);
-          
+
           if (chapter != null) {
             ref.read(selectedBookNameProvider.notifier).set(bookName);
             ref.read(selectedChapterProvider.notifier).set(chapter);
-            
+
             final verseStr = chapterVerse.substring(colonIdx + 1);
             final dashIdx = verseStr.indexOf('-');
-            final startVerseStr = dashIdx == -1 ? verseStr : verseStr.substring(0, dashIdx);
+            final startVerseStr = dashIdx == -1
+                ? verseStr
+                : verseStr.substring(0, dashIdx);
             final verseNum = int.tryParse(startVerseStr);
-            
+
             if (verseNum != null) {
               ref.read(targetVerseToScrollProvider.notifier).set(verseNum);
               ref.read(selectedVersesProvider.notifier).clear();
               ref.read(selectedVersesProvider.notifier).toggle(verseNum);
             }
-            
+
             ref.read(appModuleProvider.notifier).setModule(AppModule.reader);
           }
         },
         child: Container(
           decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          gradient: LinearGradient(
-            colors: [
-              Theme.of(context).colorScheme.primary.withAlpha(40),
-              Theme.of(context).colorScheme.primary.withAlpha(5),
+            borderRadius: BorderRadius.circular(16),
+            gradient: LinearGradient(
+              colors: [
+                Theme.of(context).colorScheme.primary.withAlpha(40),
+                Theme.of(context).colorScheme.primary.withAlpha(5),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.auto_awesome,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Verse of the Day',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                '"${verse.text}"',
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  fontStyle: FontStyle.italic,
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                verse.reference,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+              ),
             ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
           ),
         ),
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.auto_awesome, color: Theme.of(context).colorScheme.primary),
-                const SizedBox(width: 8),
-                Text('Verse of the Day', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary)),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              '"${verse.text}"',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                fontStyle: FontStyle.italic,
-                height: 1.5,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              verse.reference,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ),
       ),
     );
   }

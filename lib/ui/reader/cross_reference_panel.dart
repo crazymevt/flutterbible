@@ -104,9 +104,9 @@ class _CrossReferenceListForVerse extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Text(
                 'Cross-References for $bookName $chapter:$verse',
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
               ),
             ),
             ...xrefs.map((xref) => _CrossReferenceItem(xref: xref)),
@@ -130,13 +130,14 @@ class _CrossReferenceItem extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final targetVerseAsync = ref.watch(crossReferenceVerseProvider(xref));
-    
-    final label = '${xref.targetBookName} ${xref.targetChapter}:${xref.targetVerse}';
+
+    final label =
+        '${xref.targetBookName} ${xref.targetChapter}:${xref.targetVerse}';
 
     return targetVerseAsync.when(
       data: (targetVerse) {
         if (targetVerse == null) return const SizedBox.shrink();
-        
+
         return Container(
           margin: const EdgeInsets.only(bottom: 12.0),
           decoration: BoxDecoration(
@@ -156,13 +157,23 @@ class _CrossReferenceItem extends ConsumerWidget {
                 Expanded(
                   child: InkWell(
                     onTap: () {
-                      ref.read(selectedBookNameProvider.notifier).set(xref.targetBookName);
-                      ref.read(selectedChapterProvider.notifier).set(xref.targetChapter);
-                      ref.read(targetVerseToScrollProvider.notifier).set(xref.targetVerse);
+                      ref
+                          .read(selectedBookNameProvider.notifier)
+                          .set(xref.targetBookName);
+                      ref
+                          .read(selectedChapterProvider.notifier)
+                          .set(xref.targetChapter);
+                      ref
+                          .read(targetVerseToScrollProvider.notifier)
+                          .set(xref.targetVerse);
                       ref.read(selectedVersesProvider.notifier).clear();
-                      ref.read(selectedVersesProvider.notifier).toggle(xref.targetVerse);
-                      ref.read(navigationControllerProvider).recordHistory(verse: xref.targetVerse);
-                      
+                      ref
+                          .read(selectedVersesProvider.notifier)
+                          .toggle(xref.targetVerse);
+                      ref
+                          .read(navigationControllerProvider)
+                          .recordHistory(verse: xref.targetVerse);
+
                       // Close the panel if on mobile
                       if (MediaQuery.sizeOf(context).width <= 800) {
                         Navigator.of(context).pop();
@@ -178,10 +189,11 @@ class _CrossReferenceItem extends ConsumerWidget {
                             children: [
                               Text(
                                 label,
-                                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                                  color: const Color(0xFF4A60D1),
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: Theme.of(context).textTheme.labelLarge
+                                    ?.copyWith(
+                                      color: const Color(0xFF4A60D1),
+                                      fontWeight: FontWeight.bold,
+                                    ),
                               ),
                             ],
                           ),

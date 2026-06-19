@@ -36,7 +36,7 @@ class CrossReferences extends Table {
   TextColumn get sourceBookName => text()();
   IntColumn get sourceChapter => integer()();
   IntColumn get sourceVerse => integer()();
-  
+
   TextColumn get targetBookName => text()();
   IntColumn get targetChapter => integer()();
   IntColumn get targetVerse => integer()();

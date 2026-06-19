@@ -98,7 +98,9 @@ class BackupRestoreService {
     if (includeContent && await contentDbFile.exists()) {
       onProgress?.call('Adding downloaded content...');
       final contentBytes = await contentDbFile.readAsBytes();
-      archive.addFile(ArchiveFile('content.db', contentBytes.length, contentBytes));
+      archive.addFile(
+        ArchiveFile('content.db', contentBytes.length, contentBytes),
+      );
     }
 
     // Write manifest
@@ -109,9 +111,13 @@ class BackupRestoreService {
       includesContent: includeContent,
       deviceId: deviceId,
     );
-    final manifestJson = const JsonEncoder.withIndent('  ').convert(manifest.toJson());
+    final manifestJson = const JsonEncoder.withIndent(
+      '  ',
+    ).convert(manifest.toJson());
     final manifestBytes = utf8.encode(manifestJson);
-    archive.addFile(ArchiveFile('manifest.json', manifestBytes.length, manifestBytes));
+    archive.addFile(
+      ArchiveFile('manifest.json', manifestBytes.length, manifestBytes),
+    );
 
     // Encode as zip
     onProgress?.call('Compressing...');
@@ -120,7 +126,9 @@ class BackupRestoreService {
     // Write to temp directory
     final tempDir = await getTemporaryDirectory();
     final timestamp = DateFormat('yyyy-MM-dd_HHmmss').format(DateTime.now());
-    final backupFile = File(p.join(tempDir.path, 'studybible_backup_$timestamp.$_backupExtension'));
+    final backupFile = File(
+      p.join(tempDir.path, 'studybible_backup_$timestamp.$_backupExtension'),
+    );
     await backupFile.writeAsBytes(zipBytes);
 
     onProgress?.call('Backup created successfully');

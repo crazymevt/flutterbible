@@ -7,10 +7,10 @@ class AudioBible {
 
   factory AudioBible.fromJson(String name, Map<String, dynamic> json) {
     final Map<String, Map<String, Map<String, String>>> mappings = {};
-    
+
     // The JSON is like: { "Berean Standard Bible": { "Jude": { "1": { "gilbert": "url", ... } } } }
     // Or just { "Jude": { "1": { "gilbert": "url" } } } depending on how it was converted
-    
+
     // bsb.json structure starts with {"Berean Standard Bible": ... }
     // Let's extract the nested map
     Map<String, dynamic> rootMap = json;
@@ -25,7 +25,8 @@ class AudioBible {
           if (voiceMap is Map) {
             mappings[bookName]![chapter.toString()] = {};
             voiceMap.forEach((voice, url) {
-              mappings[bookName]![chapter.toString()]![voice.toString()] = url.toString();
+              mappings[bookName]![chapter.toString()]![voice.toString()] = url
+                  .toString();
             });
           }
         });

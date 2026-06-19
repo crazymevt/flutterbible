@@ -9,10 +9,12 @@ class ContentManagerScreen extends ConsumerStatefulWidget {
   const ContentManagerScreen({super.key});
 
   @override
-  ConsumerState<ContentManagerScreen> createState() => _ContentManagerScreenState();
+  ConsumerState<ContentManagerScreen> createState() =>
+      _ContentManagerScreenState();
 }
 
-class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen> with SingleTickerProviderStateMixin {
+class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   String _ph4SearchQuery = '';
   String _osisSearchQuery = '';
@@ -47,11 +49,7 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen> wit
       drawer: const AppDrawer(),
       body: TabBarView(
         controller: _tabController,
-        children: [
-          _buildInstalledTab(),
-          _buildPh4Tab(),
-          _buildOsisTab(),
-        ],
+        children: [_buildInstalledTab(), _buildPh4Tab(), _buildOsisTab()],
       ),
     );
   }
@@ -62,7 +60,8 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen> wit
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (err, _) => Center(child: Text('Error: $err')),
       data: (versions) {
-        if (versions.isEmpty) return const Center(child: Text('No versions installed.'));
+        if (versions.isEmpty)
+          return const Center(child: Text('No versions installed.'));
         return ListView.builder(
           itemCount: versions.length,
           itemBuilder: (context, index) {
@@ -103,7 +102,8 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen> wit
               prefixIcon: Icon(Icons.search),
               border: OutlineInputBorder(),
             ),
-            onChanged: (val) => setState(() => _ph4SearchQuery = val.toLowerCase()),
+            onChanged: (val) =>
+                setState(() => _ph4SearchQuery = val.toLowerCase()),
           ),
         ),
         Expanded(
@@ -111,10 +111,14 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen> wit
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (err, _) => Center(child: Text('Error: $err')),
             data: (modules) {
-              final filtered = modules.where((m) =>
-                  m.title.toLowerCase().contains(_ph4SearchQuery) ||
-                  m.abbr.toLowerCase().contains(_ph4SearchQuery) ||
-                  m.author.toLowerCase().contains(_ph4SearchQuery)).toList();
+              final filtered = modules
+                  .where(
+                    (m) =>
+                        m.title.toLowerCase().contains(_ph4SearchQuery) ||
+                        m.abbr.toLowerCase().contains(_ph4SearchQuery) ||
+                        m.author.toLowerCase().contains(_ph4SearchQuery),
+                  )
+                  .toList();
 
               return ListView.builder(
                 itemCount: filtered.length,
@@ -140,7 +144,10 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen> wit
                           children: [
                             LinearProgressIndicator(value: dlState.percent),
                             const SizedBox(height: 4),
-                            Text(dlState.status, style: const TextStyle(fontSize: 10)),
+                            Text(
+                              dlState.status,
+                              style: const TextStyle(fontSize: 10),
+                            ),
                           ],
                         ),
                       );
@@ -149,7 +156,9 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen> wit
                     trailing = IconButton(
                       icon: const Icon(Icons.download),
                       onPressed: () {
-                        ref.read(contentManagerControllerProvider.notifier).downloadAndImportPh4(m);
+                        ref
+                            .read(contentManagerControllerProvider.notifier)
+                            .downloadAndImportPh4(m);
                       },
                     );
                   }
@@ -160,13 +169,22 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen> wit
                         Expanded(child: Text(m.title)),
                         if (m.isPartial)
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.orange.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(4),
                               border: Border.all(color: Colors.orange),
                             ),
-                            child: const Text('PARTIAL', style: TextStyle(fontSize: 10, color: Colors.orange)),
+                            child: const Text(
+                              'PARTIAL',
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: Colors.orange,
+                              ),
+                            ),
                           ),
                       ],
                     ),
@@ -196,7 +214,8 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen> wit
               prefixIcon: Icon(Icons.search),
               border: OutlineInputBorder(),
             ),
-            onChanged: (val) => setState(() => _osisSearchQuery = val.toLowerCase()),
+            onChanged: (val) =>
+                setState(() => _osisSearchQuery = val.toLowerCase()),
           ),
         ),
         Expanded(
@@ -204,9 +223,13 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen> wit
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (err, _) => Center(child: Text('Error: $err')),
             data: (languages) {
-              final filtered = languages.where((l) =>
-                  l.name.toLowerCase().contains(_osisSearchQuery) ||
-                  l.code.toLowerCase().contains(_osisSearchQuery)).toList();
+              final filtered = languages
+                  .where(
+                    (l) =>
+                        l.name.toLowerCase().contains(_osisSearchQuery) ||
+                        l.code.toLowerCase().contains(_osisSearchQuery),
+                  )
+                  .toList();
 
               return ListView.builder(
                 itemCount: filtered.length,
@@ -225,7 +248,9 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen> wit
                       if (_expandedOsisLanguages.contains(l.code))
                         Consumer(
                           builder: (context, ref, child) {
-                            final translationsAsync = ref.watch(osisTranslationsProvider(l.code));
+                            final translationsAsync = ref.watch(
+                              osisTranslationsProvider(l.code),
+                            );
                             return translationsAsync.when(
                               loading: () => const Padding(
                                 padding: EdgeInsets.all(16.0),
@@ -233,7 +258,11 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen> wit
                               ),
                               error: (err, _) => Text('Error: $err'),
                               data: (translations) {
-                                if (translations.isEmpty) return const Padding(padding: EdgeInsets.all(16.0), child: Text('No translations found.'));
+                                if (translations.isEmpty)
+                                  return const Padding(
+                                    padding: EdgeInsets.all(16.0),
+                                    child: Text('No translations found.'),
+                                  );
                                 return Column(
                                   children: translations.map((t) {
                                     final stateKey = 'osis_${t.basename}';
@@ -242,10 +271,18 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen> wit
                                     Widget trailing;
                                     if (dlState != null) {
                                       if (dlState.status == 'Done') {
-                                        trailing = const Icon(Icons.check, color: Colors.green);
-                                      } else if (dlState.status.startsWith('Error')) {
+                                        trailing = const Icon(
+                                          Icons.check,
+                                          color: Colors.green,
+                                        );
+                                      } else if (dlState.status.startsWith(
+                                        'Error',
+                                      )) {
                                         trailing = IconButton(
-                                          icon: const Icon(Icons.error, color: Colors.red),
+                                          icon: const Icon(
+                                            Icons.error,
+                                            color: Colors.red,
+                                          ),
                                           tooltip: dlState.status,
                                           onPressed: () {},
                                         );
@@ -253,11 +290,19 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen> wit
                                         trailing = SizedBox(
                                           width: 100,
                                           child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
                                             children: [
-                                              LinearProgressIndicator(value: dlState.percent),
+                                              LinearProgressIndicator(
+                                                value: dlState.percent,
+                                              ),
                                               const SizedBox(height: 4),
-                                              Text(dlState.status, style: const TextStyle(fontSize: 10)),
+                                              Text(
+                                                dlState.status,
+                                                style: const TextStyle(
+                                                  fontSize: 10,
+                                                ),
+                                              ),
                                             ],
                                           ),
                                         );
@@ -266,7 +311,11 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen> wit
                                       trailing = IconButton(
                                         icon: const Icon(Icons.download),
                                         onPressed: () {
-                                          ref.read(contentManagerControllerProvider.notifier)
+                                          ref
+                                              .read(
+                                                contentManagerControllerProvider
+                                                    .notifier,
+                                              )
                                               .downloadAndImportOsis(t, l.code);
                                         },
                                       );
@@ -274,7 +323,9 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen> wit
 
                                     return ListTile(
                                       title: Text(t.title),
-                                      subtitle: Text('${(t.size / 1024 / 1024).toStringAsFixed(1)} MB'),
+                                      subtitle: Text(
+                                        '${(t.size / 1024 / 1024).toStringAsFixed(1)} MB',
+                                      ),
                                       trailing: trailing,
                                     );
                                   }).toList(),
@@ -282,7 +333,7 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen> wit
                               },
                             );
                           },
-                        )
+                        ),
                     ],
                   );
                 },

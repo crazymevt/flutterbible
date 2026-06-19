@@ -9,7 +9,8 @@ class JournalsPrayersScreen extends ConsumerStatefulWidget {
   const JournalsPrayersScreen({super.key});
 
   @override
-  ConsumerState<JournalsPrayersScreen> createState() => _JournalsPrayersScreenState();
+  ConsumerState<JournalsPrayersScreen> createState() =>
+      _JournalsPrayersScreenState();
 }
 
 class _JournalsPrayersScreenState extends ConsumerState<JournalsPrayersScreen> {
@@ -20,9 +21,7 @@ class _JournalsPrayersScreenState extends ConsumerState<JournalsPrayersScreen> {
     if (isDesktop) {
       return Scaffold(
         drawer: const AppDrawer(),
-        appBar: AppBar(
-          title: const Text('Journals & Prayers'),
-        ),
+        appBar: AppBar(title: const Text('Journals & Prayers')),
         body: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -65,10 +64,7 @@ class _JournalsPrayersScreenState extends ConsumerState<JournalsPrayersScreen> {
           ),
         ),
         body: const TabBarView(
-          children: [
-            JournalsListPanel(),
-            PrayerTrackerPanel(),
-          ],
+          children: [JournalsListPanel(), PrayerTrackerPanel()],
         ),
       ),
     );

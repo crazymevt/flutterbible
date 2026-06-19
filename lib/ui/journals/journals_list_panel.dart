@@ -9,7 +9,11 @@ class SelectedJournalIdNotifier extends Notifier<String?> {
   String? build() => null;
   void setId(String? id) => state = id;
 }
-final selectedJournalIdProvider = NotifierProvider<SelectedJournalIdNotifier, String?>(() => SelectedJournalIdNotifier());
+
+final selectedJournalIdProvider =
+    NotifierProvider<SelectedJournalIdNotifier, String?>(
+      () => SelectedJournalIdNotifier(),
+    );
 
 class SelectedJournalDateNotifier extends Notifier<DateTime> {
   @override
@@ -17,11 +21,16 @@ class SelectedJournalDateNotifier extends Notifier<DateTime> {
     final now = DateTime.now();
     return DateTime(now.year, now.month, now.day);
   }
+
   void setDate(DateTime date) {
     state = DateTime(date.year, date.month, date.day);
   }
 }
-final selectedJournalDateProvider = NotifierProvider<SelectedJournalDateNotifier, DateTime>(() => SelectedJournalDateNotifier());
+
+final selectedJournalDateProvider =
+    NotifierProvider<SelectedJournalDateNotifier, DateTime>(
+      () => SelectedJournalDateNotifier(),
+    );
 
 class JournalsListPanel extends ConsumerWidget {
   const JournalsListPanel({super.key});
@@ -40,7 +49,9 @@ class JournalsListPanel extends ConsumerWidget {
         final today = DateTime.now();
         final todayEntry = journals.where((j) {
           final d = DateTime.fromMillisecondsSinceEpoch(j.updatedAt).toLocal();
-          return d.year == today.year && d.month == today.month && d.day == today.day;
+          return d.year == today.year &&
+              d.month == today.month &&
+              d.day == today.day;
         }).firstOrNull;
         if (todayEntry != null) {
           ref.read(selectedJournalIdProvider.notifier).setId(todayEntry.id);
@@ -53,9 +64,11 @@ class JournalsListPanel extends ConsumerWidget {
       final journals = ref.read(journalsProvider).value ?? [];
       final found = journals.where((j) {
         final d = DateTime.fromMillisecondsSinceEpoch(j.updatedAt).toLocal();
-        return d.year == date.year && d.month == date.month && d.day == date.day;
+        return d.year == date.year &&
+            d.month == date.month &&
+            d.day == date.day;
       }).firstOrNull;
-      
+
       if (found != null) {
         ref.read(selectedJournalIdProvider.notifier).setId(found.id);
       } else {
@@ -74,14 +87,16 @@ class JournalsListPanel extends ConsumerWidget {
             lastDate: DateTime(2100),
             onDateChanged: selectDate,
           ),
-        if (isDesktop)
-          const Divider(),
+        if (isDesktop) const Divider(),
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Recent Entries', style: Theme.of(context).textTheme.titleMedium),
+              Text(
+                'Recent Entries',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -104,12 +119,16 @@ class JournalsListPanel extends ConsumerWidget {
                         );
                         if (date != null && context.mounted) {
                           selectDate(date);
-                          Navigator.of(context).push(MaterialPageRoute(
-                            builder: (_) => Scaffold(
-                              appBar: AppBar(title: const Text('Journal Editor')),
-                              body: const JournalEditorPanel(),
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => Scaffold(
+                                appBar: AppBar(
+                                  title: const Text('Journal Editor'),
+                                ),
+                                body: const JournalEditorPanel(),
+                              ),
                             ),
-                          ));
+                          );
                         }
                       },
                     ),
@@ -118,12 +137,14 @@ class JournalsListPanel extends ConsumerWidget {
                     onPressed: () {
                       ref.read(selectedJournalIdProvider.notifier).setId(null);
                       if (!isDesktop) {
-                        Navigator.of(context).push(MaterialPageRoute(
-                          builder: (_) => Scaffold(
-                            appBar: AppBar(title: const Text('New Journal')),
-                            body: const JournalEditorPanel(),
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => Scaffold(
+                              appBar: AppBar(title: const Text('New Journal')),
+                              body: const JournalEditorPanel(),
+                            ),
                           ),
-                        ));
+                        );
                       }
                     },
                   ),
@@ -143,30 +164,40 @@ class JournalsListPanel extends ConsumerWidget {
                 itemBuilder: (context, index) {
                   final journal = journals[index];
                   final isSelected = journal.id == selectedId;
-                  
+
                   return ListTile(
                     selected: isSelected,
-                    selectedTileColor: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.5),
+                    selectedTileColor: Theme.of(
+                      context,
+                    ).colorScheme.primaryContainer.withOpacity(0.5),
                     title: Text(
                       journal.title.isEmpty ? 'Untitled' : journal.title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     subtitle: Text(
-                      DateTime.fromMillisecondsSinceEpoch(journal.updatedAt).toLocal().toString().split(' ')[0],
+                      DateTime.fromMillisecondsSinceEpoch(
+                        journal.updatedAt,
+                      ).toLocal().toString().split(' ')[0],
                     ),
                     onTap: () {
-                      ref.read(selectedJournalIdProvider.notifier).setId(journal.id);
-                      final d = DateTime.fromMillisecondsSinceEpoch(journal.updatedAt).toLocal();
+                      ref
+                          .read(selectedJournalIdProvider.notifier)
+                          .setId(journal.id);
+                      final d = DateTime.fromMillisecondsSinceEpoch(
+                        journal.updatedAt,
+                      ).toLocal();
                       ref.read(selectedJournalDateProvider.notifier).setDate(d);
-                      
+
                       if (!isDesktop) {
-                        Navigator.of(context).push(MaterialPageRoute(
-                          builder: (_) => Scaffold(
-                            appBar: AppBar(title: const Text('Edit Journal')),
-                            body: const JournalEditorPanel(),
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => Scaffold(
+                              appBar: AppBar(title: const Text('Edit Journal')),
+                              body: const JournalEditorPanel(),
+                            ),
                           ),
-                        ));
+                        );
                       }
                     },
                   );

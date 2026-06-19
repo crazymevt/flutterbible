@@ -47,7 +47,9 @@ class NotesPanel extends ConsumerWidget {
             child: notesAsync.when(
               data: (notes) {
                 if (notes.isEmpty) {
-                  return const Center(child: Text('No notes for this chapter.'));
+                  return const Center(
+                    child: Text('No notes for this chapter.'),
+                  );
                 }
                 return ListView.separated(
                   padding: const EdgeInsets.all(16),
@@ -55,14 +57,21 @@ class NotesPanel extends ConsumerWidget {
                   separatorBuilder: (_, __) => const Divider(),
                   itemBuilder: (context, index) {
                     final note = notes[index];
-                    final title = note.verse != null ? 'Verse ${note.verse}' : 'Chapter Note';
+                    final title = note.verse != null
+                        ? 'Verse ${note.verse}'
+                        : 'Chapter Note';
                     return ListTile(
-                      title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      title: Text(
+                        title,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
                       subtitle: Text(note.content),
                       onTap: () {
                         if (note.verse != null) {
                           ref.read(selectedVersesProvider.notifier).clear();
-                          ref.read(selectedVersesProvider.notifier).toggle(note.verse!);
+                          ref
+                              .read(selectedVersesProvider.notifier)
+                              .toggle(note.verse!);
                         }
                         if (Navigator.of(context).canPop()) {
                           Navigator.of(context).pop();

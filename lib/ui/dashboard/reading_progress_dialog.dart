@@ -10,8 +10,20 @@ class ReadingProgressDialog extends ConsumerWidget {
 
   // Example list of books for demonstration. In a full app, this comes from content_providers.
   static const _books = [
-    'Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy', 'Joshua', 'Judges', 'Ruth',
-    'Matthew', 'Mark', 'Luke', 'John', 'Acts', 'Romans'
+    'Genesis',
+    'Exodus',
+    'Leviticus',
+    'Numbers',
+    'Deuteronomy',
+    'Joshua',
+    'Judges',
+    'Ruth',
+    'Matthew',
+    'Mark',
+    'Luke',
+    'John',
+    'Acts',
+    'Romans',
   ];
 
   @override
@@ -27,8 +39,14 @@ class ReadingProgressDialog extends ConsumerWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Books Read', style: Theme.of(context).textTheme.titleLarge),
-                  IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context)),
+                  Text(
+                    'Books Read',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(context),
+                  ),
                 ],
               ),
             ),
@@ -39,7 +57,7 @@ class ReadingProgressDialog extends ConsumerWidget {
                 itemBuilder: (context, index) {
                   final book = _books[index];
                   final readChapters = coverage[book] ?? [];
-                  
+
                   return ExpansionTile(
                     title: Text(book),
                     subtitle: Text('${readChapters.length} chapters read'),
@@ -53,15 +71,29 @@ class ReadingProgressDialog extends ConsumerWidget {
                           final isRead = readChapters.contains(chapter);
                           return InkWell(
                             onTap: () {
-                              ref.read(selectedBookNameProvider.notifier).set(book);
-                              ref.read(selectedChapterProvider.notifier).set(chapter);
-                              ref.read(appModuleProvider.notifier).setModule(AppModule.reader);
+                              ref
+                                  .read(selectedBookNameProvider.notifier)
+                                  .set(book);
+                              ref
+                                  .read(selectedChapterProvider.notifier)
+                                  .set(chapter);
+                              ref
+                                  .read(appModuleProvider.notifier)
+                                  .setModule(AppModule.reader);
                               Navigator.pop(context);
                             },
                             child: Chip(
                               label: Text('$chapter'),
-                              backgroundColor: isRead ? Colors.green.withOpacity(0.2) : Colors.grey.withOpacity(0.1),
-                              avatar: isRead ? const Icon(Icons.check, size: 16, color: Colors.green) : null,
+                              backgroundColor: isRead
+                                  ? Colors.green.withOpacity(0.2)
+                                  : Colors.grey.withOpacity(0.1),
+                              avatar: isRead
+                                  ? const Icon(
+                                      Icons.check,
+                                      size: 16,
+                                      color: Colors.green,
+                                    )
+                                  : null,
                             ),
                           );
                         }),

@@ -55,15 +55,14 @@ class _JournalEditorPanelState extends ConsumerState<JournalEditorPanel> {
     _debounce = Timer(const Duration(milliseconds: 500), () async {
       final title = _titleController.text;
       final content = _contentController.text;
-      
+
       if (title.isEmpty && content.isEmpty) return;
-      
+
       final selectedDate = ref.read(selectedJournalDateProvider);
-      
-      final id = await ref.read(journalActionProvider).saveJournal(
-        _currentId, title, content, 
-        dateOverride: selectedDate
-      );
+
+      final id = await ref
+          .read(journalActionProvider)
+          .saveJournal(_currentId, title, content, dateOverride: selectedDate);
       if (_currentId == null && mounted) {
         setState(() {
           _currentId = id;
@@ -106,15 +105,25 @@ class _JournalEditorPanelState extends ConsumerState<JournalEditorPanel> {
                       context: context,
                       builder: (c) => AlertDialog(
                         title: const Text('Delete Journal'),
-                        content: const Text('Are you sure you want to delete this entry?'),
+                        content: const Text(
+                          'Are you sure you want to delete this entry?',
+                        ),
                         actions: [
-                          TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('Cancel')),
-                          TextButton(onPressed: () => Navigator.pop(c, true), child: const Text('Delete')),
+                          TextButton(
+                            onPressed: () => Navigator.pop(c, false),
+                            child: const Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.pop(c, true),
+                            child: const Text('Delete'),
+                          ),
                         ],
                       ),
                     );
                     if (confirm == true) {
-                      await ref.read(journalActionProvider).deleteJournal(_currentId!);
+                      await ref
+                          .read(journalActionProvider)
+                          .deleteJournal(_currentId!);
                       ref.read(selectedJournalIdProvider.notifier).setId(null);
                     }
                   },

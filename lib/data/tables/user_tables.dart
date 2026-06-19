@@ -73,7 +73,8 @@ class Prayers extends Table {
   TextColumn get name => text()();
   TextColumn get description => text()();
   IntColumn get createdAt => integer()(); // epoch ms
-  IntColumn get answeredAt => integer().nullable()(); // epoch ms, null if not answered
+  IntColumn get answeredAt =>
+      integer().nullable()(); // epoch ms, null if not answered
 
   @override
   Set<Column> get primaryKey => {id};
@@ -165,7 +166,8 @@ class ReadingPlanDays extends Table {
 
   TextColumn get planId => text()();
   IntColumn get dayNumber => integer()();
-  IntColumn get date => integer().nullable()(); // epoch ms, for absolute tracking
+  IntColumn get date =>
+      integer().nullable()(); // epoch ms, for absolute tracking
   BoolColumn get completed => boolean().withDefault(const Constant(false))();
 
   @override

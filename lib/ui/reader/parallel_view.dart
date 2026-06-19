@@ -14,6 +14,7 @@ class ParallelView extends ConsumerStatefulWidget {
   final Set<int> selectedVerses;
   final Map<int, String> savedHighlights;
   final Function(int) onVerseTap;
+  final ValueChanged<int>? onFootnoteTap;
   final bool isFlowing;
   final ItemScrollController? externalScrollController;
   final ItemPositionsListener? externalPositionsListener;
@@ -24,6 +25,7 @@ class ParallelView extends ConsumerStatefulWidget {
     required this.selectedVerses,
     required this.savedHighlights,
     required this.onVerseTap,
+    this.onFootnoteTap,
     this.isFlowing = false,
     this.externalScrollController,
     this.externalPositionsListener,
@@ -35,7 +37,8 @@ class ParallelView extends ConsumerStatefulWidget {
 
 class _ParallelViewState extends ConsumerState<ParallelView> {
   final ItemScrollController itemScrollController = ItemScrollController();
-  final ItemPositionsListener itemPositionsListener = ItemPositionsListener.create();
+  final ItemPositionsListener itemPositionsListener =
+      ItemPositionsListener.create();
 
   @override
   void initState() {
@@ -72,15 +75,13 @@ class _ParallelViewState extends ConsumerState<ParallelView> {
     });
   }
 
-
-
   List<InlineSpan> _buildVerseSpans(BuildContext context, Verse verse) {
     if (verse.segments.isEmpty || verse.segments == '[]') {
       return [
         TextSpan(
           text: verse.textContent,
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(height: 1.6),
-        )
+        ),
       ];
     }
     try {
@@ -93,20 +94,53 @@ class _ParallelViewState extends ConsumerState<ParallelView> {
           continue;
         }
         hasText = true;
-        
+
         if (seg.isParagraphBreak) {
           spans.add(const TextSpan(text: '\n\n'));
         } else if (seg.isLineBreak) {
           spans.add(const TextSpan(text: '\n'));
-        } else {
-          spans.add(TextSpan(
-            text: seg.text,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  height: 1.6,
-                  fontStyle: seg.isItalic ? FontStyle.italic : null,
-                  color: seg.isJesusWords ? Colors.red.shade700 : null,
+        } else if (seg.isFootnote) {
+          spans.add(
+            WidgetSpan(
+              alignment: PlaceholderAlignment.top,
+              child: GestureDetector(
+                onTap: () {
+                  widget.onVerseTap(verse.verse);
+                  widget.onFootnoteTap?.call(verse.verse);
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 2,
+                    vertical: 2,
+                  ),
+                  margin: const EdgeInsets.only(left: 2, right: 2),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    seg.footnoteText ?? 'f',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 10,
+                    ),
+                  ),
                 ),
-          ));
+              ),
+            ),
+          );
+        } else {
+          spans.add(
+            TextSpan(
+              text: seg.text,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                height: 1.6,
+                fontStyle: seg.isItalic ? FontStyle.italic : null,
+                color: seg.isJesusWords ? Colors.red.shade700 : null,
+              ),
+            ),
+          );
         }
       }
       return spans;
@@ -115,7 +149,7 @@ class _ParallelViewState extends ConsumerState<ParallelView> {
         TextSpan(
           text: verse.textContent,
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(height: 1.6),
-        )
+        ),
       ];
     }
   }
@@ -128,7 +162,9 @@ class _ParallelViewState extends ConsumerState<ParallelView> {
       child: Center(
         child: Text(
           versionId,
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+          style: Theme.of(
+            context,
+          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
         ),
       ),
     );
@@ -177,9 +213,7 @@ class _ParallelViewState extends ConsumerState<ParallelView> {
       children: [
         Row(
           children: keys.map((versionId) {
-            return Expanded(
-              child: _buildHeader(context, versionId),
-            );
+            return Expanded(child: _buildHeader(context, versionId));
           }).toList(),
         ),
         Expanded(
@@ -198,12 +232,14 @@ class _ParallelViewState extends ConsumerState<ParallelView> {
               final verseNum = verseNumbers[index];
               final isSelected = widget.selectedVerses.contains(verseNum);
               final highlightHex = widget.savedHighlights[verseNum];
-              final highlightColor = highlightHex != null 
-                  ? Color(int.parse(highlightHex.replaceFirst('#', '0xFF'))) 
+              final highlightColor = highlightHex != null
+                  ? Color(int.parse(highlightHex.replaceFirst('#', '0xFF')))
                   : null;
 
               final bgColor = isSelected
-                  ? Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5)
+                  ? Theme.of(
+                      context,
+                    ).colorScheme.primaryContainer.withValues(alpha: 0.5)
                   : highlightColor?.withValues(alpha: 0.2);
 
               final verseSpacing = ref.watch(appVerseSpacingProvider);
@@ -219,32 +255,47 @@ class _ParallelViewState extends ConsumerState<ParallelView> {
                         final verses = widget.versesMap[versionId] ?? [];
                         // Find the verse or return a fallback
                         final verse = verses.firstWhere(
-                          (v) => v.verse == verseNum, 
-                          orElse: () => Verse(id: -1, bookId: -1, chapter: -1, verse: verseNum, textContent: '', segments: '[]')
+                          (v) => v.verse == verseNum,
+                          orElse: () => Verse(
+                            id: -1,
+                            bookId: -1,
+                            chapter: -1,
+                            verse: verseNum,
+                            textContent: '',
+                            segments: '[]',
+                          ),
                         );
 
                         return Expanded(
                           child: InkWell(
-                             onTap: () => widget.onVerseTap(verseNum),
-                             child: Padding(
-                               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                               child: verse.id == -1 
-                                   ? const SizedBox.shrink() // empty cell if verse is missing in this translation
-                                   : Text.rich(
-                                       TextSpan(
-                                         children: [
-                                           TextSpan(
-                                             text: '${verse.verse} ',
-                                             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                                   color: Theme.of(context).colorScheme.primary,
-                                                   fontWeight: FontWeight.bold,
-                                                 ),
-                                           ),
-                                           ..._buildVerseSpans(context, verse),
-                                         ],
-                                       ),
-                                     ),
-                             ),
+                            onTap: () => widget.onVerseTap(verseNum),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16.0,
+                                vertical: 8.0,
+                              ),
+                              child: verse.id == -1
+                                  ? const SizedBox.shrink() // empty cell if verse is missing in this translation
+                                  : Text.rich(
+                                      TextSpan(
+                                        children: [
+                                          TextSpan(
+                                            text: '${verse.verse} ',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .labelSmall
+                                                ?.copyWith(
+                                                  color: Theme.of(
+                                                    context,
+                                                  ).colorScheme.primary,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                          ),
+                                          ..._buildVerseSpans(context, verse),
+                                        ],
+                                      ),
+                                    ),
+                            ),
                           ),
                         );
                       }).toList(),

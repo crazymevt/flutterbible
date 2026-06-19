@@ -25,13 +25,15 @@ class ActiveToolNotifier extends Notifier<ActiveTool> {
       state = tool;
     }
   }
-  
+
   void close() {
     state = ActiveTool.none;
   }
 }
 
-final activeToolProvider = NotifierProvider<ActiveToolNotifier, ActiveTool>(() => ActiveToolNotifier());
+final activeToolProvider = NotifierProvider<ActiveToolNotifier, ActiveTool>(
+  () => ActiveToolNotifier(),
+);
 
 enum AppModule {
   reader,
@@ -54,7 +56,10 @@ class ShowDashboardOnStartNotifier extends Notifier<bool> {
   }
 }
 
-final showDashboardOnStartProvider = NotifierProvider<ShowDashboardOnStartNotifier, bool>(() => ShowDashboardOnStartNotifier());
+final showDashboardOnStartProvider =
+    NotifierProvider<ShowDashboardOnStartNotifier, bool>(
+      () => ShowDashboardOnStartNotifier(),
+    );
 
 class AppFontFamilyNotifier extends Notifier<String> {
   @override
@@ -69,7 +74,9 @@ class AppFontFamilyNotifier extends Notifier<String> {
   }
 }
 
-final appFontFamilyProvider = NotifierProvider<AppFontFamilyNotifier, String>(() => AppFontFamilyNotifier());
+final appFontFamilyProvider = NotifierProvider<AppFontFamilyNotifier, String>(
+  () => AppFontFamilyNotifier(),
+);
 
 class AppFontSizeDeltaNotifier extends Notifier<double> {
   @override
@@ -84,7 +91,10 @@ class AppFontSizeDeltaNotifier extends Notifier<double> {
   }
 }
 
-final appFontSizeDeltaProvider = NotifierProvider<AppFontSizeDeltaNotifier, double>(() => AppFontSizeDeltaNotifier());
+final appFontSizeDeltaProvider =
+    NotifierProvider<AppFontSizeDeltaNotifier, double>(
+      () => AppFontSizeDeltaNotifier(),
+    );
 
 class AppVerseSpacingNotifier extends Notifier<double> {
   @override
@@ -99,7 +109,10 @@ class AppVerseSpacingNotifier extends Notifier<double> {
   }
 }
 
-final appVerseSpacingProvider = NotifierProvider<AppVerseSpacingNotifier, double>(() => AppVerseSpacingNotifier());
+final appVerseSpacingProvider =
+    NotifierProvider<AppVerseSpacingNotifier, double>(
+      () => AppVerseSpacingNotifier(),
+    );
 
 class AppModuleNotifier extends Notifier<AppModule> {
   AppModule build() {
@@ -112,4 +125,6 @@ class AppModuleNotifier extends Notifier<AppModule> {
   }
 }
 
-final appModuleProvider = NotifierProvider<AppModuleNotifier, AppModule>(() => AppModuleNotifier());
+final appModuleProvider = NotifierProvider<AppModuleNotifier, AppModule>(
+  () => AppModuleNotifier(),
+);

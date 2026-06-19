@@ -8,11 +8,22 @@ import 'tables/user_tables.dart';
 
 part 'user_store.g.dart';
 
-@DriftDatabase(tables: [
-  Highlights, Notes, Bookmarks, Journals, Prayers, 
-  ReadingProgresses, TimeTrackers, Achievements, NavigationHistories,
-  ReadingPlans, ReadingPlanDays, ReadingPlanItems
-])
+@DriftDatabase(
+  tables: [
+    Highlights,
+    Notes,
+    Bookmarks,
+    Journals,
+    Prayers,
+    ReadingProgresses,
+    TimeTrackers,
+    Achievements,
+    NavigationHistories,
+    ReadingPlans,
+    ReadingPlanDays,
+    ReadingPlanItems,
+  ],
+)
 class UserStore extends _$UserStore {
   UserStore([QueryExecutor? e]) : super(e ?? _openConnection());
 

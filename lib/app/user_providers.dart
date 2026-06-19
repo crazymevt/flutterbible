@@ -15,10 +15,14 @@ final chapterHighlightsProvider = StreamProvider<Map<int, String>>((ref) {
   final bookName = ref.watch(selectedBookNameProvider);
   final chapter = ref.watch(selectedChapterProvider);
 
-  return (store.select(store.highlights)
-        ..where((h) => (h.bookName.equals(bookName)) & (h.chapter.equals(chapter)) & (h.deleted.equals(false))))
+  return (store.select(store.highlights)..where(
+        (h) =>
+            (h.bookName.equals(bookName)) &
+            (h.chapter.equals(chapter)) &
+            (h.deleted.equals(false)),
+      ))
       .watch()
-      .map((highlights) => { for (var h in highlights) h.verse: h.colorHex });
+      .map((highlights) => {for (var h in highlights) h.verse: h.colorHex});
 });
 
 final highlightActionProvider = Provider((ref) {
@@ -35,23 +39,39 @@ class HighlightAction {
     final chapter = ref.read(selectedChapterProvider);
     final deviceId = await ref.read(deviceIdProvider.future);
 
-    final existing = await (store.select(store.highlights)
-          ..where((h) => (h.bookName.equals(bookName)) & (h.chapter.equals(chapter)) & (h.verse.equals(verse)) & (h.deleted.equals(false))))
-        .getSingleOrNull();
+    final existing =
+        await (store.select(store.highlights)..where(
+              (h) =>
+                  (h.bookName.equals(bookName)) &
+                  (h.chapter.equals(chapter)) &
+                  (h.verse.equals(verse)) &
+                  (h.deleted.equals(false)),
+            ))
+            .getSingleOrNull();
 
     if (existing != null) {
       if (existing.colorHex == colorHex) {
         // Toggle off if same color
-        await store.into(store.highlights).insert(
-          existing.copyWith(deleted: true, updatedAt: DateTime.now().millisecondsSinceEpoch),
-          mode: InsertMode.replace,
-        );
+        await store
+            .into(store.highlights)
+            .insert(
+              existing.copyWith(
+                deleted: true,
+                updatedAt: DateTime.now().millisecondsSinceEpoch,
+              ),
+              mode: InsertMode.replace,
+            );
       } else {
         // Change color
-        await store.into(store.highlights).insert(
-          existing.copyWith(colorHex: colorHex, updatedAt: DateTime.now().millisecondsSinceEpoch),
-          mode: InsertMode.replace,
-        );
+        await store
+            .into(store.highlights)
+            .insert(
+              existing.copyWith(
+                colorHex: colorHex,
+                updatedAt: DateTime.now().millisecondsSinceEpoch,
+              ),
+              mode: InsertMode.replace,
+            );
       }
     } else {
       final newHighlight = Highlight(
@@ -75,8 +95,12 @@ final chapterNotesProvider = StreamProvider<List<Note>>((ref) {
   final bookName = ref.watch(selectedBookNameProvider);
   final chapter = ref.watch(selectedChapterProvider);
 
-  return (store.select(store.notes)
-        ..where((n) => (n.bookName.equals(bookName)) & (n.chapter.equals(chapter)) & (n.deleted.equals(false))))
+  return (store.select(store.notes)..where(
+        (n) =>
+            (n.bookName.equals(bookName)) &
+            (n.chapter.equals(chapter)) &
+            (n.deleted.equals(false)),
+      ))
       .watch();
 });
 
@@ -94,8 +118,13 @@ class NoteAction {
 
     // Simplification: one note per verse or one general chapter note
     final query = store.select(store.notes)
-      ..where((n) => (n.bookName.equals(bookName)) & (n.chapter.equals(chapter)) & (n.deleted.equals(false)));
-      
+      ..where(
+        (n) =>
+            (n.bookName.equals(bookName)) &
+            (n.chapter.equals(chapter)) &
+            (n.deleted.equals(false)),
+      );
+
     if (verse != null) {
       query.where((n) => n.verse.equals(verse));
     } else {
@@ -105,10 +134,15 @@ class NoteAction {
     final existing = await query.getSingleOrNull();
 
     if (existing != null) {
-      await store.into(store.notes).insert(
-        existing.copyWith(content: content, updatedAt: DateTime.now().millisecondsSinceEpoch),
-        mode: InsertMode.replace,
-      );
+      await store
+          .into(store.notes)
+          .insert(
+            existing.copyWith(
+              content: content,
+              updatedAt: DateTime.now().millisecondsSinceEpoch,
+            ),
+            mode: InsertMode.replace,
+          );
     } else {
       final newNote = Note(
         id: const Uuid().v4(),
@@ -123,15 +157,22 @@ class NoteAction {
       await store.into(store.notes).insert(newNote);
     }
   }
-  
+
   Future<void> deleteNote(String id) async {
     final store = ref.read(userStoreProvider);
-    final existing = await (store.select(store.notes)..where((n) => n.id.equals(id))).getSingleOrNull();
+    final existing = await (store.select(
+      store.notes,
+    )..where((n) => n.id.equals(id))).getSingleOrNull();
     if (existing != null) {
-      await store.into(store.notes).insert(
-        existing.copyWith(deleted: true, updatedAt: DateTime.now().millisecondsSinceEpoch),
-        mode: InsertMode.replace,
-      );
+      await store
+          .into(store.notes)
+          .insert(
+            existing.copyWith(
+              deleted: true,
+              updatedAt: DateTime.now().millisecondsSinceEpoch,
+            ),
+            mode: InsertMode.replace,
+          );
     }
   }
 }
@@ -142,8 +183,12 @@ final chapterBookmarksProvider = StreamProvider<List<Bookmark>>((ref) {
   final bookName = ref.watch(selectedBookNameProvider);
   final chapter = ref.watch(selectedChapterProvider);
 
-  return (store.select(store.bookmarks)
-        ..where((b) => (b.bookName.equals(bookName)) & (b.chapter.equals(chapter)) & (b.deleted.equals(false))))
+  return (store.select(store.bookmarks)..where(
+        (b) =>
+            (b.bookName.equals(bookName)) &
+            (b.chapter.equals(chapter)) &
+            (b.deleted.equals(false)),
+      ))
       .watch();
 });
 
@@ -176,18 +221,27 @@ class BookmarkAction {
 
   Future<void> deleteBookmark(String id) async {
     final store = ref.read(userStoreProvider);
-    final existing = await (store.select(store.bookmarks)..where((b) => b.id.equals(id))).getSingleOrNull();
+    final existing = await (store.select(
+      store.bookmarks,
+    )..where((b) => b.id.equals(id))).getSingleOrNull();
     if (existing != null) {
-      await store.into(store.bookmarks).insert(
-        existing.copyWith(deleted: true, updatedAt: DateTime.now().millisecondsSinceEpoch),
-        mode: InsertMode.replace,
-      );
+      await store
+          .into(store.bookmarks)
+          .insert(
+            existing.copyWith(
+              deleted: true,
+              updatedAt: DateTime.now().millisecondsSinceEpoch,
+            ),
+            mode: InsertMode.replace,
+          );
     }
   }
 }
 
 // NAVIGATION HISTORY
-final navigationHistoryProvider = StreamProvider<List<NavigationHistory>>((ref) {
+final navigationHistoryProvider = StreamProvider<List<NavigationHistory>>((
+  ref,
+) {
   final store = ref.watch(userStoreProvider);
   return (store.select(store.navigationHistories)
         ..where((h) => h.deleted.equals(false))

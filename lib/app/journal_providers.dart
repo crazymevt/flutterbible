@@ -10,7 +10,9 @@ final journalsProvider = StreamProvider<List<Journal>>((ref) {
   final store = ref.watch(userStoreProvider);
   return (store.select(store.journals)
         ..where((j) => j.deleted.equals(false))
-        ..orderBy([(j) => OrderingTerm(expression: j.updatedAt, mode: OrderingMode.desc)]))
+        ..orderBy([
+          (j) => OrderingTerm(expression: j.updatedAt, mode: OrderingMode.desc),
+        ]))
       .watch();
 });
 
@@ -20,30 +22,42 @@ class JournalAction {
   final Ref ref;
   JournalAction(this.ref);
 
-  Future<String> saveJournal(String? id, String title, String content, {String? tags, DateTime? dateOverride}) async {
+  Future<String> saveJournal(
+    String? id,
+    String title,
+    String content, {
+    String? tags,
+    DateTime? dateOverride,
+  }) async {
     final store = ref.read(userStoreProvider);
     final deviceId = await ref.read(deviceIdProvider.future);
-    
+
     final journalId = id ?? const Uuid().v4();
-    final existing = id != null 
-        ? await (store.select(store.journals)..where((j) => j.id.equals(id))).getSingleOrNull()
+    final existing = id != null
+        ? await (store.select(
+            store.journals,
+          )..where((j) => j.id.equals(id))).getSingleOrNull()
         : null;
 
-    final updateTime = dateOverride?.millisecondsSinceEpoch ?? DateTime.now().millisecondsSinceEpoch;
+    final updateTime =
+        dateOverride?.millisecondsSinceEpoch ??
+        DateTime.now().millisecondsSinceEpoch;
 
     if (existing != null) {
-      await store.into(store.journals).insert(
-        existing.copyWith(
-          title: title, 
-          content: content, 
-          tags: Value(tags),
-          // We don't overwrite updatedAt with a backdate if it's already an existing entry, unless we specifically want to.
-          // Since the user is editing it *now*, we might want to keep its original date if it's backdated, 
-          // or update to now. Let's keep it simple: use the override if provided.
-          updatedAt: updateTime
-        ),
-        mode: InsertMode.replace,
-      );
+      await store
+          .into(store.journals)
+          .insert(
+            existing.copyWith(
+              title: title,
+              content: content,
+              tags: Value(tags),
+              // We don't overwrite updatedAt with a backdate if it's already an existing entry, unless we specifically want to.
+              // Since the user is editing it *now*, we might want to keep its original date if it's backdated,
+              // or update to now. Let's keep it simple: use the override if provided.
+              updatedAt: updateTime,
+            ),
+            mode: InsertMode.replace,
+          );
     } else {
       final newJournal = Journal(
         id: journalId,
@@ -58,15 +72,22 @@ class JournalAction {
     }
     return journalId;
   }
-  
+
   Future<void> deleteJournal(String id) async {
     final store = ref.read(userStoreProvider);
-    final existing = await (store.select(store.journals)..where((j) => j.id.equals(id))).getSingleOrNull();
+    final existing = await (store.select(
+      store.journals,
+    )..where((j) => j.id.equals(id))).getSingleOrNull();
     if (existing != null) {
-      await store.into(store.journals).insert(
-        existing.copyWith(deleted: true, updatedAt: DateTime.now().millisecondsSinceEpoch),
-        mode: InsertMode.replace,
-      );
+      await store
+          .into(store.journals)
+          .insert(
+            existing.copyWith(
+              deleted: true,
+              updatedAt: DateTime.now().millisecondsSinceEpoch,
+            ),
+            mode: InsertMode.replace,
+          );
     }
   }
 }
@@ -76,7 +97,9 @@ final prayersProvider = StreamProvider<List<Prayer>>((ref) {
   final store = ref.watch(userStoreProvider);
   return (store.select(store.prayers)
         ..where((p) => p.deleted.equals(false))
-        ..orderBy([(p) => OrderingTerm(expression: p.createdAt, mode: OrderingMode.desc)]))
+        ..orderBy([
+          (p) => OrderingTerm(expression: p.createdAt, mode: OrderingMode.desc),
+        ]))
       .watch();
 });
 
@@ -90,21 +113,25 @@ class PrayerAction {
     final store = ref.read(userStoreProvider);
     final deviceId = await ref.read(deviceIdProvider.future);
     final now = DateTime.now().millisecondsSinceEpoch;
-    
+
     final prayerId = id ?? const Uuid().v4();
-    final existing = id != null 
-        ? await (store.select(store.prayers)..where((p) => p.id.equals(id))).getSingleOrNull()
+    final existing = id != null
+        ? await (store.select(
+            store.prayers,
+          )..where((p) => p.id.equals(id))).getSingleOrNull()
         : null;
 
     if (existing != null) {
-      await store.into(store.prayers).insert(
-        existing.copyWith(
-          name: name, 
-          description: description, 
-          updatedAt: now
-        ),
-        mode: InsertMode.replace,
-      );
+      await store
+          .into(store.prayers)
+          .insert(
+            existing.copyWith(
+              name: name,
+              description: description,
+              updatedAt: now,
+            ),
+            mode: InsertMode.replace,
+          );
     } else {
       final newPrayer = Prayer(
         id: prayerId,
@@ -124,27 +151,38 @@ class PrayerAction {
   Future<void> toggleAnswered(String id, bool answered) async {
     final store = ref.read(userStoreProvider);
     final now = DateTime.now().millisecondsSinceEpoch;
-    
-    final existing = await (store.select(store.prayers)..where((p) => p.id.equals(id))).getSingleOrNull();
+
+    final existing = await (store.select(
+      store.prayers,
+    )..where((p) => p.id.equals(id))).getSingleOrNull();
     if (existing != null) {
-      await store.into(store.prayers).insert(
-        existing.copyWith(
-          answeredAt: Value(answered ? now : null),
-          updatedAt: now,
-        ),
-        mode: InsertMode.replace,
-      );
+      await store
+          .into(store.prayers)
+          .insert(
+            existing.copyWith(
+              answeredAt: Value(answered ? now : null),
+              updatedAt: now,
+            ),
+            mode: InsertMode.replace,
+          );
     }
   }
-  
+
   Future<void> deletePrayer(String id) async {
     final store = ref.read(userStoreProvider);
-    final existing = await (store.select(store.prayers)..where((p) => p.id.equals(id))).getSingleOrNull();
+    final existing = await (store.select(
+      store.prayers,
+    )..where((p) => p.id.equals(id))).getSingleOrNull();
     if (existing != null) {
-      await store.into(store.prayers).insert(
-        existing.copyWith(deleted: true, updatedAt: DateTime.now().millisecondsSinceEpoch),
-        mode: InsertMode.replace,
-      );
+      await store
+          .into(store.prayers)
+          .insert(
+            existing.copyWith(
+              deleted: true,
+              updatedAt: DateTime.now().millisecondsSinceEpoch,
+            ),
+            mode: InsertMode.replace,
+          );
     }
   }
 }

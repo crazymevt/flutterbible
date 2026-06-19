@@ -47,20 +47,49 @@ class OsisTranslation {
 }
 
 class ContentManagerApi {
-  final Dio _dio = Dio(BaseOptions(
-    headers: {'User-Agent': 'Mozilla/5.0 (StudyBible Flutter)'},
-    responseType: ResponseType.plain,
-  ));
+  final Dio _dio = Dio(
+    BaseOptions(
+      headers: {'User-Agent': 'Mozilla/5.0 (StudyBible Flutter)'},
+      responseType: ResponseType.plain,
+    ),
+  );
 
   static const _osisLanguageNames = {
-    "af": "Afrikaans", "ar": "Arabic", "bg": "Bulgarian", "ch": "Chamorro", "cs": "Czech",
-    "da": "Danish", "de": "German", "en": "English", "es": "Spanish", "eu": "Basque",
-    "fi": "Finnish", "fr": "French", "gd": "Scottish Gaelic", "he": "Hebrew",
-    "hr": "Croatian", "ht": "Haitian Creole", "hu": "Hungarian", "it": "Italian",
-    "ko": "Korean", "la": "Latin", "lv": "Latvian", "mi": "Maori", "no": "Norwegian",
-    "pl": "Polish", "pt": "Portuguese", "ro": "Romanian", "ru": "Russian", "sq": "Albanian",
-    "sv": "Swedish", "sw": "Swahili", "th": "Thai", "tl": "Tagalog", "tr": "Turkish",
-    "vi": "Vietnamese", "zh": "Chinese"
+    "af": "Afrikaans",
+    "ar": "Arabic",
+    "bg": "Bulgarian",
+    "ch": "Chamorro",
+    "cs": "Czech",
+    "da": "Danish",
+    "de": "German",
+    "en": "English",
+    "es": "Spanish",
+    "eu": "Basque",
+    "fi": "Finnish",
+    "fr": "French",
+    "gd": "Scottish Gaelic",
+    "he": "Hebrew",
+    "hr": "Croatian",
+    "ht": "Haitian Creole",
+    "hu": "Hungarian",
+    "it": "Italian",
+    "ko": "Korean",
+    "la": "Latin",
+    "lv": "Latvian",
+    "mi": "Maori",
+    "no": "Norwegian",
+    "pl": "Polish",
+    "pt": "Portuguese",
+    "ro": "Romanian",
+    "ru": "Russian",
+    "sq": "Albanian",
+    "sv": "Swedish",
+    "sw": "Swahili",
+    "th": "Thai",
+    "tl": "Tagalog",
+    "tr": "Turkish",
+    "vi": "Vietnamese",
+    "zh": "Chinese",
   };
 
   /// Scrape ph4.org for MyBible modules
@@ -92,28 +121,36 @@ class ContentManagerApi {
         final isPartial = dlLink.classes.contains('circle_d2');
 
         if (url.isNotEmpty && abbr != null && title.isNotEmpty) {
-          final fullUrl = url.startsWith('http') ? url : 'https://www.ph4.org/$url';
-          
+          final fullUrl = url.startsWith('http')
+              ? url
+              : 'https://www.ph4.org/$url';
+
           final lowerAbbr = abbr.toLowerCase();
           ModuleType type = ModuleType.bible;
-          if (fullUrl.contains('commentaries') || lowerAbbr.endsWith('.commentary')) {
+          if (fullUrl.contains('commentaries') ||
+              lowerAbbr.endsWith('.commentary')) {
             type = ModuleType.commentary;
-          } else if (fullUrl.contains('dictionaries') || lowerAbbr.endsWith('.dictionary')) {
+          } else if (fullUrl.contains('dictionaries') ||
+              lowerAbbr.endsWith('.dictionary')) {
             type = ModuleType.dictionary;
-          } else if (fullUrl.contains('subheadings') || lowerAbbr.endsWith('.subheadings')) {
+          } else if (fullUrl.contains('subheadings') ||
+              lowerAbbr.endsWith('.subheadings')) {
             type = ModuleType.subheadings;
-          } else if (fullUrl.contains('devotions') || lowerAbbr.endsWith('.devotions')) {
+          } else if (fullUrl.contains('devotions') ||
+              lowerAbbr.endsWith('.devotions')) {
             type = ModuleType.devotional;
           }
 
-          modules.add(Ph4Module(
-            url: fullUrl,
-            abbr: abbr,
-            title: title,
-            author: author,
-            isPartial: isPartial,
-            type: type,
-          ));
+          modules.add(
+            Ph4Module(
+              url: fullUrl,
+              abbr: abbr,
+              title: title,
+              author: author,
+              isPartial: isPartial,
+              type: type,
+            ),
+          );
         }
       }
       return modules;
@@ -168,14 +205,19 @@ class ContentManagerApi {
       for (final item in data) {
         final name = item['name'] as String;
         if (item['type'] == 'file' && name.toLowerCase().endsWith('.xml')) {
-          final title = name.replaceAll(RegExp(r'\.xml$', caseSensitive: false), '');
-          translations.add(OsisTranslation(
-            name: name,
-            title: title,
-            downloadUrl: item['download_url'] as String,
-            size: item['size'] as int,
-            basename: _osisEdnBasename(name),
-          ));
+          final title = name.replaceAll(
+            RegExp(r'\.xml$', caseSensitive: false),
+            '',
+          );
+          translations.add(
+            OsisTranslation(
+              name: name,
+              title: title,
+              downloadUrl: item['download_url'] as String,
+              size: item['size'] as int,
+              basename: _osisEdnBasename(name),
+            ),
+          );
         }
       }
       translations.sort((a, b) => a.title.compareTo(b.title));
@@ -187,10 +229,14 @@ class ContentManagerApi {
   }
 
   /// Download a file with progress tracking
-  Future<void> downloadFile(String url, String targetPath, {void Function(int, int)? onReceiveProgress}) async {
-    final dioDownload = Dio(BaseOptions(
-      headers: {'User-Agent': 'Mozilla/5.0 (StudyBible Flutter)'},
-    ));
+  Future<void> downloadFile(
+    String url,
+    String targetPath, {
+    void Function(int, int)? onReceiveProgress,
+  }) async {
+    final dioDownload = Dio(
+      BaseOptions(headers: {'User-Agent': 'Mozilla/5.0 (StudyBible Flutter)'}),
+    );
     await dioDownload.download(
       url,
       targetPath,

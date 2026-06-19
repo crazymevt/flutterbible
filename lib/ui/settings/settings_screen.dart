@@ -13,19 +13,22 @@ class SettingsScreen extends ConsumerWidget {
     final fontSizeDelta = ref.watch(appFontSizeDeltaProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Settings'),
-      ),
+      appBar: AppBar(title: const Text('Settings')),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 8.0),
-            child: Text('General', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            child: Text(
+              'General',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
           ),
           SwitchListTile(
             title: const Text('Show Dashboard on Startup'),
-            subtitle: const Text('Launch directly to the dashboard instead of the reader'),
+            subtitle: const Text(
+              'Launch directly to the dashboard instead of the reader',
+            ),
             value: showDashboardOnStart,
             onChanged: (value) {
               ref.read(showDashboardOnStartProvider.notifier).set(value);
@@ -34,7 +37,10 @@ class SettingsScreen extends ConsumerWidget {
           const Divider(),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 8.0),
-            child: Text('Appearance', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            child: Text(
+              'Appearance',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
           ),
           ListTile(
             title: const Text('Font Family'),
@@ -46,21 +52,22 @@ class SettingsScreen extends ConsumerWidget {
                   ref.read(appFontFamilyProvider.notifier).set(newValue);
                 }
               },
-              items: <String>[
-                'System Default',
-                'Roboto',
-                'Lora',
-                'Open Sans',
-                'Lato',
-                'Source Code Pro',
-                'Merriweather',
-                'Playfair Display'
-              ].map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
+              items:
+                  <String>[
+                    'System Default',
+                    'Roboto',
+                    'Lora',
+                    'Open Sans',
+                    'Lato',
+                    'Source Code Pro',
+                    'Merriweather',
+                    'Playfair Display',
+                  ].map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
             ),
           ),
           ListTile(
@@ -78,7 +85,9 @@ class SettingsScreen extends ConsumerWidget {
                     min: -4.0,
                     max: 8.0,
                     divisions: 12,
-                    label: fontSizeDelta == 0.0 ? 'Default' : '${fontSizeDelta > 0 ? '+' : ''}${fontSizeDelta.toInt()}',
+                    label: fontSizeDelta == 0.0
+                        ? 'Default'
+                        : '${fontSizeDelta > 0 ? '+' : ''}${fontSizeDelta.toInt()}',
                     onChanged: (double value) {
                       ref.read(appFontSizeDeltaProvider.notifier).set(value);
                     },
@@ -90,7 +99,9 @@ class SettingsScreen extends ConsumerWidget {
           ),
           ListTile(
             title: const Text('Verse Spacing'),
-            subtitle: const Text('Adjust the space between verses in the reader'),
+            subtitle: const Text(
+              'Adjust the space between verses in the reader',
+            ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -103,7 +114,10 @@ class SettingsScreen extends ConsumerWidget {
                     min: 0.0,
                     max: 32.0,
                     divisions: 8,
-                    label: ref.watch(appVerseSpacingProvider).toInt().toString(),
+                    label: ref
+                        .watch(appVerseSpacingProvider)
+                        .toInt()
+                        .toString(),
                     onChanged: (double value) {
                       ref.read(appVerseSpacingProvider.notifier).set(value);
                     },

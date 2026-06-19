@@ -11,7 +11,11 @@ class SelectedPlanIdNotifier extends Notifier<String?> {
   String? build() => null;
   void set(String? id) => state = id;
 }
-final _selectedPlanIdProvider = NotifierProvider<SelectedPlanIdNotifier, String?>(() => SelectedPlanIdNotifier());
+
+final _selectedPlanIdProvider =
+    NotifierProvider<SelectedPlanIdNotifier, String?>(
+      () => SelectedPlanIdNotifier(),
+    );
 
 class ReadingPlanPanel extends ConsumerWidget {
   const ReadingPlanPanel({super.key});
@@ -39,22 +43,26 @@ class ReadingPlanPanel extends ConsumerWidget {
                   if (plans.isEmpty) {
                     return _EmptyState();
                   }
-                  
+
                   // Auto-select the first plan if none selected
                   var selectedId = ref.watch(_selectedPlanIdProvider);
-                  if (selectedId == null || !plans.any((p) => p.id == selectedId)) {
+                  if (selectedId == null ||
+                      !plans.any((p) => p.id == selectedId)) {
                     selectedId = plans.first.id;
                     WidgetsBinding.instance.addPostFrameCallback((_) {
-                      ref.read(_selectedPlanIdProvider.notifier).set(selectedId);
+                      ref
+                          .read(_selectedPlanIdProvider.notifier)
+                          .set(selectedId);
                     });
                   }
-                  
+
                   // Unused selectedPlan var removed
-                  
+
                   return _ActivePlanView(
                     plans: plans,
                     selectedPlanId: selectedId,
-                    onPlanSelected: (id) => ref.read(_selectedPlanIdProvider.notifier).set(id),
+                    onPlanSelected: (id) =>
+                        ref.read(_selectedPlanIdProvider.notifier).set(id),
                   );
                 },
                 loading: () => const Center(child: CircularProgressIndicator()),
@@ -77,7 +85,11 @@ class _EmptyState extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.menu_book, size: 64, color: Theme.of(context).colorScheme.primary.withAlpha(100)),
+            Icon(
+              Icons.menu_book,
+              size: 64,
+              color: Theme.of(context).colorScheme.primary.withAlpha(100),
+            ),
             const SizedBox(height: 16),
             Text(
               'No Active Plans',
@@ -95,10 +107,12 @@ class _EmptyState extends ConsumerWidget {
               label: const Text('Create New Plan'),
               onPressed: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const ReadingPlanGeneratorScreen()),
+                  MaterialPageRoute(
+                    builder: (_) => const ReadingPlanGeneratorScreen(),
+                  ),
                 );
               },
-            )
+            ),
           ],
         ),
       ),
@@ -125,7 +139,10 @@ class _ActivePlanView extends ConsumerWidget {
       children: [
         if (plans.length > 1)
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 8.0,
+            ),
             child: Row(
               children: [
                 Expanded(
@@ -137,10 +154,17 @@ class _ActivePlanView extends ConsumerWidget {
                       border: OutlineInputBorder(),
                       isDense: true,
                     ),
-                    items: plans.map((p) => DropdownMenuItem<String>(
-                      value: p.id,
-                      child: Text(p.title, overflow: TextOverflow.ellipsis),
-                    )).toList(),
+                    items: plans
+                        .map(
+                          (p) => DropdownMenuItem<String>(
+                            value: p.id,
+                            child: Text(
+                              p.title,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        )
+                        .toList(),
                     onChanged: onPlanSelected,
                   ),
                 ),
@@ -152,10 +176,13 @@ class _ActivePlanView extends ConsumerWidget {
               ],
             ),
           ),
-        
+
         if (plans.length == 1)
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 8.0,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -177,15 +204,16 @@ class _ActivePlanView extends ConsumerWidget {
           ),
 
         const Divider(),
-        
+
         Expanded(
           child: daysAsync.when(
             data: (days) {
-              if (days.isEmpty) return const Center(child: Text('No days in this plan.'));
-              
+              if (days.isEmpty)
+                return const Center(child: Text('No days in this plan.'));
+
               // Find current day (first uncompleted day)
               final currentDayIndex = days.indexWhere((d) => !d.completed);
-              
+
               if (currentDayIndex == -1) {
                 return const Center(
                   child: Column(
@@ -195,13 +223,13 @@ class _ActivePlanView extends ConsumerWidget {
                       SizedBox(height: 16),
                       Text('Plan Completed!'),
                     ],
-                  )
+                  ),
                 );
               }
-              
+
               final currentDay = days[currentDayIndex];
               return _DayView(
-                day: currentDay, 
+                day: currentDay,
                 dayIndex: currentDayIndex,
                 totalDays: days.length,
               );
@@ -210,7 +238,7 @@ class _ActivePlanView extends ConsumerWidget {
             error: (e, st) => Center(child: Text('Error: $e')),
           ),
         ),
-        
+
         // Add new plan button at the very bottom
         Padding(
           padding: const EdgeInsets.all(8.0),
@@ -219,7 +247,9 @@ class _ActivePlanView extends ConsumerWidget {
             label: const Text('Create Another Plan'),
             onPressed: () {
               Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const ReadingPlanGeneratorScreen()),
+                MaterialPageRoute(
+                  builder: (_) => const ReadingPlanGeneratorScreen(),
+                ),
               );
             },
           ),
@@ -233,7 +263,9 @@ class _ActivePlanView extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Plan?'),
-        content: const Text('Are you sure you want to permanently delete this reading plan and all its progress?'),
+        content: const Text(
+          'Are you sure you want to permanently delete this reading plan and all its progress?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -284,8 +316,12 @@ class _DayView extends ConsumerWidget {
               const SizedBox(height: 4),
               if (day.date != null)
                 Text(
-                  DateFormat.yMMMd().format(DateTime.fromMillisecondsSinceEpoch(day.date!)),
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey),
+                  DateFormat.yMMMd().format(
+                    DateTime.fromMillisecondsSinceEpoch(day.date!),
+                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: Colors.grey),
                 ),
               const SizedBox(height: 8),
               LinearProgressIndicator(
@@ -296,15 +332,16 @@ class _DayView extends ConsumerWidget {
               Text(
                 'Progress: $dayIndex / $totalDays days',
                 style: Theme.of(context).textTheme.bodySmall,
-              )
+              ),
             ],
           ),
         ),
-        
+
         Expanded(
           child: itemsAsync.when(
             data: (items) {
-              if (items.isEmpty) return const Center(child: Text('No readings.'));
+              if (items.isEmpty)
+                return const Center(child: Text('No readings.'));
               return ListView.builder(
                 itemCount: items.length,
                 itemBuilder: (context, index) {
@@ -317,16 +354,26 @@ class _DayView extends ConsumerWidget {
                     leading: Checkbox(
                       value: item.completed,
                       onChanged: (val) {
-                        ref.read(readingPlanControllerProvider).toggleItemComplete(item, val ?? false);
+                        ref
+                            .read(readingPlanControllerProvider)
+                            .toggleItemComplete(item, val ?? false);
                       },
                     ),
-                    title: Text(refText, style: TextStyle(
-                      decoration: item.completed ? TextDecoration.lineThrough : null,
-                      color: item.completed ? Colors.grey : null,
-                    )),
+                    title: Text(
+                      refText,
+                      style: TextStyle(
+                        decoration: item.completed
+                            ? TextDecoration.lineThrough
+                            : null,
+                        color: item.completed ? Colors.grey : null,
+                      ),
+                    ),
                     trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                     onTap: () {
-                      nav.navigateTo(bookName: item.bookName, chapter: item.startChapter);
+                      nav.navigateTo(
+                        bookName: item.bookName,
+                        chapter: item.startChapter,
+                      );
                     },
                   );
                 },
@@ -346,7 +393,9 @@ class _DayView extends ConsumerWidget {
             icon: const Icon(Icons.check_circle_outline),
             label: const Text('Complete Day', style: TextStyle(fontSize: 16)),
             onPressed: () {
-              ref.read(readingPlanControllerProvider).toggleDayComplete(day, true);
+              ref
+                  .read(readingPlanControllerProvider)
+                  .toggleDayComplete(day, true);
               // The UI will automatically rebuild and show the next uncompleted day
             },
           ),

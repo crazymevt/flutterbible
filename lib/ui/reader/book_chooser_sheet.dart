@@ -24,39 +24,43 @@ class _BookChooserSheetState extends ConsumerState<BookChooserSheet> {
         height: MediaQuery.of(context).size.height * 0.8,
         padding: const EdgeInsets.all(16),
         child: Column(
-        children: [
-          Row(
-            children: [
-              if (selectedBookId != null)
+          children: [
+            Row(
+              children: [
+                if (selectedBookId != null)
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: () {
+                      setState(() {
+                        selectedBookId = null;
+                        selectedBookName = null;
+                      });
+                    },
+                  ),
+                Expanded(
+                  child: Text(
+                    selectedBookName ?? 'Select Book',
+                    style: Theme.of(context).textTheme.titleLarge,
+                    textAlign: selectedBookId != null
+                        ? TextAlign.left
+                        : TextAlign.center,
+                  ),
+                ),
                 IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () {
-                    setState(() {
-                      selectedBookId = null;
-                      selectedBookName = null;
-                    });
-                  },
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.pop(context),
                 ),
-              Expanded(
-                child: Text(
-                  selectedBookName ?? 'Select Book',
-                  style: Theme.of(context).textTheme.titleLarge,
-                  textAlign: selectedBookId != null ? TextAlign.left : TextAlign.center,
-                ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ],
-          ),
-          const Divider(),
-          Expanded(
-            child: selectedBookId == null ? _buildBookList() : _buildChapterGrid(),
-          ),
-        ],
+              ],
+            ),
+            const Divider(),
+            Expanded(
+              child: selectedBookId == null
+                  ? _buildBookList()
+                  : _buildChapterGrid(),
+            ),
+          ],
+        ),
       ),
-    ),
     );
   }
 
@@ -106,14 +110,18 @@ class _BookChooserSheetState extends ConsumerState<BookChooserSheet> {
             final chapter = index + 1;
             return InkWell(
               onTap: () {
-                ref.read(selectedBookNameProvider.notifier).set(selectedBookName!);
+                ref
+                    .read(selectedBookNameProvider.notifier)
+                    .set(selectedBookName!);
                 ref.read(selectedChapterProvider.notifier).set(chapter);
                 ref.read(navigationControllerProvider).recordHistory();
                 Navigator.of(context).pop();
               },
               child: Container(
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primaryContainer.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 alignment: Alignment.center,

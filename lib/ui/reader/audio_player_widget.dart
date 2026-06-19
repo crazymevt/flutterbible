@@ -72,7 +72,7 @@ class _AudioPlayerWidgetState extends ConsumerState<AudioPlayerWidget> {
             final playerState = snapshot.data;
             final processingState = playerState?.processingState;
             final playing = playerState?.playing;
-            
+
             if (processingState == ProcessingState.loading ||
                 processingState == ProcessingState.buffering) {
               return Container(
@@ -116,12 +116,13 @@ class _AudioPlayerWidgetState extends ConsumerState<AudioPlayerWidget> {
             builder: (context, snapshot) {
               final position = snapshot.data ?? Duration.zero;
               final duration = _player.duration ?? Duration.zero;
-              
+
               String formatDuration(Duration d) {
                 String twoDigits(int n) => n.toString().padLeft(2, "0");
                 String twoDigitMinutes = twoDigits(d.inMinutes.remainder(60));
                 String twoDigitSeconds = twoDigits(d.inSeconds.remainder(60));
-                if (d.inHours > 0) return "${twoDigits(d.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
+                if (d.inHours > 0)
+                  return "${twoDigits(d.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
                 return "$twoDigitMinutes:$twoDigitSeconds";
               }
 
@@ -130,13 +131,19 @@ class _AudioPlayerWidgetState extends ConsumerState<AudioPlayerWidget> {
                   Expanded(
                     child: SliderTheme(
                       data: SliderTheme.of(context).copyWith(
-                        thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 4.0),
-                        overlayShape: const RoundSliderOverlayShape(overlayRadius: 10.0),
+                        thumbShape: const RoundSliderThumbShape(
+                          enabledThumbRadius: 4.0,
+                        ),
+                        overlayShape: const RoundSliderOverlayShape(
+                          overlayRadius: 10.0,
+                        ),
                         trackHeight: 2.0,
                       ),
                       child: Slider(
                         value: position.inMilliseconds.toDouble(),
-                        max: duration.inMilliseconds.toDouble() > 0 ? duration.inMilliseconds.toDouble() : 1.0,
+                        max: duration.inMilliseconds.toDouble() > 0
+                            ? duration.inMilliseconds.toDouble()
+                            : 1.0,
                         onChanged: (value) {
                           _player.seek(Duration(milliseconds: value.round()));
                         },
@@ -152,7 +159,7 @@ class _AudioPlayerWidgetState extends ConsumerState<AudioPlayerWidget> {
             },
           ),
         ),
-        
+
         const SizedBox(width: 8),
 
         // Voice Actor Dropdown
@@ -167,11 +174,16 @@ class _AudioPlayerWidgetState extends ConsumerState<AudioPlayerWidget> {
                 ref.read(selectedVoiceProvider.notifier).setVoice(newValue);
               }
             },
-            items: audioData.availableVoices.map<DropdownMenuItem<String>>((String value) {
+            items: audioData.availableVoices.map<DropdownMenuItem<String>>((
+              String value,
+            ) {
               final formattedName = value[0].toUpperCase() + value.substring(1);
               return DropdownMenuItem<String>(
                 value: value,
-                child: Text(formattedName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                child: Text(
+                  formattedName,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
               );
             }).toList(),
           ),

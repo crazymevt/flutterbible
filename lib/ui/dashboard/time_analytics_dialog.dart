@@ -28,24 +28,34 @@ class _TimeAnalyticsDialogState extends State<TimeAnalyticsDialog> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Time Analytics', style: Theme.of(context).textTheme.headlineSmall),
+                Text(
+                  'Time Analytics',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
                 DropdownButton<TimeRange>(
                   value: _selectedRange,
                   onChanged: (val) {
                     if (val != null) setState(() => _selectedRange = val);
                   },
                   items: const [
-                    DropdownMenuItem(value: TimeRange.pastMonth, child: Text('Past Month')),
-                    DropdownMenuItem(value: TimeRange.past3Months, child: Text('Past 3 Months')),
-                    DropdownMenuItem(value: TimeRange.pastYear, child: Text('Past Year')),
+                    DropdownMenuItem(
+                      value: TimeRange.pastMonth,
+                      child: Text('Past Month'),
+                    ),
+                    DropdownMenuItem(
+                      value: TimeRange.past3Months,
+                      child: Text('Past 3 Months'),
+                    ),
+                    DropdownMenuItem(
+                      value: TimeRange.pastYear,
+                      child: Text('Past Year'),
+                    ),
                   ],
                 ),
               ],
             ),
             const SizedBox(height: 32),
-            Expanded(
-              child: _buildBarChart(),
-            ),
+            Expanded(child: _buildBarChart()),
             const SizedBox(height: 16),
             Align(
               alignment: Alignment.centerRight,
@@ -63,7 +73,7 @@ class _TimeAnalyticsDialogState extends State<TimeAnalyticsDialog> {
   Widget _buildBarChart() {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    
+
     int numBuckets = 0;
     Duration bucketSize;
     DateTime startDate;
@@ -91,7 +101,7 @@ class _TimeAnalyticsDialogState extends State<TimeAnalyticsDialog> {
     for (final t in widget.trackers) {
       final d = DateTime.fromMillisecondsSinceEpoch(t.endTime).toLocal();
       if (d.isBefore(startDate)) continue;
-      
+
       if (_selectedRange == TimeRange.pastYear) {
         // Precise month matching for past year
         int monthDiff = (today.year - d.year) * 12 + today.month - d.month;
@@ -117,7 +127,7 @@ class _TimeAnalyticsDialogState extends State<TimeAnalyticsDialog> {
       children: List.generate(numBuckets, (index) {
         final heightPct = buckets[index] / maxMs;
         final minutes = buckets[index] ~/ 60000;
-        
+
         String label = '';
         if (_selectedRange == TimeRange.pastMonth && index % 5 == 0) {
           label = '${index + 1}';
@@ -125,7 +135,20 @@ class _TimeAnalyticsDialogState extends State<TimeAnalyticsDialog> {
           label = 'W${index + 1}';
         } else if (_selectedRange == TimeRange.pastYear) {
           final m = DateTime(startDate.year, startDate.month + index, 1);
-          final monthStr = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m.month - 1];
+          final monthStr = [
+            'Jan',
+            'Feb',
+            'Mar',
+            'Apr',
+            'May',
+            'Jun',
+            'Jul',
+            'Aug',
+            'Sep',
+            'Oct',
+            'Nov',
+            'Dec',
+          ][m.month - 1];
           label = monthStr;
         }
 
@@ -133,8 +156,11 @@ class _TimeAnalyticsDialogState extends State<TimeAnalyticsDialog> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              if (minutes > 0 && numBuckets <= 12) 
-                Text('${minutes}m', style: const TextStyle(fontSize: 10, color: Colors.grey)),
+              if (minutes > 0 && numBuckets <= 12)
+                Text(
+                  '${minutes}m',
+                  style: const TextStyle(fontSize: 10, color: Colors.grey),
+                ),
               const SizedBox(height: 4),
               Expanded(
                 child: FractionallySizedBox(
@@ -143,16 +169,21 @@ class _TimeAnalyticsDialogState extends State<TimeAnalyticsDialog> {
                   child: Container(
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.primary,
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(4),
+                      ),
                     ),
                   ),
                 ),
               ),
               const SizedBox(height: 8),
               if (label.isNotEmpty)
-                Text(label, style: const TextStyle(fontSize: 10, color: Colors.grey)),
+                Text(
+                  label,
+                  style: const TextStyle(fontSize: 10, color: Colors.grey),
+                ),
               if (label.isEmpty && numBuckets <= 30) // placeholder for spacing
-                 const Text('', style: TextStyle(fontSize: 10)),
+                const Text('', style: TextStyle(fontSize: 10)),
             ],
           ),
         );

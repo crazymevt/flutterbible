@@ -13,7 +13,7 @@ class SearchResult {
   final int? verse;
   final int? bookOrder;
   final String? sourceName;
-  
+
   SearchResult({
     required this.type,
     required this.referenceId,
@@ -36,17 +36,21 @@ class SearchQueryNotifier extends Notifier<String> {
   }
 }
 
-final globalSearchQueryProvider = NotifierProvider<SearchQueryNotifier, String>(() => SearchQueryNotifier());
+final globalSearchQueryProvider = NotifierProvider<SearchQueryNotifier, String>(
+  () => SearchQueryNotifier(),
+);
 
-final globalSearchResultsProvider = FutureProvider<List<SearchResult>>((ref) async {
+final globalSearchResultsProvider = FutureProvider<List<SearchResult>>((
+  ref,
+) async {
   final contentStore = ref.watch(contentStoreProvider);
   final userStore = ref.watch(userStoreProvider);
   final query = ref.watch(globalSearchQueryProvider);
-  
+
   if (query.trim().isEmpty) return [];
 
   final searchPattern = query.trim(); // For SQLite FTS5 MATCH
-  
+
   final List<SearchResult> results = [];
 
   // 1. Query Content Database
@@ -70,51 +74,64 @@ final globalSearchResultsProvider = FutureProvider<List<SearchResult>>((ref) asy
     LIMIT 100
   ''';
 
-  final contentRows = await contentStore.customSelect(contentQuery, variables: [Variable.withString(searchPattern)]).get();
+  final contentRows = await contentStore
+      .customSelect(
+        contentQuery,
+        variables: [Variable.withString(searchPattern)],
+      )
+      .get();
   for (final row in contentRows) {
     final type = row.read<String>('type');
     final refId = row.read<int>('reference_id');
     final text = row.read<String>('text_content');
-    
+
     if (type == 'verse') {
       final bName = row.readNullable<String>('verse_book') ?? 'Unknown Book';
       final cNum = row.readNullable<int>('verse_chapter') ?? 1;
       final vNum = row.readNullable<int>('verse_num') ?? 1;
       final bOrder = row.readNullable<int>('verse_book_order') ?? 0;
-      results.add(SearchResult(
-        type: type,
-        referenceId: refId,
-        textContent: text,
-        title: '$bName $cNum:$vNum',
-        book: bName,
-        chapter: cNum,
-        verse: vNum,
-        bookOrder: bOrder,
-      ));
+      results.add(
+        SearchResult(
+          type: type,
+          referenceId: refId,
+          textContent: text,
+          title: '$bName $cNum:$vNum',
+          book: bName,
+          chapter: cNum,
+          verse: vNum,
+          bookOrder: bOrder,
+        ),
+      );
     } else if (type == 'commentary') {
-      final cName = row.readNullable<String>('comm_name') ?? 'Unknown Commentary';
+      final cName =
+          row.readNullable<String>('comm_name') ?? 'Unknown Commentary';
       final cBook = row.readNullable<String>('comm_book') ?? 'General';
       final cChapter = row.readNullable<int>('comm_chapter');
-      results.add(SearchResult(
-        type: type,
-        referenceId: refId,
-        textContent: text,
-        title: '$cName - $cBook',
-        book: cBook,
-        chapter: cChapter,
-        sourceName: cName,
-      ));
+      results.add(
+        SearchResult(
+          type: type,
+          referenceId: refId,
+          textContent: text,
+          title: '$cName - $cBook',
+          book: cBook,
+          chapter: cChapter,
+          sourceName: cName,
+        ),
+      );
     } else if (type == 'dictionary') {
       final word = row.readNullable<String>('dict_word') ?? 'Unknown Word';
       final def = row.readNullable<String>('dict_def') ?? '';
-      final dName = row.readNullable<String>('dict_name') ?? 'Unknown Dictionary';
-      results.add(SearchResult(
-        type: type,
-        referenceId: refId,
-        textContent: def,
-        title: word,
-        sourceName: dName,
-      ));
+      final dName =
+          row.readNullable<String>('dict_name') ?? 'Unknown Dictionary';
+      results.add(
+        SearchResult(
+          type: type,
+          referenceId: refId,
+          textContent: def,
+          title: word,
+          sourceName: dName,
+        ),
+      );
     }
   }
 
@@ -133,26 +150,33 @@ final globalSearchResultsProvider = FutureProvider<List<SearchResult>>((ref) asy
   ''';
 
   try {
-    final userRows = await userStore.customSelect(userQuery, variables: [Variable.withString(searchPattern)]).get();
+    final userRows = await userStore
+        .customSelect(
+          userQuery,
+          variables: [Variable.withString(searchPattern)],
+        )
+        .get();
     for (final row in userRows) {
       final type = row.readNullable<String>('type');
       if (type == null) continue;
       final refId = row.readNullable<int>('reference_id') ?? 0;
       final text = row.readNullable<String>('text_content') ?? '';
-      
+
       if (type == 'note') {
         final bName = row.readNullable<String>('note_book') ?? 'Unknown Book';
         final cNum = row.readNullable<int>('note_chapter') ?? 1;
         final vNum = row.readNullable<int>('note_verse');
         final target = vNum != null ? '$bName $cNum:$vNum' : '$bName $cNum';
-        results.add(SearchResult(
-          type: type,
-          referenceId: refId,
-          textContent: text,
-          title: 'Note: $target',
-          book: bName,
-          chapter: cNum,
-        ));
+        results.add(
+          SearchResult(
+            type: type,
+            referenceId: refId,
+            textContent: text,
+            title: 'Note: $target',
+            book: bName,
+            chapter: cNum,
+          ),
+        );
       }
     }
   } catch (e) {
@@ -162,13 +186,13 @@ final globalSearchResultsProvider = FutureProvider<List<SearchResult>>((ref) asy
   // Deduplicate and sort verses by canonical order
   final verses = results.where((r) => r.type == 'verse').toList();
   final others = results.where((r) => r.type != 'verse').toList();
-  
+
   // Make distinct by title (book chapter:verse) just in case
   final Map<String, SearchResult> distinctVerses = {};
   for (final v in verses) {
     distinctVerses[v.title] = v;
   }
-  
+
   final uniqueVerses = distinctVerses.values.toList();
   uniqueVerses.sort((a, b) {
     int bookCmp = (a.bookOrder ?? 0).compareTo(b.bookOrder ?? 0);

@@ -47,12 +47,18 @@ class MobileToolsDrawer extends ConsumerWidget {
             ),
             const Divider(),
             ListTile(
-              leading: const Tooltip(message: 'Library', child: Icon(Icons.library_books)),
+              leading: const Tooltip(
+                message: 'Library',
+                child: Icon(Icons.library_books),
+              ),
               title: const Text('Library'),
               onTap: () => _openTool(context, const StudyPane()),
             ),
             ListTile(
-              leading: const Tooltip(message: 'Cross-References', child: Icon(Icons.compare_arrows)),
+              leading: const Tooltip(
+                message: 'Cross-References',
+                child: Icon(Icons.compare_arrows),
+              ),
               title: const Text('Cross-References'),
               onTap: () => _openTool(context, const CrossReferencePanel()),
             ),
@@ -62,36 +68,57 @@ class MobileToolsDrawer extends ConsumerWidget {
               onTap: () => _openTool(context, const NotesPanel()),
             ),
             ListTile(
-              leading: const Tooltip(message: 'Search', child: Icon(Icons.search)),
+              leading: const Tooltip(
+                message: 'Search',
+                child: Icon(Icons.search),
+              ),
               title: const Text('Search'),
               onTap: () => _openTool(context, const SearchPanel()),
             ),
             ListTile(
-              leading: const Tooltip(message: 'Dictionary', child: Icon(Icons.import_contacts)),
+              leading: const Tooltip(
+                message: 'Dictionary',
+                child: Icon(Icons.import_contacts),
+              ),
               title: const Text('Dictionary'),
               onTap: () => _openTool(context, const DictionaryPanel()),
             ),
             ListTile(
-              leading: const Tooltip(message: 'Commentaries', child: Icon(Icons.menu_book)),
+              leading: const Tooltip(
+                message: 'Commentaries',
+                child: Icon(Icons.menu_book),
+              ),
               title: const Text('Commentaries'),
               onTap: () => _openTool(context, const CommentaryPanel()),
             ),
             ListTile(
-              leading: const Tooltip(message: 'History', child: Icon(Icons.history)),
+              leading: const Tooltip(
+                message: 'History',
+                child: Icon(Icons.history),
+              ),
               title: const Text('History'),
               onTap: () => _openTool(context, const HistoryPanel()),
             ),
             ListTile(
-              leading: const Tooltip(message: 'Media', child: Icon(Icons.video_library)),
+              leading: const Tooltip(
+                message: 'Media',
+                child: Icon(Icons.video_library),
+              ),
               title: const Text('Media'),
               onTap: () {
                 final bookName = ref.read(selectedBookNameProvider);
                 final chapter = ref.read(selectedChapterProvider);
-                _openTool(context, MediaPanel(bookName: bookName, chapter: chapter));
+                _openTool(
+                  context,
+                  MediaPanel(bookName: bookName, chapter: chapter),
+                );
               },
             ),
             ListTile(
-              leading: const Tooltip(message: 'Reading Plans', child: Icon(Icons.menu_book)),
+              leading: const Tooltip(
+                message: 'Reading Plans',
+                child: Icon(Icons.menu_book),
+              ),
               title: const Text('Reading Plans'),
               onTap: () => _openTool(context, const ReadingPlanPanel()),
             ),

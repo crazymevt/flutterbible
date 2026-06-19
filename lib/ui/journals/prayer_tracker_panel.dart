@@ -7,7 +7,11 @@ class HideAnsweredPrayersNotifier extends Notifier<bool> {
   bool build() => false;
   void setHide(bool val) => state = val;
 }
-final hideAnsweredPrayersProvider = NotifierProvider<HideAnsweredPrayersNotifier, bool>(() => HideAnsweredPrayersNotifier());
+
+final hideAnsweredPrayersProvider =
+    NotifierProvider<HideAnsweredPrayersNotifier, bool>(
+      () => HideAnsweredPrayersNotifier(),
+    );
 
 class PrayerTrackerPanel extends ConsumerWidget {
   const PrayerTrackerPanel({super.key});
@@ -24,14 +28,19 @@ class PrayerTrackerPanel extends ConsumerWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Prayer Tracker', style: Theme.of(context).textTheme.titleMedium),
+              Text(
+                'Prayer Tracker',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Text('Hide Answered'),
                   Switch(
                     value: hideAnswered,
-                    onChanged: (val) => ref.read(hideAnsweredPrayersProvider.notifier).setHide(val),
+                    onChanged: (val) => ref
+                        .read(hideAnsweredPrayersProvider.notifier)
+                        .setHide(val),
                   ),
                   IconButton(
                     icon: const Icon(Icons.add),
@@ -46,8 +55,10 @@ class PrayerTrackerPanel extends ConsumerWidget {
         Expanded(
           child: prayersAsync.when(
             data: (prayers) {
-              final visiblePrayers = hideAnswered ? prayers.where((p) => p.answeredAt == null).toList() : prayers;
-              
+              final visiblePrayers = hideAnswered
+                  ? prayers.where((p) => p.answeredAt == null).toList()
+                  : prayers;
+
               if (visiblePrayers.isEmpty) {
                 return const Center(child: Text('No prayers found.'));
               }
@@ -64,13 +75,19 @@ class PrayerTrackerPanel extends ConsumerWidget {
                       value: isAnswered,
                       onChanged: (val) {
                         if (val != null) {
-                          ref.read(prayerActionProvider).toggleAnswered(prayer.id, val);
+                          ref
+                              .read(prayerActionProvider)
+                              .toggleAnswered(prayer.id, val);
                         }
                       },
                     ),
                     title: Text(
                       prayer.name,
-                      style: TextStyle(decoration: isAnswered ? TextDecoration.lineThrough : null),
+                      style: TextStyle(
+                        decoration: isAnswered
+                            ? TextDecoration.lineThrough
+                            : null,
+                      ),
                     ),
                     subtitle: Text(
                       'Created: ${DateTime.fromMillisecondsSinceEpoch(prayer.createdAt).toLocal().toString().split(' ')[0]}',
@@ -78,20 +95,33 @@ class PrayerTrackerPanel extends ConsumerWidget {
                     ),
                     children: [
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                          vertical: 8.0,
+                        ),
                         child: Align(
                           alignment: Alignment.centerLeft,
-                          child: Text(prayer.description.isEmpty ? 'No description' : prayer.description),
+                          child: Text(
+                            prayer.description.isEmpty
+                                ? 'No description'
+                                : prayer.description,
+                          ),
                         ),
                       ),
                       if (isAnswered)
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16.0,
+                            vertical: 4.0,
+                          ),
                           child: Align(
                             alignment: Alignment.centerLeft,
                             child: Text(
                               'Answered on: ${DateTime.fromMillisecondsSinceEpoch(prayer.answeredAt!).toLocal().toString().split(' ')[0]}',
-                              style: TextStyle(color: Colors.green.shade700, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                color: Colors.green.shade700,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
@@ -101,25 +131,48 @@ class PrayerTrackerPanel extends ConsumerWidget {
                           TextButton.icon(
                             icon: const Icon(Icons.edit, size: 18),
                             label: const Text('Edit'),
-                            onPressed: () => _showAddPrayerDialog(context, ref, prayerId: prayer.id, initialName: prayer.name, initialDesc: prayer.description),
+                            onPressed: () => _showAddPrayerDialog(
+                              context,
+                              ref,
+                              prayerId: prayer.id,
+                              initialName: prayer.name,
+                              initialDesc: prayer.description,
+                            ),
                           ),
                           TextButton.icon(
-                            icon: const Icon(Icons.delete, size: 18, color: Colors.red),
-                            label: const Text('Delete', style: TextStyle(color: Colors.red)),
+                            icon: const Icon(
+                              Icons.delete,
+                              size: 18,
+                              color: Colors.red,
+                            ),
+                            label: const Text(
+                              'Delete',
+                              style: TextStyle(color: Colors.red),
+                            ),
                             onPressed: () async {
                               final confirm = await showDialog<bool>(
                                 context: context,
                                 builder: (c) => AlertDialog(
                                   title: const Text('Delete Prayer'),
-                                  content: const Text('Are you sure you want to delete this prayer?'),
+                                  content: const Text(
+                                    'Are you sure you want to delete this prayer?',
+                                  ),
                                   actions: [
-                                    TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('Cancel')),
-                                    TextButton(onPressed: () => Navigator.pop(c, true), child: const Text('Delete')),
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(c, false),
+                                      child: const Text('Cancel'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(c, true),
+                                      child: const Text('Delete'),
+                                    ),
                                   ],
                                 ),
                               );
                               if (confirm == true) {
-                                await ref.read(prayerActionProvider).deletePrayer(prayer.id);
+                                await ref
+                                    .read(prayerActionProvider)
+                                    .deletePrayer(prayer.id);
                               }
                             },
                           ),
@@ -138,7 +191,13 @@ class PrayerTrackerPanel extends ConsumerWidget {
     );
   }
 
-  void _showAddPrayerDialog(BuildContext context, WidgetRef ref, {String? prayerId, String? initialName, String? initialDesc}) {
+  void _showAddPrayerDialog(
+    BuildContext context,
+    WidgetRef ref, {
+    String? prayerId,
+    String? initialName,
+    String? initialDesc,
+  }) {
     final nameCtrl = TextEditingController(text: initialName);
     final descCtrl = TextEditingController(text: initialDesc);
 
@@ -163,13 +222,18 @@ class PrayerTrackerPanel extends ConsumerWidget {
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
             ElevatedButton(
               onPressed: () async {
                 final name = nameCtrl.text.trim();
                 final desc = descCtrl.text.trim();
                 if (name.isNotEmpty) {
-                  await ref.read(prayerActionProvider).savePrayer(prayerId, name, desc);
+                  await ref
+                      .read(prayerActionProvider)
+                      .savePrayer(prayerId, name, desc);
                   if (context.mounted) Navigator.pop(context);
                 }
               },

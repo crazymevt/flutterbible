@@ -14,7 +14,7 @@ final audioBiblesProvider = FutureProvider<List<AudioBible>>((ref) async {
   };
 
   final List<AudioBible> bibles = [];
-  
+
   for (final entry in files.entries) {
     try {
       final jsonString = await rootBundle.loadString(entry.value);
@@ -24,7 +24,7 @@ final audioBiblesProvider = FutureProvider<List<AudioBible>>((ref) async {
       print('Failed to load audio bible: ${entry.key} - $e');
     }
   }
-  
+
   return bibles;
 });
 
@@ -36,23 +36,32 @@ final activeAudioBibleProvider = Provider<AsyncValue<AudioBible?>>((ref) {
   final availableVersionsAsync = ref.watch(versionsProvider);
   final availableBiblesAsync = ref.watch(audioBiblesProvider);
 
-  if (availableVersionsAsync is AsyncLoading || availableBiblesAsync is AsyncLoading) {
+  if (availableVersionsAsync is AsyncLoading ||
+      availableBiblesAsync is AsyncLoading) {
     return const AsyncValue.loading();
   }
 
   if (availableVersionsAsync is AsyncError) {
-    return AsyncValue.error(availableVersionsAsync.error!, availableVersionsAsync.stackTrace!);
+    return AsyncValue.error(
+      availableVersionsAsync.error!,
+      availableVersionsAsync.stackTrace!,
+    );
   }
 
   if (availableBiblesAsync is AsyncError) {
-    return AsyncValue.error(availableBiblesAsync.error!, availableBiblesAsync.stackTrace!);
+    return AsyncValue.error(
+      availableBiblesAsync.error!,
+      availableBiblesAsync.stackTrace!,
+    );
   }
 
   final versions = availableVersionsAsync.value ?? [];
   final bibles = availableBiblesAsync.value ?? [];
 
   final activeId = activeVersions.first;
-  final activeBibleVersion = versions.where((v) => v.id == activeId).firstOrNull;
+  final activeBibleVersion = versions
+      .where((v) => v.id == activeId)
+      .firstOrNull;
 
   if (activeBibleVersion == null) return const AsyncValue.data(null);
 
@@ -61,12 +70,18 @@ final activeAudioBibleProvider = Provider<AsyncValue<AudioBible?>>((ref) {
   final id = activeBibleVersion.id.toLowerCase();
 
   // Check for KJV matches
-  if (name.contains('kjv') || name.contains('king james') || abbrev.contains('kjv') || id.contains('kjv')) {
+  if (name.contains('kjv') ||
+      name.contains('king james') ||
+      abbrev.contains('kjv') ||
+      id.contains('kjv')) {
     return AsyncValue.data(bibles.where((b) => b.name == 'kjv').firstOrNull);
   }
-  
+
   // Check for BSB matches
-  if (name.contains('bsb') || name.contains('berean') || abbrev.contains('bsb') || id.contains('bsb')) {
+  if (name.contains('bsb') ||
+      name.contains('berean') ||
+      abbrev.contains('bsb') ||
+      id.contains('bsb')) {
     return AsyncValue.data(bibles.where((b) => b.name == 'bsb').firstOrNull);
   }
 

@@ -8,7 +8,7 @@ import 'sync_record.dart';
 /// 3. If both timestamps and deleted flags are identical, it falls back to a stable
 ///    tie-breaker (comparing deviceIds lexically) to ensure determinism across all peers.
 List<T> mergeRecords<T extends SyncRecord>(List<T> existing, List<T> incoming) {
-  final Map<String, T> merged = { for (var e in existing) e.id: e };
+  final Map<String, T> merged = {for (var e in existing) e.id: e};
 
   for (final inc in incoming) {
     final ex = merged[inc.id];

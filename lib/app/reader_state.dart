@@ -7,12 +7,14 @@ class ActiveVersionsNotifier extends Notifier<List<String>> {
     final prefs = ref.watch(sharedPreferencesProvider);
     return prefs.getStringList('activeVersions') ?? ['NLT'];
   }
-  
+
   void set(List<String> versions) {
     state = versions;
-    ref.read(sharedPreferencesProvider).setStringList('activeVersions', versions);
+    ref
+        .read(sharedPreferencesProvider)
+        .setStringList('activeVersions', versions);
   }
-  
+
   void toggle(String version) {
     List<String> newState;
     if (state.contains(version)) {
@@ -27,7 +29,11 @@ class ActiveVersionsNotifier extends Notifier<List<String>> {
     set(newState);
   }
 }
-final activeVersionsProvider = NotifierProvider<ActiveVersionsNotifier, List<String>>(() => ActiveVersionsNotifier());
+
+final activeVersionsProvider =
+    NotifierProvider<ActiveVersionsNotifier, List<String>>(
+      () => ActiveVersionsNotifier(),
+    );
 
 class SelectedBookNameNotifier extends Notifier<String> {
   @override
@@ -35,13 +41,18 @@ class SelectedBookNameNotifier extends Notifier<String> {
     final prefs = ref.watch(sharedPreferencesProvider);
     return prefs.getString('selectedBookName') ?? 'John';
   }
+
   void set(String name) {
     state = name;
     ref.read(sharedPreferencesProvider).setString('selectedBookName', name);
     ref.read(selectedVersesProvider.notifier).clear();
   }
 }
-final selectedBookNameProvider = NotifierProvider<SelectedBookNameNotifier, String>(() => SelectedBookNameNotifier());
+
+final selectedBookNameProvider =
+    NotifierProvider<SelectedBookNameNotifier, String>(
+      () => SelectedBookNameNotifier(),
+    );
 
 enum RightPanelModule {
   commentaries,
@@ -59,13 +70,17 @@ class SelectedChapterNotifier extends Notifier<int> {
     final prefs = ref.watch(sharedPreferencesProvider);
     return prefs.getInt('selectedChapter') ?? 1;
   }
+
   void set(int chapter) {
     state = chapter;
     ref.read(sharedPreferencesProvider).setInt('selectedChapter', chapter);
     ref.read(selectedVersesProvider.notifier).clear();
   }
 }
-final selectedChapterProvider = NotifierProvider<SelectedChapterNotifier, int>(() => SelectedChapterNotifier());
+
+final selectedChapterProvider = NotifierProvider<SelectedChapterNotifier, int>(
+  () => SelectedChapterNotifier(),
+);
 
 // Added to allow jumping to a specific verse when navigating from outside
 class TargetVerseNotifier extends Notifier<int?> {
@@ -73,12 +88,15 @@ class TargetVerseNotifier extends Notifier<int?> {
   int? build() => null;
   void set(int? verse) => state = verse;
 }
-final targetVerseToScrollProvider = NotifierProvider<TargetVerseNotifier, int?>(() => TargetVerseNotifier());
+
+final targetVerseToScrollProvider = NotifierProvider<TargetVerseNotifier, int?>(
+  () => TargetVerseNotifier(),
+);
 
 class SelectedVersesNotifier extends Notifier<Set<int>> {
   @override
   Set<int> build() => <int>{};
-  
+
   void toggle(int verseId) {
     final newState = Set<int>.from(state);
     if (newState.contains(verseId)) {
@@ -88,13 +106,16 @@ class SelectedVersesNotifier extends Notifier<Set<int>> {
     }
     state = newState;
   }
-  
+
   void clear() {
     state = <int>{};
   }
 }
 
-final selectedVersesProvider = NotifierProvider<SelectedVersesNotifier, Set<int>>(() => SelectedVersesNotifier());
+final selectedVersesProvider =
+    NotifierProvider<SelectedVersesNotifier, Set<int>>(
+      () => SelectedVersesNotifier(),
+    );
 
 class SelectedCommentaryNotifier extends Notifier<int?> {
   @override
@@ -103,6 +124,7 @@ class SelectedCommentaryNotifier extends Notifier<int?> {
     final val = prefs.getInt('selectedCommentary');
     return val == 0 ? null : val;
   }
+
   void set(int? id) {
     state = id;
     if (id != null) {
@@ -113,4 +135,7 @@ class SelectedCommentaryNotifier extends Notifier<int?> {
   }
 }
 
-final selectedCommentaryProvider = NotifierProvider<SelectedCommentaryNotifier, int?>(() => SelectedCommentaryNotifier());
+final selectedCommentaryProvider =
+    NotifierProvider<SelectedCommentaryNotifier, int?>(
+      () => SelectedCommentaryNotifier(),
+    );

@@ -23,11 +23,11 @@ class VerseModel {
   }
 
   Map<String, dynamic> toJson() => {
-        'bookId': bookId,
-        'chapter': chapter,
-        'verse': verse,
-        'segments': segments.map((s) => s.toJson()).toList(),
-      };
+    'bookId': bookId,
+    'chapter': chapter,
+    'verse': verse,
+    'segments': segments.map((s) => s.toJson()).toList(),
+  };
 }
 
 class VerseSegment {
@@ -35,11 +35,7 @@ class VerseSegment {
   final String? strongs;
   final List<String> attrs; // e.g. "jesus_words", "italics"
 
-  const VerseSegment({
-    required this.text,
-    this.strongs,
-    this.attrs = const [],
-  });
+  const VerseSegment({required this.text, this.strongs, this.attrs = const []});
 
   factory VerseSegment.fromJson(Map<String, dynamic> json) {
     return VerseSegment(
@@ -50,8 +46,8 @@ class VerseSegment {
   }
 
   Map<String, dynamic> toJson() => {
-        'text': text,
-        if (strongs != null) 'strongs': strongs,
-        if (attrs.isNotEmpty) 'attrs': attrs,
-      };
+    'text': text,
+    if (strongs != null) 'strongs': strongs,
+    if (attrs.isNotEmpty) 'attrs': attrs,
+  };
 }

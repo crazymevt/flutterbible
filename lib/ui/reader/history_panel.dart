@@ -49,38 +49,50 @@ class HistoryPanel extends ConsumerWidget {
                 if (history.isEmpty) {
                   return const Center(child: Text('No history yet.'));
                 }
-                
+
                 return ListView.separated(
                   itemCount: history.length,
                   separatorBuilder: (_, __) => const Divider(height: 1),
                   itemBuilder: (context, index) {
                     final item = history[index];
-                    final title = item.verse != null 
+                    final title = item.verse != null
                         ? '${item.bookName} ${item.chapter}:${item.verse}'
                         : '${item.bookName} ${item.chapter}';
-                        
+
                     return ListTile(
                       leading: const Icon(Icons.history),
                       title: Text(
                         title,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      subtitle: item.verseText != null && item.verseText!.isNotEmpty
+                      subtitle:
+                          item.verseText != null && item.verseText!.isNotEmpty
                           ? Text(
-                              item.verseText!.replaceAll(RegExp(r'<[^>]*>'), '').replaceAll(RegExp(r'\s+'), ' ').trim(),
+                              item.verseText!
+                                  .replaceAll(RegExp(r'<[^>]*>'), '')
+                                  .replaceAll(RegExp(r'\s+'), ' ')
+                                  .trim(),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             )
                           : null,
                       onTap: () {
-                        ref.read(selectedBookNameProvider.notifier).set(item.bookName);
-                        ref.read(selectedChapterProvider.notifier).set(item.chapter);
+                        ref
+                            .read(selectedBookNameProvider.notifier)
+                            .set(item.bookName);
+                        ref
+                            .read(selectedChapterProvider.notifier)
+                            .set(item.chapter);
                         if (item.verse != null) {
-                          ref.read(targetVerseToScrollProvider.notifier).set(item.verse!);
+                          ref
+                              .read(targetVerseToScrollProvider.notifier)
+                              .set(item.verse!);
                           ref.read(selectedVersesProvider.notifier).clear();
-                          ref.read(selectedVersesProvider.notifier).toggle(item.verse!);
+                          ref
+                              .read(selectedVersesProvider.notifier)
+                              .toggle(item.verse!);
                         }
-                        
+
                         ref.read(activeToolProvider.notifier).close();
                         if (MediaQuery.sizeOf(context).width <= 800) {
                           Navigator.of(context).pop();
@@ -91,7 +103,8 @@ class HistoryPanel extends ConsumerWidget {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, stack) => Center(child: Text('Error loading history')),
+              error: (err, stack) =>
+                  Center(child: Text('Error loading history')),
             ),
           ),
         ],

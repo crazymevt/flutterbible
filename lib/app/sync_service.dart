@@ -32,23 +32,20 @@ class SyncService {
   final UserStore _store;
   final Ref _ref;
   FileSyncEngine? _engine;
-  
+
   SyncService(this._store, this._ref);
 
   Future<void> _ensureInit() async {
     if (_engine != null) return;
-    
+
     final deviceId = await _ref.read(deviceIdProvider.future);
-    
+
     // We place the sync folder inside Documents/StudyBibleSync for easy user access.
     // In production, the user would select an external sync folder (like a Syncthing folder).
     final docs = await getApplicationDocumentsDirectory();
     final syncDir = Directory(p.join(docs.path, 'StudyBibleSync'));
-    
-    _engine = FileSyncEngine(
-      syncFolder: syncDir,
-      localDeviceId: deviceId,
-    );
+
+    _engine = FileSyncEngine(syncFolder: syncDir, localDeviceId: deviceId);
   }
 
   Future<void> sync() async {
@@ -58,58 +55,70 @@ class SyncService {
     final localHighlights = await _store.select(_store.highlights).get();
     final localNotes = await _store.select(_store.notes).get();
     final localBookmarks = await _store.select(_store.bookmarks).get();
-    
+
     final localRecords = <GenericSyncRecord>[];
-    
-    localRecords.addAll(localHighlights.map((h) => GenericSyncRecord(
-      id: h.id,
-      updatedAt: h.updatedAt,
-      deviceId: h.deviceId,
-      deleted: h.deleted,
-      payload: {
-        'type': 'highlight',
-        'bookName': h.bookName,
-        'chapter': h.chapter,
-        'verse': h.verse,
-        'colorHex': h.colorHex,
-      },
-    )));
 
-    localRecords.addAll(localNotes.map((n) => GenericSyncRecord(
-      id: n.id,
-      updatedAt: n.updatedAt,
-      deviceId: n.deviceId,
-      deleted: n.deleted,
-      payload: {
-        'type': 'note',
-        'bookName': n.bookName,
-        'chapter': n.chapter,
-        'verse': n.verse,
-        'content': n.content,
-      },
-    )));
+    localRecords.addAll(
+      localHighlights.map(
+        (h) => GenericSyncRecord(
+          id: h.id,
+          updatedAt: h.updatedAt,
+          deviceId: h.deviceId,
+          deleted: h.deleted,
+          payload: {
+            'type': 'highlight',
+            'bookName': h.bookName,
+            'chapter': h.chapter,
+            'verse': h.verse,
+            'colorHex': h.colorHex,
+          },
+        ),
+      ),
+    );
 
-    localRecords.addAll(localBookmarks.map((b) => GenericSyncRecord(
-      id: b.id,
-      updatedAt: b.updatedAt,
-      deviceId: b.deviceId,
-      deleted: b.deleted,
-      payload: {
-        'type': 'bookmark',
-        'bookName': b.bookName,
-        'chapter': b.chapter,
-        'verse': b.verse,
-        'label': b.label,
-      },
-    )));
+    localRecords.addAll(
+      localNotes.map(
+        (n) => GenericSyncRecord(
+          id: n.id,
+          updatedAt: n.updatedAt,
+          deviceId: n.deviceId,
+          deleted: n.deleted,
+          payload: {
+            'type': 'note',
+            'bookName': n.bookName,
+            'chapter': n.chapter,
+            'verse': n.verse,
+            'content': n.content,
+          },
+        ),
+      ),
+    );
+
+    localRecords.addAll(
+      localBookmarks.map(
+        (b) => GenericSyncRecord(
+          id: b.id,
+          updatedAt: b.updatedAt,
+          deviceId: b.deviceId,
+          deleted: b.deleted,
+          payload: {
+            'type': 'bookmark',
+            'bookName': b.bookName,
+            'chapter': b.chapter,
+            'verse': b.verse,
+            'label': b.label,
+          },
+        ),
+      ),
+    );
 
     // 2. Pull remote records
     final remoteRecordsRaw = await _engine!.pull();
     final remoteRecords = remoteRecordsRaw.cast<GenericSyncRecord>();
-    
+
     // 3. Merge
     final merged = mergeRecords(localRecords, remoteRecords);
-    
+
     // 4. Update local DB
     await _store.transaction(() async {
       for (final rec in merged) {
@@ -125,7 +134,9 @@ class SyncService {
             verse: rec.payload['verse'] as int,
             colorHex: rec.payload['colorHex'] as String,
           );
-          await _store.into(_store.highlights).insert(highlight, mode: InsertMode.replace);
+          await _store
+              .into(_store.highlights)
+              .insert(highlight, mode: InsertMode.replace);
         } else if (type == 'note') {
           final note = Note(
             id: rec.id,
@@ -137,7 +148,9 @@ class SyncService {
             verse: rec.payload['verse'] as int?,
             content: rec.payload['content'] as String,
           );
-          await _store.into(_store.notes).insert(note, mode: InsertMode.replace);
+          await _store
+              .into(_store.notes)
+              .insert(note, mode: InsertMode.replace);
         } else if (type == 'bookmark') {
           final bookmark = Bookmark(
             id: rec.id,
@@ -149,7 +162,9 @@ class SyncService {
             verse: rec.payload['verse'] as int,
             label: rec.payload['label'] as String,
           );
-          await _store.into(_store.bookmarks).insert(bookmark, mode: InsertMode.replace);
+          await _store
+              .into(_store.bookmarks)
+              .insert(bookmark, mode: InsertMode.replace);
         }
       }
     });

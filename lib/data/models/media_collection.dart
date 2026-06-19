@@ -25,7 +25,9 @@ class MediaItem {
       type: json['type'] ?? 'video',
       id: json['id'],
       url: json['url'],
-      chapters: json['chapters'] != null ? List<int>.from(json['chapters']) : null,
+      chapters: json['chapters'] != null
+          ? List<int>.from(json['chapters'])
+          : null,
       duration: json['duration'],
       description: json['description'],
       slug: json['slug'],
@@ -38,7 +40,8 @@ class MediaCollection {
   final String copyright;
   final String url;
   final String description;
-  final Map<String, List<MediaItem>> mediaByBook; // Map of "Book Name" -> List of MediaItem
+  final Map<String, List<MediaItem>>
+  mediaByBook; // Map of "Book Name" -> List of MediaItem
 
   MediaCollection({
     required this.name,
@@ -50,7 +53,7 @@ class MediaCollection {
 
   factory MediaCollection.fromJson(Map<String, dynamic> json) {
     final mediaMap = <String, List<MediaItem>>{};
-    
+
     if (json['media'] != null && json['media'] is Map) {
       final mediaRaw = json['media'] as Map<String, dynamic>;
       mediaRaw.forEach((bookName, itemsList) {

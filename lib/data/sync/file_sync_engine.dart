@@ -13,7 +13,7 @@ class GenericSyncRecord implements SyncRecord {
   final String deviceId;
   @override
   final bool deleted;
-  
+
   final Map<String, dynamic> payload;
 
   GenericSyncRecord({
@@ -30,7 +30,11 @@ class GenericSyncRecord implements SyncRecord {
       updatedAt: json['updatedAt'] as int,
       deviceId: json['deviceId'] as String,
       deleted: json['deleted'] == true,
-      payload: Map<String, dynamic>.from(json)..remove('id')..remove('updatedAt')..remove('deviceId')..remove('deleted'),
+      payload: Map<String, dynamic>.from(json)
+        ..remove('id')
+        ..remove('updatedAt')
+        ..remove('deviceId')
+        ..remove('deleted'),
     );
   }
 
@@ -51,14 +55,15 @@ class FileSyncEngine implements SyncEngine {
 
   FileSyncEngine({required this.syncFolder, required this.localDeviceId});
 
-  File get _localFile => File(p.join(syncFolder.path, 'state-$localDeviceId.jsonl'));
+  File get _localFile =>
+      File(p.join(syncFolder.path, 'state-$localDeviceId.jsonl'));
 
   @override
   Future<void> push(List<SyncRecord> localRecords) async {
     if (!await syncFolder.exists()) {
       await syncFolder.create(recursive: true);
     }
-    
+
     final sink = _localFile.openWrite();
     for (final record in localRecords) {
       if (record is GenericSyncRecord) {
@@ -76,7 +81,9 @@ class FileSyncEngine implements SyncEngine {
 
     final List<GenericSyncRecord> allRemoteRecords = [];
 
-    final files = syncFolder.listSync().whereType<File>().where((f) => f.path.endsWith('.jsonl'));
+    final files = syncFolder.listSync().whereType<File>().where(
+      (f) => f.path.endsWith('.jsonl'),
+    );
     for (final file in files) {
       if (p.basename(file.path) == 'state-$localDeviceId.jsonl') continue;
 

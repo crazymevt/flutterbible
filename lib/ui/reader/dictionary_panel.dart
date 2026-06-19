@@ -72,7 +72,9 @@ class _DictionaryPanelState extends ConsumerState<DictionaryPanel> {
                     ),
                   ),
                   onSubmitted: (value) {
-                    ref.read(dictionarySearchQueryProvider.notifier).setQuery(value);
+                    ref
+                        .read(dictionarySearchQueryProvider.notifier)
+                        .setQuery(value);
                   },
                 ),
               ],
@@ -83,7 +85,11 @@ class _DictionaryPanelState extends ConsumerState<DictionaryPanel> {
             child: entriesAsync.when(
               data: (entries) {
                 if (entries.isEmpty) {
-                  return const Center(child: Text('No definitions found. Search for a word above.'));
+                  return const Center(
+                    child: Text(
+                      'No definitions found. Search for a word above.',
+                    ),
+                  );
                 }
                 return ListView.separated(
                   padding: const EdgeInsets.all(16),
@@ -96,10 +102,11 @@ class _DictionaryPanelState extends ConsumerState<DictionaryPanel> {
                       children: [
                         Text(
                           item.dictionary.name,
-                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: Theme.of(context).colorScheme.primary,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                         const SizedBox(height: 8),
                         HtmlWidget(

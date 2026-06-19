@@ -59,44 +59,43 @@ class _DesktopLayout extends ConsumerWidget {
           Expanded(
             child: Row(
               children: [
-                const Expanded(
-                  flex: 5,
-                  child: ReaderScreen(),
-                ),
+                const Expanded(flex: 5, child: ReaderScreen()),
                 if (activeTool != ActiveTool.none)
                   const VerticalDivider(width: 1, thickness: 1),
                 if (activeTool != ActiveTool.none)
                   Expanded(
                     flex: 4,
-                    child: Builder(builder: (context) {
-                      if (activeTool == ActiveTool.crossReference)
-                        return const CrossReferencePanel();
-                      if (activeTool == ActiveTool.library)
-                        return const StudyPane();
-                      if (activeTool == ActiveTool.commentaries)
-                        return const CommentaryPanel();
-                      if (activeTool == ActiveTool.notes)
-                        return const NotesPanel();
-                      if (activeTool == ActiveTool.dictionary)
-                        return const DictionaryPanel();
-                      if (activeTool == ActiveTool.search)
-                        return const SearchPanel();
-                      if (activeTool == ActiveTool.history)
-                        return const HistoryPanel();
-                      if (activeTool == ActiveTool.media) {
-                        final book = ref.watch(selectedBookNameProvider);
-                        final chap = ref.watch(selectedChapterProvider);
-                        return MediaPanel(bookName: book, chapter: chap);
-                      }
-                      if (activeTool == ActiveTool.readingPlans)
-                        return const ReadingPlanPanel();
-                      return const SizedBox.shrink();
-                    }),
+                    child: Builder(
+                      builder: (context) {
+                        if (activeTool == ActiveTool.crossReference)
+                          return const CrossReferencePanel();
+                        if (activeTool == ActiveTool.library)
+                          return const StudyPane();
+                        if (activeTool == ActiveTool.commentaries)
+                          return const CommentaryPanel();
+                        if (activeTool == ActiveTool.notes)
+                          return const NotesPanel();
+                        if (activeTool == ActiveTool.dictionary)
+                          return const DictionaryPanel();
+                        if (activeTool == ActiveTool.search)
+                          return const SearchPanel();
+                        if (activeTool == ActiveTool.history)
+                          return const HistoryPanel();
+                        if (activeTool == ActiveTool.media) {
+                          final book = ref.watch(selectedBookNameProvider);
+                          final chap = ref.watch(selectedChapterProvider);
+                          return MediaPanel(bookName: book, chapter: chap);
+                        }
+                        if (activeTool == ActiveTool.readingPlans)
+                          return const ReadingPlanPanel();
+                        return const SizedBox.shrink();
+                      },
+                    ),
                   ),
               ],
             ),
           ),
-          
+
           // Far right Navigation Rail
           NavigationRail(
             backgroundColor: const Color(0xFF2D2B3B),
@@ -105,11 +104,17 @@ class _DesktopLayout extends ConsumerWidget {
             indicatorColor: Colors.white24,
             destinations: const [
               NavigationRailDestination(
-                icon: Tooltip(message: 'Library', child: Icon(Icons.library_books)),
+                icon: Tooltip(
+                  message: 'Library',
+                  child: Icon(Icons.library_books),
+                ),
                 label: Text('Library'),
               ),
               NavigationRailDestination(
-                icon: Tooltip(message: 'Cross-References', child: Icon(Icons.compare_arrows)),
+                icon: Tooltip(
+                  message: 'Cross-References',
+                  child: Icon(Icons.compare_arrows),
+                ),
                 label: Text('Cross-Ref'),
               ),
               NavigationRailDestination(
@@ -121,11 +126,17 @@ class _DesktopLayout extends ConsumerWidget {
                 label: Text('Search'),
               ),
               NavigationRailDestination(
-                icon: Tooltip(message: 'Dictionary', child: Icon(Icons.import_contacts)),
+                icon: Tooltip(
+                  message: 'Dictionary',
+                  child: Icon(Icons.import_contacts),
+                ),
                 label: Text('Dictionary'),
               ),
               NavigationRailDestination(
-                icon: Tooltip(message: 'Commentaries', child: Icon(Icons.menu_book)),
+                icon: Tooltip(
+                  message: 'Commentaries',
+                  child: Icon(Icons.menu_book),
+                ),
                 label: Text('Commentaries'),
               ),
               NavigationRailDestination(
@@ -133,11 +144,17 @@ class _DesktopLayout extends ConsumerWidget {
                 label: Text('History'),
               ),
               NavigationRailDestination(
-                icon: Tooltip(message: 'Media', child: Icon(Icons.video_library)),
+                icon: Tooltip(
+                  message: 'Media',
+                  child: Icon(Icons.video_library),
+                ),
                 label: Text('Media'),
               ),
               NavigationRailDestination(
-                icon: Tooltip(message: 'Reading Plans', child: Icon(Icons.menu_book)),
+                icon: Tooltip(
+                  message: 'Reading Plans',
+                  child: Icon(Icons.menu_book),
+                ),
                 label: Text('Plans'),
               ),
             ],
@@ -154,31 +171,51 @@ class _DesktopLayout extends ConsumerWidget {
 
   int? _getSelectedIndex(ActiveTool tool) {
     switch (tool) {
-      case ActiveTool.library: return 0;
-      case ActiveTool.crossReference: return 1;
-      case ActiveTool.notes: return 2;
-      case ActiveTool.search: return 3;
-      case ActiveTool.dictionary: return 4;
-      case ActiveTool.commentaries: return 5;
-      case ActiveTool.history: return 6;
-      case ActiveTool.media: return 7;
-      case ActiveTool.readingPlans: return 8;
-      case ActiveTool.none: return null;
+      case ActiveTool.library:
+        return 0;
+      case ActiveTool.crossReference:
+        return 1;
+      case ActiveTool.notes:
+        return 2;
+      case ActiveTool.search:
+        return 3;
+      case ActiveTool.dictionary:
+        return 4;
+      case ActiveTool.commentaries:
+        return 5;
+      case ActiveTool.history:
+        return 6;
+      case ActiveTool.media:
+        return 7;
+      case ActiveTool.readingPlans:
+        return 8;
+      case ActiveTool.none:
+        return null;
     }
   }
 
   ActiveTool _getToolFromIndex(int index) {
     switch (index) {
-      case 0: return ActiveTool.library;
-      case 1: return ActiveTool.crossReference;
-      case 2: return ActiveTool.notes;
-      case 3: return ActiveTool.search;
-      case 4: return ActiveTool.dictionary;
-      case 5: return ActiveTool.commentaries;
-      case 6: return ActiveTool.history;
-      case 7: return ActiveTool.media;
-      case 8: return ActiveTool.readingPlans;
-      default: return ActiveTool.none;
+      case 0:
+        return ActiveTool.library;
+      case 1:
+        return ActiveTool.crossReference;
+      case 2:
+        return ActiveTool.notes;
+      case 3:
+        return ActiveTool.search;
+      case 4:
+        return ActiveTool.dictionary;
+      case 5:
+        return ActiveTool.commentaries;
+      case 6:
+        return ActiveTool.history;
+      case 7:
+        return ActiveTool.media;
+      case 8:
+        return ActiveTool.readingPlans;
+      default:
+        return ActiveTool.none;
     }
   }
 }

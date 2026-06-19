@@ -19,9 +19,12 @@ final osisLanguagesProvider = FutureProvider<List<OsisLanguage>>((ref) async {
   return ref.read(contentManagerApiProvider).fetchOsisLanguages();
 });
 
-final osisTranslationsProvider = FutureProvider.family<List<OsisTranslation>, String>((ref, langCode) async {
-  return ref.read(contentManagerApiProvider).fetchOsisTranslations(langCode);
-});
+final osisTranslationsProvider =
+    FutureProvider.family<List<OsisTranslation>, String>((ref, langCode) async {
+      return ref
+          .read(contentManagerApiProvider)
+          .fetchOsisTranslations(langCode);
+    });
 
 class DownloadProgress {
   final double percent;
@@ -41,35 +44,51 @@ class ContentManagerController extends Notifier<Map<String, DownloadProgress>> {
       final api = ref.read(contentManagerApiProvider);
       final tempDir = await getTemporaryDirectory();
       await tempDir.create(recursive: true);
-      
+
       final safeAbbr = module.abbr.replaceAll(RegExp(r'[^a-zA-Z0-9_-]'), '_');
       final dlFile = File(p.join(tempDir.path, '$safeAbbr.zip.bz2'));
 
-      await api.downloadFile(module.url, dlFile.path, onReceiveProgress: (received, total) {
-        if (total != -1) {
-          state = {...state, stateKey: DownloadProgress(received / total, 'Downloading...')};
-        }
-      });
+      await api.downloadFile(
+        module.url,
+        dlFile.path,
+        onReceiveProgress: (received, total) {
+          if (total != -1) {
+            state = {
+              ...state,
+              stateKey: DownloadProgress(received / total, 'Downloading...'),
+            };
+          }
+        },
+      );
 
       state = {...state, stateKey: DownloadProgress(1.0, 'Extracting...')};
-      
+
       final extractDir = Directory(p.join(tempDir.path, 'extract_$safeAbbr'));
-      final extractedFiles = await ArchiveExtractor.extractArchive(dlFile, extractDir);
+      final extractedFiles = await ArchiveExtractor.extractArchive(
+        dlFile,
+        extractDir,
+      );
 
       state = {...state, stateKey: DownloadProgress(1.0, 'Importing...')};
 
-      final sqliteFiles = extractedFiles.where(
-        (f) => f.path.toLowerCase().endsWith('.sqlite3') || f.path.toLowerCase().endsWith('.sqlite')
-      ).toList();
-      
+      final sqliteFiles = extractedFiles
+          .where(
+            (f) =>
+                f.path.toLowerCase().endsWith('.sqlite3') ||
+                f.path.toLowerCase().endsWith('.sqlite'),
+          )
+          .toList();
+
       if (sqliteFiles.isEmpty) {
-        final fileNames = extractedFiles.map((f) => p.basename(f.path)).join(', ');
+        final fileNames = extractedFiles
+            .map((f) => p.basename(f.path))
+            .join(', ');
         throw Exception('No SQLite file found in archive. Saw: $fileNames');
       }
 
       final store = ref.read(contentStoreProvider);
       final importer = MyBibleImporter(store);
-      
+
       for (final sqliteFile in sqliteFiles) {
         final fname = p.basename(sqliteFile.path).toLowerCase();
         ModuleType inferredType = module.type;
@@ -91,16 +110,18 @@ class ContentManagerController extends Notifier<Map<String, DownloadProgress>> {
       await dlFile.delete();
 
       state = {...state, stateKey: DownloadProgress(1.0, 'Done')};
-      
+
       // Refresh installed versions
       ref.invalidate(versionsProvider);
-
     } catch (e) {
       state = {...state, stateKey: DownloadProgress(0, 'Error: $e')};
     }
   }
 
-  Future<void> downloadAndImportOsis(OsisTranslation translation, String langCode) async {
+  Future<void> downloadAndImportOsis(
+    OsisTranslation translation,
+    String langCode,
+  ) async {
     final stateKey = 'osis_${translation.basename}';
     state = {...state, stateKey: DownloadProgress(0, 'Downloading...')};
 
@@ -111,11 +132,18 @@ class ContentManagerController extends Notifier<Map<String, DownloadProgress>> {
 
       final dlFile = File(p.join(tempDir.path, translation.name));
 
-      await api.downloadFile(translation.downloadUrl, dlFile.path, onReceiveProgress: (received, total) {
-        if (total != -1) {
-          state = {...state, stateKey: DownloadProgress(received / total, 'Downloading...')};
-        }
-      });
+      await api.downloadFile(
+        translation.downloadUrl,
+        dlFile.path,
+        onReceiveProgress: (received, total) {
+          if (total != -1) {
+            state = {
+              ...state,
+              stateKey: DownloadProgress(received / total, 'Downloading...'),
+            };
+          }
+        },
+      );
 
       state = {...state, stateKey: DownloadProgress(1.0, 'Importing...')};
 
@@ -136,13 +164,15 @@ class ContentManagerController extends Notifier<Map<String, DownloadProgress>> {
 
       // Refresh installed versions
       ref.invalidate(versionsProvider);
-
     } catch (e) {
       state = {...state, stateKey: DownloadProgress(0, 'Error: $e')};
     }
   }
 }
 
-final contentManagerControllerProvider = NotifierProvider<ContentManagerController, Map<String, DownloadProgress>>(() {
-  return ContentManagerController();
-});
+final contentManagerControllerProvider =
+    NotifierProvider<ContentManagerController, Map<String, DownloadProgress>>(
+      () {
+        return ContentManagerController();
+      },
+    );

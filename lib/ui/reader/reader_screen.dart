@@ -12,6 +12,7 @@ import 'book_chooser_sheet.dart';
 import 'study_pane.dart';
 import 'mobile_tools_drawer.dart';
 import 'audio_player_widget.dart';
+import 'commentary_panel.dart';
 import '../app_drawer.dart';
 import '../../app/dashboard_providers.dart';
 import 'dart:async';
@@ -25,7 +26,7 @@ class ReaderScreen extends ConsumerStatefulWidget {
 
 class _ReaderScreenState extends ConsumerState<ReaderScreen> {
   bool _isFlowing = false;
-  
+
   // Tracking
   int _sessionStartTime = 0;
   late final AppLifecycleListener _lifecycleListener;
@@ -45,7 +46,8 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
   }
 
   void _handleLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.hidden) {
       _logSession();
     } else if (state == AppLifecycleState.resumed) {
       _sessionStartTime = DateTime.now().millisecondsSinceEpoch;
@@ -70,11 +72,11 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
 
   void _updateChapterTracking(String book, int chapter) {
     if (_trackingBook == book && _trackingChapter == chapter) return;
-    
+
     _trackingBook = book;
     _trackingChapter = chapter;
     _chapterReadTimer?.cancel();
-    
+
     // Start a 5-second timer to mark the chapter as read
     _chapterReadTimer = Timer(const Duration(seconds: 5), () {
       if (mounted) {
@@ -85,29 +87,48 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
 
   void _showVersionPicker() async {
     final availableVersions = await ref.read(versionsProvider.future);
-    
+
     if (!mounted) return;
     showModalBottomSheet(
       context: context,
       builder: (context) {
-        return Consumer(builder: (context, ref, child) {
-          final activeVersions = ref.watch(activeVersionsProvider);
-          return ListView.builder(
-            itemCount: availableVersions.length,
-            itemBuilder: (context, index) {
-              final version = availableVersions[index];
-              final isActive = activeVersions.contains(version.id);
-              return CheckboxListTile(
-                title: Text('${version.name} (${version.id})'),
-                value: isActive,
-                onChanged: (checked) {
-                  ref.read(activeVersionsProvider.notifier).toggle(version.id);
-                },
-              );
-            },
-          );
-        });
+        return Consumer(
+          builder: (context, ref, child) {
+            final activeVersions = ref.watch(activeVersionsProvider);
+            return ListView.builder(
+              itemCount: availableVersions.length,
+              itemBuilder: (context, index) {
+                final version = availableVersions[index];
+                final isActive = activeVersions.contains(version.id);
+                return CheckboxListTile(
+                  title: Text('${version.name} (${version.id})'),
+                  value: isActive,
+                  onChanged: (checked) {
+                    ref
+                        .read(activeVersionsProvider.notifier)
+                        .toggle(version.id);
+                  },
+                );
+              },
+            );
+          },
+        );
       },
+    );
+  }
+
+  void _openCommentaryPanel() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.9,
+        minChildSize: 0.5,
+        maxChildSize: 1.0,
+        expand: false,
+        builder: (_, scrollController) => CommentaryPanel(),
+      ),
     );
   }
 
@@ -127,7 +148,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     ref.listen<int>(selectedChapterProvider, (prev, next) {
       _updateChapterTracking(ref.read(selectedBookNameProvider), next);
     });
-    
+
     // Trigger initial tracking if not already tracking
     if (_trackingBook == null) {
       _updateChapterTracking(bookName, chapter);
@@ -141,7 +162,8 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
             IconButton(
               icon: const Icon(Icons.chevron_left),
               tooltip: 'Previous Chapter',
-              onPressed: () => ref.read(navigationControllerProvider).previousChapter(),
+              onPressed: () =>
+                  ref.read(navigationControllerProvider).previousChapter(),
             ),
             InkWell(
               borderRadius: BorderRadius.circular(8),
@@ -154,7 +176,10 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                 );
               },
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 4.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 4.0,
+                  vertical: 4.0,
+                ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -167,7 +192,8 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
             IconButton(
               icon: const Icon(Icons.chevron_right),
               tooltip: 'Next Chapter',
-              onPressed: () => ref.read(navigationControllerProvider).nextChapter(),
+              onPressed: () =>
+                  ref.read(navigationControllerProvider).nextChapter(),
             ),
             if (MediaQuery.sizeOf(context).width > 800)
               const Expanded(child: AudioPlayerWidget()),
@@ -187,9 +213,9 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                 }
               } catch (e) {
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Sync failed: $e')),
-                  );
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text('Sync failed: $e')));
                 }
               }
             },
@@ -225,11 +251,13 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                   tooltip: 'Study Pane',
                   onPressed: () => Scaffold.of(context).openEndDrawer(),
                 );
-              }
+              },
             ),
         ],
       ),
-      endDrawer: MediaQuery.sizeOf(context).width <= 800 ? const MobileToolsDrawer() : const StudyPane(),
+      endDrawer: MediaQuery.sizeOf(context).width <= 800
+          ? const MobileToolsDrawer()
+          : const StudyPane(),
       body: parallelVersesAsync.when(
         data: (versesMap) {
           if (versesMap.isEmpty) {
@@ -246,13 +274,19 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                     verses: verses,
                     selectedVerses: selectedVerses,
                     savedHighlights: savedHighlights,
-                    onVerseTap: (verseId) => ref.read(selectedVersesProvider.notifier).toggle(verseId),
+                    onVerseTap: (verseId) => ref
+                        .read(selectedVersesProvider.notifier)
+                        .toggle(verseId),
+                    onFootnoteTap: (verseId) => _openCommentaryPanel(),
                   )
                 : VerseListView(
                     verses: verses,
                     selectedVerses: selectedVerses,
                     savedHighlights: savedHighlights,
-                    onVerseTap: (verseId) => ref.read(selectedVersesProvider.notifier).toggle(verseId),
+                    onVerseTap: (verseId) => ref
+                        .read(selectedVersesProvider.notifier)
+                        .toggle(verseId),
+                    onFootnoteTap: (verseId) => _openCommentaryPanel(),
                   );
           } else {
             content = ParallelView(
@@ -260,7 +294,9 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
               isFlowing: _isFlowing,
               selectedVerses: selectedVerses,
               savedHighlights: savedHighlights,
-              onVerseTap: (verseId) => ref.read(selectedVersesProvider.notifier).toggle(verseId),
+              onVerseTap: (verseId) =>
+                  ref.read(selectedVersesProvider.notifier).toggle(verseId),
+              onFootnoteTap: (verseId) => _openCommentaryPanel(),
             );
           }
 
@@ -271,10 +307,19 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                   children: [
                     if (MediaQuery.sizeOf(context).width <= 800)
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0,
+                          vertical: 4.0,
+                        ),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surfaceContainerHighest.withAlpha(128),
-                          border: Border(bottom: BorderSide(color: Theme.of(context).dividerColor)),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.surfaceContainerHighest.withAlpha(128),
+                          border: Border(
+                            bottom: BorderSide(
+                              color: Theme.of(context).dividerColor,
+                            ),
+                          ),
                         ),
                         child: const AudioPlayerWidget(),
                       ),

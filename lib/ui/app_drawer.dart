@@ -10,7 +10,7 @@ class AppDrawer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentModule = ref.watch(appModuleProvider);
-    
+
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
@@ -46,7 +46,9 @@ class AppDrawer extends ConsumerWidget {
             title: const Text('Journals & Prayers'),
             selected: currentModule == AppModule.journalsPrayers,
             onTap: () {
-              ref.read(appModuleProvider.notifier).setModule(AppModule.journalsPrayers);
+              ref
+                  .read(appModuleProvider.notifier)
+                  .setModule(AppModule.journalsPrayers);
               Navigator.of(context).pop();
             },
           ),
@@ -55,7 +57,9 @@ class AppDrawer extends ConsumerWidget {
             title: const Text('Dashboard'),
             selected: currentModule == AppModule.dashboard,
             onTap: () {
-              ref.read(appModuleProvider.notifier).setModule(AppModule.dashboard);
+              ref
+                  .read(appModuleProvider.notifier)
+                  .setModule(AppModule.dashboard);
               Navigator.of(context).pop();
             },
           ),
@@ -64,7 +68,9 @@ class AppDrawer extends ConsumerWidget {
             title: const Text('Content Manager'),
             selected: currentModule == AppModule.contentManager,
             onTap: () {
-              ref.read(appModuleProvider.notifier).setModule(AppModule.contentManager);
+              ref
+                  .read(appModuleProvider.notifier)
+                  .setModule(AppModule.contentManager);
               Navigator.of(context).pop();
             },
           ),
@@ -74,7 +80,9 @@ class AppDrawer extends ConsumerWidget {
             title: const Text('Backup & Restore'),
             selected: currentModule == AppModule.backupRestore,
             onTap: () {
-              ref.read(appModuleProvider.notifier).setModule(AppModule.backupRestore);
+              ref
+                  .read(appModuleProvider.notifier)
+                  .setModule(AppModule.backupRestore);
               Navigator.of(context).pop();
             },
           ),
@@ -83,9 +91,9 @@ class AppDrawer extends ConsumerWidget {
             title: const Text('Settings'),
             onTap: () {
               Navigator.of(context).pop(); // close drawer
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const SettingsScreen()),
-              );
+              Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (_) => const SettingsScreen()));
             },
           ),
         ],
