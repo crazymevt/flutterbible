@@ -141,6 +141,11 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
       appBar: AppBar(
         title: Row(
           children: [
+            IconButton(
+              icon: const Icon(Icons.chevron_left),
+              tooltip: 'Previous Chapter',
+              onPressed: () => ref.read(navigationControllerProvider).previousChapter(),
+            ),
             InkWell(
               borderRadius: BorderRadius.circular(8),
               onTap: () {
@@ -152,7 +157,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                 );
               },
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 4.0),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -161,6 +166,11 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                   ],
                 ),
               ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.chevron_right),
+              tooltip: 'Next Chapter',
+              onPressed: () => ref.read(navigationControllerProvider).nextChapter(),
             ),
             const Expanded(child: AudioPlayerWidget()),
           ],
