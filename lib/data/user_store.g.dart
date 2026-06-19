@@ -3898,6 +3898,520 @@ class AchievementsCompanion extends UpdateCompanion<Achievement> {
   }
 }
 
+class $NavigationHistoriesTable extends NavigationHistories
+    with TableInfo<$NavigationHistoriesTable, NavigationHistory> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $NavigationHistoriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deviceIdMeta = const VerificationMeta(
+    'deviceId',
+  );
+  @override
+  late final GeneratedColumn<String> deviceId = GeneratedColumn<String>(
+    'device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedMeta = const VerificationMeta(
+    'deleted',
+  );
+  @override
+  late final GeneratedColumn<bool> deleted = GeneratedColumn<bool>(
+    'deleted',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("deleted" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _bookNameMeta = const VerificationMeta(
+    'bookName',
+  );
+  @override
+  late final GeneratedColumn<String> bookName = GeneratedColumn<String>(
+    'book_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _chapterMeta = const VerificationMeta(
+    'chapter',
+  );
+  @override
+  late final GeneratedColumn<int> chapter = GeneratedColumn<int>(
+    'chapter',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _verseMeta = const VerificationMeta('verse');
+  @override
+  late final GeneratedColumn<int> verse = GeneratedColumn<int>(
+    'verse',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _verseTextMeta = const VerificationMeta(
+    'verseText',
+  );
+  @override
+  late final GeneratedColumn<String> verseText = GeneratedColumn<String>(
+    'verse_text',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    updatedAt,
+    deviceId,
+    deleted,
+    bookName,
+    chapter,
+    verse,
+    verseText,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'navigation_histories';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<NavigationHistory> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('device_id')) {
+      context.handle(
+        _deviceIdMeta,
+        deviceId.isAcceptableOrUnknown(data['device_id']!, _deviceIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_deviceIdMeta);
+    }
+    if (data.containsKey('deleted')) {
+      context.handle(
+        _deletedMeta,
+        deleted.isAcceptableOrUnknown(data['deleted']!, _deletedMeta),
+      );
+    }
+    if (data.containsKey('book_name')) {
+      context.handle(
+        _bookNameMeta,
+        bookName.isAcceptableOrUnknown(data['book_name']!, _bookNameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_bookNameMeta);
+    }
+    if (data.containsKey('chapter')) {
+      context.handle(
+        _chapterMeta,
+        chapter.isAcceptableOrUnknown(data['chapter']!, _chapterMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_chapterMeta);
+    }
+    if (data.containsKey('verse')) {
+      context.handle(
+        _verseMeta,
+        verse.isAcceptableOrUnknown(data['verse']!, _verseMeta),
+      );
+    }
+    if (data.containsKey('verse_text')) {
+      context.handle(
+        _verseTextMeta,
+        verseText.isAcceptableOrUnknown(data['verse_text']!, _verseTextMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  NavigationHistory map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return NavigationHistory(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deviceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}device_id'],
+      )!,
+      deleted: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}deleted'],
+      )!,
+      bookName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}book_name'],
+      )!,
+      chapter: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}chapter'],
+      )!,
+      verse: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}verse'],
+      ),
+      verseText: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}verse_text'],
+      ),
+    );
+  }
+
+  @override
+  $NavigationHistoriesTable createAlias(String alias) {
+    return $NavigationHistoriesTable(attachedDatabase, alias);
+  }
+}
+
+class NavigationHistory extends DataClass
+    implements Insertable<NavigationHistory> {
+  final String id;
+  final int updatedAt;
+  final String deviceId;
+  final bool deleted;
+  final String bookName;
+  final int chapter;
+  final int? verse;
+  final String? verseText;
+  const NavigationHistory({
+    required this.id,
+    required this.updatedAt,
+    required this.deviceId,
+    required this.deleted,
+    required this.bookName,
+    required this.chapter,
+    this.verse,
+    this.verseText,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['updated_at'] = Variable<int>(updatedAt);
+    map['device_id'] = Variable<String>(deviceId);
+    map['deleted'] = Variable<bool>(deleted);
+    map['book_name'] = Variable<String>(bookName);
+    map['chapter'] = Variable<int>(chapter);
+    if (!nullToAbsent || verse != null) {
+      map['verse'] = Variable<int>(verse);
+    }
+    if (!nullToAbsent || verseText != null) {
+      map['verse_text'] = Variable<String>(verseText);
+    }
+    return map;
+  }
+
+  NavigationHistoriesCompanion toCompanion(bool nullToAbsent) {
+    return NavigationHistoriesCompanion(
+      id: Value(id),
+      updatedAt: Value(updatedAt),
+      deviceId: Value(deviceId),
+      deleted: Value(deleted),
+      bookName: Value(bookName),
+      chapter: Value(chapter),
+      verse: verse == null && nullToAbsent
+          ? const Value.absent()
+          : Value(verse),
+      verseText: verseText == null && nullToAbsent
+          ? const Value.absent()
+          : Value(verseText),
+    );
+  }
+
+  factory NavigationHistory.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return NavigationHistory(
+      id: serializer.fromJson<String>(json['id']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+      deviceId: serializer.fromJson<String>(json['deviceId']),
+      deleted: serializer.fromJson<bool>(json['deleted']),
+      bookName: serializer.fromJson<String>(json['bookName']),
+      chapter: serializer.fromJson<int>(json['chapter']),
+      verse: serializer.fromJson<int?>(json['verse']),
+      verseText: serializer.fromJson<String?>(json['verseText']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+      'deviceId': serializer.toJson<String>(deviceId),
+      'deleted': serializer.toJson<bool>(deleted),
+      'bookName': serializer.toJson<String>(bookName),
+      'chapter': serializer.toJson<int>(chapter),
+      'verse': serializer.toJson<int?>(verse),
+      'verseText': serializer.toJson<String?>(verseText),
+    };
+  }
+
+  NavigationHistory copyWith({
+    String? id,
+    int? updatedAt,
+    String? deviceId,
+    bool? deleted,
+    String? bookName,
+    int? chapter,
+    Value<int?> verse = const Value.absent(),
+    Value<String?> verseText = const Value.absent(),
+  }) => NavigationHistory(
+    id: id ?? this.id,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deviceId: deviceId ?? this.deviceId,
+    deleted: deleted ?? this.deleted,
+    bookName: bookName ?? this.bookName,
+    chapter: chapter ?? this.chapter,
+    verse: verse.present ? verse.value : this.verse,
+    verseText: verseText.present ? verseText.value : this.verseText,
+  );
+  NavigationHistory copyWithCompanion(NavigationHistoriesCompanion data) {
+    return NavigationHistory(
+      id: data.id.present ? data.id.value : this.id,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deviceId: data.deviceId.present ? data.deviceId.value : this.deviceId,
+      deleted: data.deleted.present ? data.deleted.value : this.deleted,
+      bookName: data.bookName.present ? data.bookName.value : this.bookName,
+      chapter: data.chapter.present ? data.chapter.value : this.chapter,
+      verse: data.verse.present ? data.verse.value : this.verse,
+      verseText: data.verseText.present ? data.verseText.value : this.verseText,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('NavigationHistory(')
+          ..write('id: $id, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('deleted: $deleted, ')
+          ..write('bookName: $bookName, ')
+          ..write('chapter: $chapter, ')
+          ..write('verse: $verse, ')
+          ..write('verseText: $verseText')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    updatedAt,
+    deviceId,
+    deleted,
+    bookName,
+    chapter,
+    verse,
+    verseText,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is NavigationHistory &&
+          other.id == this.id &&
+          other.updatedAt == this.updatedAt &&
+          other.deviceId == this.deviceId &&
+          other.deleted == this.deleted &&
+          other.bookName == this.bookName &&
+          other.chapter == this.chapter &&
+          other.verse == this.verse &&
+          other.verseText == this.verseText);
+}
+
+class NavigationHistoriesCompanion extends UpdateCompanion<NavigationHistory> {
+  final Value<String> id;
+  final Value<int> updatedAt;
+  final Value<String> deviceId;
+  final Value<bool> deleted;
+  final Value<String> bookName;
+  final Value<int> chapter;
+  final Value<int?> verse;
+  final Value<String?> verseText;
+  final Value<int> rowid;
+  const NavigationHistoriesCompanion({
+    this.id = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deviceId = const Value.absent(),
+    this.deleted = const Value.absent(),
+    this.bookName = const Value.absent(),
+    this.chapter = const Value.absent(),
+    this.verse = const Value.absent(),
+    this.verseText = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  NavigationHistoriesCompanion.insert({
+    required String id,
+    required int updatedAt,
+    required String deviceId,
+    this.deleted = const Value.absent(),
+    required String bookName,
+    required int chapter,
+    this.verse = const Value.absent(),
+    this.verseText = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       updatedAt = Value(updatedAt),
+       deviceId = Value(deviceId),
+       bookName = Value(bookName),
+       chapter = Value(chapter);
+  static Insertable<NavigationHistory> custom({
+    Expression<String>? id,
+    Expression<int>? updatedAt,
+    Expression<String>? deviceId,
+    Expression<bool>? deleted,
+    Expression<String>? bookName,
+    Expression<int>? chapter,
+    Expression<int>? verse,
+    Expression<String>? verseText,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deviceId != null) 'device_id': deviceId,
+      if (deleted != null) 'deleted': deleted,
+      if (bookName != null) 'book_name': bookName,
+      if (chapter != null) 'chapter': chapter,
+      if (verse != null) 'verse': verse,
+      if (verseText != null) 'verse_text': verseText,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  NavigationHistoriesCompanion copyWith({
+    Value<String>? id,
+    Value<int>? updatedAt,
+    Value<String>? deviceId,
+    Value<bool>? deleted,
+    Value<String>? bookName,
+    Value<int>? chapter,
+    Value<int?>? verse,
+    Value<String?>? verseText,
+    Value<int>? rowid,
+  }) {
+    return NavigationHistoriesCompanion(
+      id: id ?? this.id,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deviceId: deviceId ?? this.deviceId,
+      deleted: deleted ?? this.deleted,
+      bookName: bookName ?? this.bookName,
+      chapter: chapter ?? this.chapter,
+      verse: verse ?? this.verse,
+      verseText: verseText ?? this.verseText,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (deviceId.present) {
+      map['device_id'] = Variable<String>(deviceId.value);
+    }
+    if (deleted.present) {
+      map['deleted'] = Variable<bool>(deleted.value);
+    }
+    if (bookName.present) {
+      map['book_name'] = Variable<String>(bookName.value);
+    }
+    if (chapter.present) {
+      map['chapter'] = Variable<int>(chapter.value);
+    }
+    if (verse.present) {
+      map['verse'] = Variable<int>(verse.value);
+    }
+    if (verseText.present) {
+      map['verse_text'] = Variable<String>(verseText.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('NavigationHistoriesCompanion(')
+          ..write('id: $id, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('deleted: $deleted, ')
+          ..write('bookName: $bookName, ')
+          ..write('chapter: $chapter, ')
+          ..write('verse: $verse, ')
+          ..write('verseText: $verseText, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$UserStore extends GeneratedDatabase {
   _$UserStore(QueryExecutor e) : super(e);
   $UserStoreManager get managers => $UserStoreManager(this);
@@ -3910,6 +4424,8 @@ abstract class _$UserStore extends GeneratedDatabase {
       $ReadingProgressesTable(this);
   late final $TimeTrackersTable timeTrackers = $TimeTrackersTable(this);
   late final $AchievementsTable achievements = $AchievementsTable(this);
+  late final $NavigationHistoriesTable navigationHistories =
+      $NavigationHistoriesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3923,6 +4439,7 @@ abstract class _$UserStore extends GeneratedDatabase {
     readingProgresses,
     timeTrackers,
     achievements,
+    navigationHistories,
   ];
 }
 
@@ -5893,6 +6410,279 @@ typedef $$AchievementsTableProcessedTableManager =
       Achievement,
       PrefetchHooks Function()
     >;
+typedef $$NavigationHistoriesTableCreateCompanionBuilder =
+    NavigationHistoriesCompanion Function({
+      required String id,
+      required int updatedAt,
+      required String deviceId,
+      Value<bool> deleted,
+      required String bookName,
+      required int chapter,
+      Value<int?> verse,
+      Value<String?> verseText,
+      Value<int> rowid,
+    });
+typedef $$NavigationHistoriesTableUpdateCompanionBuilder =
+    NavigationHistoriesCompanion Function({
+      Value<String> id,
+      Value<int> updatedAt,
+      Value<String> deviceId,
+      Value<bool> deleted,
+      Value<String> bookName,
+      Value<int> chapter,
+      Value<int?> verse,
+      Value<String?> verseText,
+      Value<int> rowid,
+    });
+
+class $$NavigationHistoriesTableFilterComposer
+    extends Composer<_$UserStore, $NavigationHistoriesTable> {
+  $$NavigationHistoriesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get deleted => $composableBuilder(
+    column: $table.deleted,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bookName => $composableBuilder(
+    column: $table.bookName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get chapter => $composableBuilder(
+    column: $table.chapter,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get verse => $composableBuilder(
+    column: $table.verse,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get verseText => $composableBuilder(
+    column: $table.verseText,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$NavigationHistoriesTableOrderingComposer
+    extends Composer<_$UserStore, $NavigationHistoriesTable> {
+  $$NavigationHistoriesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get deleted => $composableBuilder(
+    column: $table.deleted,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bookName => $composableBuilder(
+    column: $table.bookName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get chapter => $composableBuilder(
+    column: $table.chapter,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get verse => $composableBuilder(
+    column: $table.verse,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get verseText => $composableBuilder(
+    column: $table.verseText,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$NavigationHistoriesTableAnnotationComposer
+    extends Composer<_$UserStore, $NavigationHistoriesTable> {
+  $$NavigationHistoriesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get deviceId =>
+      $composableBuilder(column: $table.deviceId, builder: (column) => column);
+
+  GeneratedColumn<bool> get deleted =>
+      $composableBuilder(column: $table.deleted, builder: (column) => column);
+
+  GeneratedColumn<String> get bookName =>
+      $composableBuilder(column: $table.bookName, builder: (column) => column);
+
+  GeneratedColumn<int> get chapter =>
+      $composableBuilder(column: $table.chapter, builder: (column) => column);
+
+  GeneratedColumn<int> get verse =>
+      $composableBuilder(column: $table.verse, builder: (column) => column);
+
+  GeneratedColumn<String> get verseText =>
+      $composableBuilder(column: $table.verseText, builder: (column) => column);
+}
+
+class $$NavigationHistoriesTableTableManager
+    extends
+        RootTableManager<
+          _$UserStore,
+          $NavigationHistoriesTable,
+          NavigationHistory,
+          $$NavigationHistoriesTableFilterComposer,
+          $$NavigationHistoriesTableOrderingComposer,
+          $$NavigationHistoriesTableAnnotationComposer,
+          $$NavigationHistoriesTableCreateCompanionBuilder,
+          $$NavigationHistoriesTableUpdateCompanionBuilder,
+          (
+            NavigationHistory,
+            BaseReferences<
+              _$UserStore,
+              $NavigationHistoriesTable,
+              NavigationHistory
+            >,
+          ),
+          NavigationHistory,
+          PrefetchHooks Function()
+        > {
+  $$NavigationHistoriesTableTableManager(
+    _$UserStore db,
+    $NavigationHistoriesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$NavigationHistoriesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$NavigationHistoriesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$NavigationHistoriesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<String> deviceId = const Value.absent(),
+                Value<bool> deleted = const Value.absent(),
+                Value<String> bookName = const Value.absent(),
+                Value<int> chapter = const Value.absent(),
+                Value<int?> verse = const Value.absent(),
+                Value<String?> verseText = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => NavigationHistoriesCompanion(
+                id: id,
+                updatedAt: updatedAt,
+                deviceId: deviceId,
+                deleted: deleted,
+                bookName: bookName,
+                chapter: chapter,
+                verse: verse,
+                verseText: verseText,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required int updatedAt,
+                required String deviceId,
+                Value<bool> deleted = const Value.absent(),
+                required String bookName,
+                required int chapter,
+                Value<int?> verse = const Value.absent(),
+                Value<String?> verseText = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => NavigationHistoriesCompanion.insert(
+                id: id,
+                updatedAt: updatedAt,
+                deviceId: deviceId,
+                deleted: deleted,
+                bookName: bookName,
+                chapter: chapter,
+                verse: verse,
+                verseText: verseText,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$NavigationHistoriesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$UserStore,
+      $NavigationHistoriesTable,
+      NavigationHistory,
+      $$NavigationHistoriesTableFilterComposer,
+      $$NavigationHistoriesTableOrderingComposer,
+      $$NavigationHistoriesTableAnnotationComposer,
+      $$NavigationHistoriesTableCreateCompanionBuilder,
+      $$NavigationHistoriesTableUpdateCompanionBuilder,
+      (
+        NavigationHistory,
+        BaseReferences<
+          _$UserStore,
+          $NavigationHistoriesTable,
+          NavigationHistory
+        >,
+      ),
+      NavigationHistory,
+      PrefetchHooks Function()
+    >;
 
 class $UserStoreManager {
   final _$UserStore _db;
@@ -5913,4 +6703,6 @@ class $UserStoreManager {
       $$TimeTrackersTableTableManager(_db, _db.timeTrackers);
   $$AchievementsTableTableManager get achievements =>
       $$AchievementsTableTableManager(_db, _db.achievements);
+  $$NavigationHistoriesTableTableManager get navigationHistories =>
+      $$NavigationHistoriesTableTableManager(_db, _db.navigationHistories);
 }

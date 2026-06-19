@@ -1,7 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:drift/drift.dart';
+import 'package:uuid/uuid.dart';
 import 'package:study_bible/data/content_store.dart';
+import '../data/user_store.dart';
 import 'reader_state.dart';
+import 'user_providers.dart';
+import 'sync_service.dart';
 
 final contentStoreProvider = Provider<ContentStore>((ref) {
   return ContentStore();
@@ -107,21 +111,26 @@ final commentaryEntriesProvider = FutureProvider<List<CommentaryEntry>>((ref) as
   final chapter = ref.watch(selectedChapterProvider);
   final selectedVerses = ref.watch(selectedVersesProvider);
   final showIntro = ref.watch(showBookIntroProvider);
+  final selectedCommentaryId = ref.watch(selectedCommentaryProvider);
+
+  if (selectedCommentaryId == null) return [];
 
   if (showIntro) {
     return (store.select(store.commentaryEntries)
-          ..where((c) => c.bookName.equals(bookName) & c.chapter.isNull()))
+          ..where((c) => c.commentaryId.equals(selectedCommentaryId) & c.bookName.equals(bookName) & c.chapter.isNull()))
         .get();
   }
 
   if (selectedVerses.isNotEmpty) {
     return (store.select(store.commentaryEntries)
-          ..where((c) => c.bookName.equals(bookName) & c.chapter.equals(chapter) & c.verse.isIn(selectedVerses)))
+          ..where((c) => c.commentaryId.equals(selectedCommentaryId) & c.bookName.equals(bookName) & c.chapter.equals(chapter) & c.verse.isIn(selectedVerses))
+          ..orderBy([(c) => OrderingTerm.asc(c.verse)]))
         .get();
   } else {
     // Show all commentaries for the chapter
     return (store.select(store.commentaryEntries)
-          ..where((c) => c.bookName.equals(bookName) & c.chapter.equals(chapter)))
+          ..where((c) => c.commentaryId.equals(selectedCommentaryId) & c.bookName.equals(bookName) & c.chapter.equals(chapter))
+          ..orderBy([(c) => OrderingTerm.asc(c.verse)]))
         .get();
   }
 });
@@ -168,6 +177,45 @@ class NavigationController {
   final Ref ref;
   NavigationController(this.ref);
 
+  Future<void> recordHistory({int? verse}) async {
+    final store = ref.read(contentStoreProvider);
+    final userStore = ref.read(userStoreProvider);
+    final bookName = ref.read(selectedBookNameProvider);
+    final chapter = ref.read(selectedChapterProvider);
+    final activeVersions = ref.read(activeVersionsProvider);
+    
+    String? verseText;
+    
+    // Only query text if a verse was explicitly provided and we have versions
+    if (verse != null && activeVersions.isNotEmpty) {
+      final versionId = activeVersions.first;
+      final book = await ref.read(bookByNameProvider((versionId: versionId, name: bookName)).future);
+      if (book != null) {
+        final v = await (store.select(store.verses)..where((v) => v.bookId.equals(book.id) & v.chapter.equals(chapter) & v.verse.equals(verse))).getSingleOrNull();
+        if (v != null) {
+          verseText = v.textContent;
+        }
+      }
+    }
+
+    final deviceId = await ref.read(deviceIdProvider.future);
+    
+    final newEntry = NavigationHistory(
+      id: const Uuid().v4(),
+      updatedAt: DateTime.now().millisecondsSinceEpoch,
+      deviceId: deviceId,
+      deleted: false,
+      bookName: bookName,
+      chapter: chapter,
+      verse: verse,
+      verseText: verseText,
+    );
+    
+    print('DEBUG: Saving history -> book: $bookName, chapter: $chapter, verse: $verse, text: $verseText');
+    
+    await userStore.into(userStore.navigationHistories).insert(newEntry);
+  }
+
   Future<void> nextChapter() async {
     final activeVersions = ref.read(activeVersionsProvider);
     if (activeVersions.isEmpty) return;
@@ -190,6 +238,9 @@ class NavigationController {
       ref.read(selectedBookNameProvider.notifier).set(books[bookIndex + 1].name);
       ref.read(selectedChapterProvider.notifier).set(1);
     }
+    
+    // Only record chapter history
+    recordHistory();
   }
 
   Future<void> previousChapter() async {
@@ -213,5 +264,8 @@ class NavigationController {
       ref.read(selectedBookNameProvider.notifier).set(prevBook.name);
       ref.read(selectedChapterProvider.notifier).set(maxChapter);
     }
+    
+    // Only record chapter history
+    recordHistory();
   }
 }

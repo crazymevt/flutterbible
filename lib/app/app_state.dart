@@ -8,6 +8,7 @@ enum ActiveTool {
   dictionary,
   library,
   commentaries,
+  history,
 }
 
 class ActiveToolNotifier extends Notifier<ActiveTool> {
@@ -33,6 +34,7 @@ enum AppModule {
   reader,
   journalsPrayers,
   dashboard,
+  contentManager,
 }
 
 class AppModuleNotifier extends Notifier<AppModule> {

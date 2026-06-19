@@ -158,6 +158,14 @@ class _CrossReferenceItem extends ConsumerWidget {
                     onTap: () {
                       ref.read(selectedBookNameProvider.notifier).set(xref.targetBookName);
                       ref.read(selectedChapterProvider.notifier).set(xref.targetChapter);
+                      ref.read(selectedVersesProvider.notifier).clear();
+                      ref.read(selectedVersesProvider.notifier).toggle(xref.targetVerse);
+                      ref.read(navigationControllerProvider).recordHistory(verse: xref.targetVerse);
+                      
+                      // Close the panel if on mobile
+                      if (MediaQuery.sizeOf(context).width <= 800) {
+                        Navigator.of(context).pop();
+                      }
                     },
                     child: Padding(
                       padding: const EdgeInsets.all(12.0),

@@ -156,6 +156,14 @@ class _ResultsList extends ConsumerWidget {
                 if (item.chapter != null) {
                   ref.read(selectedChapterProvider.notifier).set(item.chapter!);
                 }
+                if (item.verse != null) {
+                  ref.read(selectedVersesProvider.notifier).clear();
+                  ref.read(selectedVersesProvider.notifier).toggle(item.verse!);
+                  ref.read(navigationControllerProvider).recordHistory(verse: item.verse);
+                } else {
+                  ref.read(navigationControllerProvider).recordHistory();
+                }
+                
                 if (MediaQuery.sizeOf(context).width <= 800) {
                   Navigator.of(context).pop();
                 }
@@ -185,6 +193,7 @@ class _ResultsList extends ConsumerWidget {
                 if (item.chapter != null) {
                   ref.read(selectedChapterProvider.notifier).set(item.chapter!);
                 }
+                ref.read(navigationControllerProvider).recordHistory();
               }
               if (MediaQuery.sizeOf(context).width <= 800) {
                 Navigator.of(context).pop();
@@ -284,6 +293,7 @@ class _GroupedResultsList extends ConsumerWidget {
                     ref.read(selectedBookNameProvider.notifier).set(item.book!);
                     if (item.chapter != null) {
                       ref.read(selectedChapterProvider.notifier).set(item.chapter!);
+                      ref.read(navigationControllerProvider).recordHistory();
                     }
                   }
                   if (MediaQuery.sizeOf(context).width <= 800) {

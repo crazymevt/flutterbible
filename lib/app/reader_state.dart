@@ -1,32 +1,57 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'shared_prefs.dart';
 
 class ActiveVersionsNotifier extends Notifier<List<String>> {
   @override
-  List<String> build() => ['NLT'];
-  void set(List<String> versions) => state = versions;
+  List<String> build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getStringList('activeVersions') ?? ['NLT'];
+  }
+  
+  void set(List<String> versions) {
+    state = versions;
+    ref.read(sharedPreferencesProvider).setStringList('activeVersions', versions);
+  }
+  
   void toggle(String version) {
+    List<String> newState;
     if (state.contains(version)) {
       if (state.length > 1) {
-        state = state.where((v) => v != version).toList();
+        newState = state.where((v) => v != version).toList();
+      } else {
+        return; // Don't allow removing the last version
       }
     } else {
-      state = [...state, version];
+      newState = [...state, version];
     }
+    set(newState);
   }
 }
 final activeVersionsProvider = NotifierProvider<ActiveVersionsNotifier, List<String>>(() => ActiveVersionsNotifier());
 
 class SelectedBookNameNotifier extends Notifier<String> {
   @override
-  String build() => 'John';
-  void set(String name) => state = name;
+  String build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getString('selectedBookName') ?? 'John';
+  }
+  void set(String name) {
+    state = name;
+    ref.read(sharedPreferencesProvider).setString('selectedBookName', name);
+  }
 }
 final selectedBookNameProvider = NotifierProvider<SelectedBookNameNotifier, String>(() => SelectedBookNameNotifier());
 
 class SelectedChapterNotifier extends Notifier<int> {
   @override
-  int build() => 1;
-  void set(int chapter) => state = chapter;
+  int build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getInt('selectedChapter') ?? 1;
+  }
+  void set(int chapter) {
+    state = chapter;
+    ref.read(sharedPreferencesProvider).setInt('selectedChapter', chapter);
+  }
 }
 final selectedChapterProvider = NotifierProvider<SelectedChapterNotifier, int>(() => SelectedChapterNotifier());
 
@@ -50,3 +75,22 @@ class SelectedVersesNotifier extends Notifier<Set<int>> {
 }
 
 final selectedVersesProvider = NotifierProvider<SelectedVersesNotifier, Set<int>>(() => SelectedVersesNotifier());
+
+class SelectedCommentaryNotifier extends Notifier<int?> {
+  @override
+  int? build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    final val = prefs.getInt('selectedCommentary');
+    return val == 0 ? null : val;
+  }
+  void set(int? id) {
+    state = id;
+    if (id != null) {
+      ref.read(sharedPreferencesProvider).setInt('selectedCommentary', id);
+    } else {
+      ref.read(sharedPreferencesProvider).remove('selectedCommentary');
+    }
+  }
+}
+
+final selectedCommentaryProvider = NotifierProvider<SelectedCommentaryNotifier, int?>(() => SelectedCommentaryNotifier());

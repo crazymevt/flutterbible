@@ -185,3 +185,13 @@ class BookmarkAction {
     }
   }
 }
+
+// NAVIGATION HISTORY
+final navigationHistoryProvider = StreamProvider<List<NavigationHistory>>((ref) {
+  final store = ref.watch(userStoreProvider);
+  return (store.select(store.navigationHistories)
+        ..where((h) => h.deleted.equals(false))
+        ..orderBy([(h) => OrderingTerm.desc(h.updatedAt)])
+        ..limit(25))
+      .watch();
+});

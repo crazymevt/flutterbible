@@ -108,7 +108,8 @@ class _BookChooserSheetState extends ConsumerState<BookChooserSheet> {
               onTap: () {
                 ref.read(selectedBookNameProvider.notifier).set(selectedBookName!);
                 ref.read(selectedChapterProvider.notifier).set(chapter);
-                Navigator.pop(context);
+                ref.read(navigationControllerProvider).recordHistory();
+                Navigator.of(context).pop();
               },
               child: Container(
                 decoration: BoxDecoration(

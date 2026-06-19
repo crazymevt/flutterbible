@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../../data/content_store.dart';
+import '../../data/models/verse_segment.dart';
 
 import 'chapter_navigation_footer.dart';
 
@@ -18,6 +20,52 @@ class VerseListView extends StatelessWidget {
     required this.onVerseTap,
     this.showFooter = true,
   });
+
+  List<InlineSpan> _buildVerseSpans(BuildContext context, Verse verse) {
+    if (verse.segments.isEmpty || verse.segments == '[]') {
+      return [
+        TextSpan(
+          text: verse.textContent,
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(height: 1.6),
+        )
+      ];
+    }
+    try {
+      final List<dynamic> jsonList = jsonDecode(verse.segments);
+      final segments = jsonList.map((e) => VerseSegment.fromJson(e)).toList();
+      final List<InlineSpan> spans = [];
+      bool hasText = false;
+      for (final seg in segments) {
+        if (!hasText && (seg.isParagraphBreak || seg.isLineBreak)) {
+          continue; // skip leading breaks
+        }
+        hasText = true;
+        
+        if (seg.isParagraphBreak) {
+          spans.add(const TextSpan(text: '\n\n'));
+        } else if (seg.isLineBreak) {
+          spans.add(const TextSpan(text: '\n'));
+        } else {
+          spans.add(TextSpan(
+            text: seg.text,
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  height: 1.6,
+                  fontStyle: seg.isItalic ? FontStyle.italic : null,
+                  color: seg.isJesusWords ? Colors.red.shade700 : null,
+                ),
+          ));
+        }
+      }
+      return spans;
+    } catch (e) {
+      return [
+        TextSpan(
+          text: verse.textContent,
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(height: 1.6),
+        )
+      ];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,21 +97,15 @@ class VerseListView extends StatelessWidget {
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
                         color: Theme.of(context).colorScheme.primary,
                         fontWeight: FontWeight.bold,
-                        fontFeatures: const [FontFeature.superscripts()],
                       ),
                 ),
-                TextSpan(
-                  text: verse.textContent,
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        height: 1.6,
-                      ),
-                ),
+                ..._buildVerseSpans(context, verse),
               ],
             ),
           ),
           onTap: () => onVerseTap(verse.verse),
         );
-    },
+      },
     );
   }
 }

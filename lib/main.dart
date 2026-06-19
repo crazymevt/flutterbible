@@ -1,9 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'ui/main_shell.dart';
+import 'app/shared_prefs.dart';
 
 void main() async {
-  runApp(const ProviderScope(child: StudyBibleApp()));
+  WidgetsFlutterBinding.ensureInitialized();
+  final prefs = await SharedPreferences.getInstance();
+  
+  runApp(
+    ProviderScope(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(prefs),
+      ],
+      child: const StudyBibleApp(),
+    ),
+  );
 }
 
 class StudyBibleApp extends StatelessWidget {

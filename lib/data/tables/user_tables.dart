@@ -123,3 +123,19 @@ class Achievements extends Table {
   @override
   Set<Column> get primaryKey => {id};
 }
+
+@DataClassName('NavigationHistory')
+class NavigationHistories extends Table {
+  TextColumn get id => text()(); // UUID
+  IntColumn get updatedAt => integer()(); // epoch ms
+  TextColumn get deviceId => text()();
+  BoolColumn get deleted => boolean().withDefault(const Constant(false))();
+
+  TextColumn get bookName => text()();
+  IntColumn get chapter => integer()();
+  IntColumn get verse => integer().nullable()();
+  TextColumn get verseText => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}

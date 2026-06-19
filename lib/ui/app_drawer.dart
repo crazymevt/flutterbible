@@ -57,6 +57,15 @@ class AppDrawer extends ConsumerWidget {
               Navigator.of(context).pop();
             },
           ),
+          ListTile(
+            leading: const Icon(Icons.cloud_download),
+            title: const Text('Content Manager'),
+            selected: currentModule == AppModule.contentManager,
+            onTap: () {
+              ref.read(appModuleProvider.notifier).setModule(AppModule.contentManager);
+              Navigator.of(context).pop();
+            },
+          ),
         ],
       ),
     );

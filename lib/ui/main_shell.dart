@@ -7,8 +7,10 @@ import 'reader/commentary_panel.dart';
 import 'reader/notes_panel.dart';
 import 'reader/dictionary_panel.dart';
 import 'reader/search_panel.dart';
+import 'reader/history_panel.dart';
 import 'journals/journals_prayers_screen.dart';
 import 'dashboard/dashboard_screen.dart';
+import 'content_manager/content_manager_screen.dart';
 
 class MainShell extends ConsumerWidget {
   const MainShell({super.key});
@@ -20,6 +22,8 @@ class MainShell extends ConsumerWidget {
       return const JournalsPrayersScreen();
     } else if (currentModule == AppModule.dashboard) {
       return const DashboardScreen();
+    } else if (currentModule == AppModule.contentManager) {
+      return const ContentManagerScreen();
     }
 
     return LayoutBuilder(
@@ -79,6 +83,11 @@ class _DesktopLayout extends ConsumerWidget {
                     flex: 4,
                     child: SearchPanel(),
                   ),
+                if (activeTool == ActiveTool.history)
+                  const Expanded(
+                    flex: 4,
+                    child: HistoryPanel(),
+                  ),
                 // Add other tools here...
               ],
             ),
@@ -115,6 +124,10 @@ class _DesktopLayout extends ConsumerWidget {
                 icon: Tooltip(message: 'Commentaries', child: Icon(Icons.menu_book)),
                 label: Text('Commentaries'),
               ),
+              NavigationRailDestination(
+                icon: Tooltip(message: 'History', child: Icon(Icons.history)),
+                label: Text('History'),
+              ),
             ],
             selectedIndex: _getSelectedIndex(activeTool),
             onDestinationSelected: (index) {
@@ -135,6 +148,7 @@ class _DesktopLayout extends ConsumerWidget {
       case ActiveTool.search: return 3;
       case ActiveTool.dictionary: return 4;
       case ActiveTool.commentaries: return 5;
+      case ActiveTool.history: return 6;
       case ActiveTool.none: return null;
     }
   }
@@ -147,6 +161,7 @@ class _DesktopLayout extends ConsumerWidget {
       case 3: return ActiveTool.search;
       case 4: return ActiveTool.dictionary;
       case 5: return ActiveTool.commentaries;
+      case 6: return ActiveTool.history;
       default: return ActiveTool.none;
     }
   }

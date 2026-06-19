@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import '../../data/content_store.dart';
+import '../../data/models/verse_segment.dart';
 import 'chapter_navigation_footer.dart';
 
 class FlowingParagraphView extends StatefulWidget {
@@ -75,18 +77,10 @@ class _FlowingParagraphViewState extends State<FlowingParagraphView> {
           : highlightColor?.withValues(alpha: 0.4);
       final recognizer = _recognizers[index];
 
-      return TextSpan(
-        children: [
-          TextSpan(
-            text: '${verse.verse} ',
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: Theme.of(context).colorScheme.primary,
-                  fontWeight: FontWeight.bold,
-                  fontFeatures: const [FontFeature.superscripts()],
-                  backgroundColor: bgColor,
-                ),
-            recognizer: recognizer,
-          ),
+      List<InlineSpan> leadingBreaks = [];
+      List<InlineSpan> verseSpans;
+      if (verse.segments.isEmpty || verse.segments == '[]') {
+        verseSpans = [
           TextSpan(
             text: '${verse.textContent} ',
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
@@ -94,7 +88,66 @@ class _FlowingParagraphViewState extends State<FlowingParagraphView> {
                   backgroundColor: bgColor,
                 ),
             recognizer: recognizer,
+          )
+        ];
+      } else {
+        try {
+          final List<dynamic> jsonList = jsonDecode(verse.segments);
+          final segments = jsonList.map((e) => VerseSegment.fromJson(e)).toList();
+          verseSpans = [];
+          bool hasText = false;
+          for (final seg in segments) {
+            if (!hasText && (seg.isParagraphBreak || seg.isLineBreak)) {
+              if (seg.isParagraphBreak) leadingBreaks.add(const TextSpan(text: '\n\n'));
+              if (seg.isLineBreak) leadingBreaks.add(const TextSpan(text: '\n'));
+              continue;
+            }
+            hasText = true;
+            
+            if (seg.isParagraphBreak) {
+              verseSpans.add(const TextSpan(text: '\n\n'));
+            } else if (seg.isLineBreak) {
+              verseSpans.add(const TextSpan(text: '\n'));
+            } else {
+              verseSpans.add(TextSpan(
+                text: seg.text,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      height: 1.8,
+                      backgroundColor: bgColor,
+                      fontStyle: seg.isItalic ? FontStyle.italic : null,
+                      color: seg.isJesusWords ? Colors.red.shade700 : null,
+                    ),
+                recognizer: recognizer,
+              ));
+            }
+          }
+        } catch (e) {
+          verseSpans = [
+            TextSpan(
+              text: '${verse.textContent} ',
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    height: 1.8,
+                    backgroundColor: bgColor,
+                  ),
+              recognizer: recognizer,
+            )
+          ];
+        }
+      }
+
+      return TextSpan(
+        children: [
+          ...leadingBreaks,
+          TextSpan(
+            text: '${verse.verse} ',
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                  backgroundColor: bgColor,
+                ),
+            recognizer: recognizer,
           ),
+          ...verseSpans,
         ],
       );
     }).toList();

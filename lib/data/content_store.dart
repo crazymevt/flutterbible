@@ -24,17 +24,37 @@ class ContentStore extends _$ContentStore {
 
   @override
   int get schemaVersion => 1;
+
+  Future<void> deleteVersion(String versionId) async {
+    await transaction(() async {
+      final bookIds = await (select(books)..where((b) => b.versionId.equals(versionId))).map((b) => b.id).get();
+      if (bookIds.isNotEmpty) {
+        await (delete(verses)..where((v) => v.bookId.isIn(bookIds))).go();
+        await (delete(books)..where((b) => b.id.isIn(bookIds))).go();
+      }
+      await (delete(versions)..where((v) => v.id.equals(versionId))).go();
+    });
+  }
+
+  Future<void> deleteCommentary(int id) async {
+    await transaction(() async {
+      await (delete(commentaryEntries)..where((c) => c.commentaryId.equals(id))).go();
+      await (delete(commentaries)..where((c) => c.id.equals(id))).go();
+    });
+  }
+
+  Future<void> deleteDictionary(int id) async {
+    await transaction(() async {
+      await (delete(dictionaryEntries)..where((d) => d.dictionaryId.equals(id))).go();
+      await (delete(dictionaries)..where((d) => d.id.equals(id))).go();
+    });
+  }
 }
 
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
     final dbFolder = await getApplicationDocumentsDirectory();
     final file = File(p.join(dbFolder.path, 'content.db'));
-    
-    // Always overwrite from assets during development
-    if (await file.exists()) {
-      await file.delete();
-    }
     
     if (!await file.exists()) {
       try {
