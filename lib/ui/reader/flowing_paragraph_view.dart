@@ -1,11 +1,14 @@
-import 'dart:convert';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../app/app_state.dart';
+import '../../app/content_providers.dart';
 import '../../data/content_store.dart';
-import '../../data/models/verse_segment.dart';
 import 'chapter_navigation_footer.dart';
+import 'dictionary_panel.dart';
+import 'verse_text_builder.dart';
 
-class FlowingParagraphView extends StatefulWidget {
+class FlowingParagraphView extends ConsumerStatefulWidget {
   final List<Verse> verses;
   final Set<int> selectedVerses;
   final Map<int, String> savedHighlights;
@@ -30,10 +33,11 @@ class FlowingParagraphView extends StatefulWidget {
   });
 
   @override
-  State<FlowingParagraphView> createState() => _FlowingParagraphViewState();
+  ConsumerState<FlowingParagraphView> createState() =>
+      _FlowingParagraphViewState();
 }
 
-class _FlowingParagraphViewState extends State<FlowingParagraphView> {
+class _FlowingParagraphViewState extends ConsumerState<FlowingParagraphView> {
   late List<TapGestureRecognizer> _recognizers;
 
   @override
@@ -60,6 +64,28 @@ class _FlowingParagraphViewState extends State<FlowingParagraphView> {
   void _disposeRecognizers() {
     for (final r in _recognizers) {
       r.dispose();
+    }
+  }
+
+  void _openDictionary(String word) {
+    ref.read(dictionarySearchQueryProvider.notifier).setQuery(word);
+    if (MediaQuery.sizeOf(context).width > 800) {
+      ref.read(activeToolProvider.notifier).setTool(ActiveTool.dictionary);
+    } else {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (_) => Container(
+          height: MediaQuery.sizeOf(context).height * 0.8,
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          ),
+          child: const DictionaryPanel(),
+        ),
+      );
     }
   }
 
@@ -104,116 +130,29 @@ class _FlowingParagraphViewState extends State<FlowingParagraphView> {
         subheadingSpans.add(const TextSpan(text: '\n'));
       }
 
-      List<InlineSpan> leadingBreaks = [];
-      List<InlineSpan> verseSpans;
-      if (verse.segments.isEmpty || verse.segments == '[]') {
-        verseSpans = [
-          TextSpan(
-            text: '${verse.textContent} ',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              height: 1.8,
-              backgroundColor: bgColor,
-            ),
-            recognizer: recognizer,
-          ),
-        ];
-      } else {
-        try {
-          final List<dynamic> jsonList = jsonDecode(verse.segments);
-          final segments = jsonList
-              .map((e) => VerseSegment.fromJson(e))
-              .toList();
-          verseSpans = [];
-          bool hasText = false;
-          for (final seg in segments) {
-            if (!hasText && (seg.isParagraphBreak || seg.isLineBreak)) {
-              if (seg.isParagraphBreak)
-                leadingBreaks.add(const TextSpan(text: '\n\n'));
-              if (seg.isLineBreak)
-                leadingBreaks.add(const TextSpan(text: '\n'));
-              continue;
-            }
-            hasText = true;
+      final verseNumberSpan = TextSpan(
+        text: '${verse.verse} ',
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+          color: Theme.of(context).colorScheme.primary,
+          fontWeight: FontWeight.bold,
+          backgroundColor: bgColor,
+        ),
+        recognizer: recognizer,
+      );
 
-            if (seg.isParagraphBreak) {
-              verseSpans.add(const TextSpan(text: '\n\n'));
-            } else if (seg.isLineBreak) {
-              verseSpans.add(const TextSpan(text: '\n'));
-            } else if (seg.isFootnote) {
-              verseSpans.add(
-                WidgetSpan(
-                  alignment: PlaceholderAlignment.top,
-                  child: GestureDetector(
-                    onTap: () {
-                      widget.onVerseTap(verse.verse);
-                      widget.onFootnoteTap?.call(verse.verse);
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 2,
-                        vertical: 2,
-                      ),
-                      margin: const EdgeInsets.only(left: 2, right: 2),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primaryContainer,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        seg.footnoteText ?? 'f',
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onPrimaryContainer,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 10,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            } else {
-              verseSpans.add(
-                TextSpan(
-                  text: seg.text,
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    height: 1.8,
-                    backgroundColor: bgColor,
-                    fontStyle: seg.isItalic ? FontStyle.italic : null,
-                    color: seg.isJesusWords ? Colors.red.shade700 : null,
-                  ),
-                  recognizer: recognizer,
-                ),
-              );
-            }
-          }
-        } catch (e) {
-          verseSpans = [
-            TextSpan(
-              text: '${verse.textContent} ',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                height: 1.8,
-                backgroundColor: bgColor,
-              ),
-              recognizer: recognizer,
-            ),
-          ];
-        }
-      }
+      final verseSpans = buildVerseSpans(
+        context: context,
+        verse: verse,
+        bgColor: bgColor,
+        onVerseTap: widget.onVerseTap,
+        onFootnoteTap: widget.onFootnoteTap,
+        onWordRightClick: _openDictionary,
+        verseNumberSpan: verseNumberSpan,
+      );
 
       return TextSpan(
         children: [
           ...subheadingSpans,
-          ...leadingBreaks,
-          TextSpan(
-            text: '${verse.verse} ',
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
-              fontWeight: FontWeight.bold,
-              backgroundColor: bgColor,
-            ),
-            recognizer: recognizer,
-          ),
           ...verseSpans,
         ],
       );
