@@ -117,7 +117,9 @@ final commentaryEntriesProvider = FutureProvider<List<CommentaryEntry>>((ref) as
 
   if (showIntro) {
     return (store.select(store.commentaryEntries)
-          ..where((c) => c.commentaryId.equals(selectedCommentaryId) & c.bookName.equals(bookName) & c.chapter.isNull()))
+          ..where((c) => c.commentaryId.equals(selectedCommentaryId) & 
+                         c.bookName.equals(bookName) & 
+                         (c.chapter.equals(0) | c.chapter.isNull())))
         .get();
   }
 
