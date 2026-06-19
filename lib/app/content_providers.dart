@@ -201,6 +201,26 @@ class NavigationController {
     }
 
     final deviceId = await ref.read(deviceIdProvider.future);
+
+    // Remove any existing entry with the same book/chapter/verse combo
+    // so we don't get duplicates — the new entry becomes the most recent.
+    final existingQuery = userStore.select(userStore.navigationHistories)
+      ..where((h) =>
+          h.bookName.equals(bookName) &
+          h.chapter.equals(chapter) &
+          h.deleted.equals(false));
+    if (verse != null) {
+      existingQuery.where((h) => h.verse.equals(verse));
+    } else {
+      existingQuery.where((h) => h.verse.isNull());
+    }
+    final existing = await existingQuery.get();
+    for (final old in existing) {
+      await userStore.into(userStore.navigationHistories).insert(
+        old.copyWith(deleted: true, updatedAt: DateTime.now().millisecondsSinceEpoch),
+        mode: InsertMode.replace,
+      );
+    }
     
     final newEntry = NavigationHistory(
       id: const Uuid().v4(),
