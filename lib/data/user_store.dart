@@ -23,13 +23,15 @@ part 'user_store.g.dart';
     ReadingPlanDays,
     ReadingPlanItems,
     Sermons,
+    Tags,
+    EntityTags,
   ],
 )
 class UserStore extends _$UserStore {
   UserStore([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 10;
 
   @override
   MigrationStrategy get migration {
@@ -140,6 +142,23 @@ class UserStore extends _$UserStore {
           await customStatement('''
             CREATE TRIGGER IF NOT EXISTS sermons_ad AFTER DELETE ON sermons BEGIN
               DELETE FROM user_search WHERE type = 'sermon' AND reference_id = old.id;
+            END;
+          ''');
+        }
+        if (from < 10) {
+          await m.createTable(tags);
+          await m.createTable(entityTags);
+          // Insert trigger to add tags into search index automatically
+          await customStatement('''
+            CREATE TRIGGER IF NOT EXISTS tags_ai AFTER INSERT ON entity_tags BEGIN
+              INSERT INTO user_search(type, reference_id, text_content) 
+              SELECT new.entity_type, new.entity_id, '#' || tags.name 
+              FROM tags WHERE tags.id = new.tag_id;
+            END;
+          ''');
+          await customStatement('''
+            CREATE TRIGGER IF NOT EXISTS tags_ad AFTER DELETE ON entity_tags BEGIN
+              DELETE FROM user_search WHERE text_content = (SELECT '#' || name FROM tags WHERE id = old.tag_id) AND reference_id = old.entity_id AND type = old.entity_type;
             END;
           ''');
         }

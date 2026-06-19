@@ -10,7 +10,16 @@ import 'ui/main_shell.dart';
 import 'app/shared_prefs.dart';
 import 'app/app_state.dart';
 import 'theme/app_themes.dart';
+import 'dart:ui';
 
+class AppScrollBehavior extends MaterialScrollBehavior {
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+        PointerDeviceKind.trackpad,
+      };
+}
 
 
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
@@ -132,6 +141,7 @@ class _StudyBibleAppState extends ConsumerState<StudyBibleApp>
         fontSizeDelta: fontSizeDelta,
       ),
       themeMode: themeMode,
+      scrollBehavior: AppScrollBehavior(),
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,

@@ -7,6 +7,7 @@ import '../../app/sermon_providers.dart';
 import '../../app/user_providers.dart';
 import 'export_dialog.dart';
 import 'sermon_presentation_screen.dart';
+import '../tags/tag_editor_dialog.dart';
 
 
 class SermonEditorScreen extends ConsumerStatefulWidget {
@@ -171,6 +172,19 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
                   });
               },
             ),
+            IconButton(
+              icon: const Icon(Icons.label),
+              tooltip: 'Manage Tags',
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (_) => TagEditorDialog(
+                    entityId: widget.sermonId,
+                    entityType: 'sermon',
+                  ),
+                );
+              },
+            ),
             TextButton.icon(
               icon: const Icon(Icons.list_alt),
               label: const Text('Outline'),
@@ -244,6 +258,19 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
                               ExportDialog.show(context, [sermon]);
                             }
                           });
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.label),
+                      tooltip: 'Manage Tags',
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (_) => TagEditorDialog(
+                            entityId: widget.sermonId,
+                            entityType: 'sermon',
+                          ),
+                        );
                       },
                     ),
                     IconButton(

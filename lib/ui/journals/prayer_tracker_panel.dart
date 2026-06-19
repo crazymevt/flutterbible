@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/journal_providers.dart';
+import '../tags/tag_editor_dialog.dart';
 
 class HideAnsweredPrayersNotifier extends Notifier<bool> {
   @override
@@ -138,6 +139,19 @@ class PrayerTrackerPanel extends ConsumerWidget {
                               initialName: prayer.name,
                               initialDesc: prayer.description,
                             ),
+                          ),
+                          TextButton.icon(
+                            icon: const Icon(Icons.label, size: 18),
+                            label: const Text('Tags'),
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (_) => TagEditorDialog(
+                                  entityId: prayer.id,
+                                  entityType: 'prayer',
+                                ),
+                              );
+                            },
                           ),
                           TextButton.icon(
                             icon: const Icon(

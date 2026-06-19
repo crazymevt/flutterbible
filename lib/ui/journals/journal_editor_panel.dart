@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/journal_providers.dart';
 import 'journals_list_panel.dart';
+import '../tags/tag_editor_dialog.dart';
 
 class JournalEditorPanel extends ConsumerStatefulWidget {
   const JournalEditorPanel({super.key});
@@ -97,8 +98,21 @@ class _JournalEditorPanelState extends ConsumerState<JournalEditorPanel> {
                   ),
                 ),
               ),
-              if (_currentId != null)
-                IconButton(
+              if (_currentId != null) ...[
+                  IconButton(
+                    icon: const Icon(Icons.label),
+                    tooltip: 'Manage Tags',
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (_) => TagEditorDialog(
+                          entityId: _currentId!,
+                          entityType: 'journal',
+                        ),
+                      );
+                    },
+                  ),
+                  IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),
                   onPressed: () async {
                     final confirm = await showDialog<bool>(
@@ -128,6 +142,7 @@ class _JournalEditorPanelState extends ConsumerState<JournalEditorPanel> {
                     }
                   },
                 ),
+              ],
             ],
           ),
         ),

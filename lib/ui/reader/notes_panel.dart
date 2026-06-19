@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/user_providers.dart';
 import '../../app/app_state.dart';
 import '../../app/reader_state.dart';
+import '../tags/tag_editor_dialog.dart';
 
 class NotesPanel extends ConsumerWidget {
   const NotesPanel({super.key});
@@ -94,6 +95,19 @@ class NotesPanel extends ConsumerWidget {
                           Navigator.of(context).pop();
                         }
                       },
+                      trailing: IconButton(
+                        icon: const Icon(Icons.label_outline),
+                        tooltip: 'Manage Tags',
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (_) => TagEditorDialog(
+                              entityId: note.id,
+                              entityType: 'note',
+                            ),
+                          );
+                        },
+                      ),
                     );
                   },
                 );

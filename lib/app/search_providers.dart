@@ -52,7 +52,9 @@ final globalSearchResultsProvider = FutureProvider<List<SearchResult>>((
 
   if (query.trim().isEmpty) return [];
 
-  final searchPattern = query.trim(); // For SQLite FTS5 MATCH
+  // Sanitize the query for FTS5 to prevent syntax errors with punctuation
+  final cleanQuery = query.trim().replaceAll('"', '""');
+  final searchPattern = '"$cleanQuery"*'; // Match prefix as phrase
 
   final List<SearchResult> results = [];
 
@@ -153,10 +155,14 @@ final globalSearchResultsProvider = FutureProvider<List<SearchResult>>((
       f.reference_id, 
       f.text_content,
       n.book_name as note_book, n.chapter as note_chapter, n.verse as note_verse, n.selected_verses as note_selected_verses,
-      s.title as sermon_title, s.series as sermon_series
+      s.title as sermon_title, s.series as sermon_series,
+      j.title as journal_title,
+      p.name as prayer_name
     FROM user_search f
     LEFT JOIN notes n ON f.type = 'note' AND f.reference_id = n.id
     LEFT JOIN sermons s ON f.type = 'sermon' AND f.reference_id = s.id
+    LEFT JOIN journals j ON f.type = 'journal' AND f.reference_id = j.id
+    LEFT JOIN prayers p ON f.type = 'prayer' AND f.reference_id = p.id
     WHERE user_search MATCH ?
     ORDER BY rank
     LIMIT 100
@@ -175,7 +181,44 @@ final globalSearchResultsProvider = FutureProvider<List<SearchResult>>((
       final refId = row.readNullable<String>('reference_id') ?? '';
       final text = row.readNullable<String>('text_content') ?? '';
 
-      if (type == 'note') {
+      if (type == 'verse') {
+        final refId = row.readNullable<String>('reference_id') ?? '';
+        final parts = refId.split(':');
+        if (parts.length > 1) {
+          final data = parts[1].split('|');
+          if (data.length >= 3) {
+            final book = data[0];
+            final chapter = int.tryParse(data[1]);
+            final verse = int.tryParse(data[2]);
+            
+            results.add(SearchResult(
+              type: type,
+              referenceId: refId,
+              textContent: text,
+              title: '$book $chapter:$verse',
+              book: book,
+              chapter: chapter,
+              verse: verse,
+            ));
+          }
+        }
+      } else if (type == 'journal') {
+        final jTitle = row.readNullable<String>('journal_title') ?? 'Journal';
+        results.add(SearchResult(
+          type: type,
+          referenceId: refId,
+          textContent: text,
+          title: 'Journal: $jTitle',
+        ));
+      } else if (type == 'prayer') {
+        final pName = row.readNullable<String>('prayer_name') ?? 'Prayer';
+        results.add(SearchResult(
+          type: type,
+          referenceId: refId,
+          textContent: text,
+          title: 'Prayer: $pName',
+        ));
+      } else if (type == 'note') {
         final bName = row.readNullable<String>('note_book') ?? 'Unknown Book';
         final cNum = row.readNullable<int>('note_chapter') ?? 1;
         final vNum = row.readNullable<int>('note_verse');

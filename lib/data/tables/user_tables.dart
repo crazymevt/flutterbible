@@ -209,3 +209,32 @@ class ReadingPlanItems extends Table {
   @override
   Set<Column> get primaryKey => {id};
 }
+
+@DataClassName('Tag')
+class Tags extends Table {
+  TextColumn get id => text()();
+  IntColumn get updatedAt => integer()();
+  TextColumn get deviceId => text()();
+  BoolColumn get deleted => boolean().withDefault(const Constant(false))();
+
+  TextColumn get name => text()();
+  TextColumn get colorHex => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+@DataClassName('EntityTag')
+class EntityTags extends Table {
+  TextColumn get id => text()();
+  IntColumn get updatedAt => integer()();
+  TextColumn get deviceId => text()();
+  BoolColumn get deleted => boolean().withDefault(const Constant(false))();
+
+  TextColumn get tagId => text()();
+  TextColumn get entityId => text()();
+  TextColumn get entityType => text()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}

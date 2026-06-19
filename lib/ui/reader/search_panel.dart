@@ -10,6 +10,8 @@ import 'dictionary_panel.dart';
 import 'commentary_panel.dart';
 import 'notes_panel.dart';
 import '../sermons/sermon_editor_screen.dart';
+import '../tags/tags_tab_view.dart';
+import '../journals/journals_list_panel.dart';
 
 class SearchPanel extends ConsumerStatefulWidget {
   const SearchPanel({super.key});
@@ -45,9 +47,11 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
 
     return Material(
       color: Theme.of(context).colorScheme.surface,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
+      child: DefaultTabController(
+        length: 2,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -97,11 +101,20 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
                         .setQuery(value);
                   },
                 ),
+                const SizedBox(height: 16),
+                const TabBar(
+                  tabs: [
+                    Tab(text: 'Text Search'),
+                    Tab(text: 'Tags'),
+                  ],
+                ),
               ],
             ),
           ),
           Expanded(
-            child: resultsAsync.when(
+            child: TabBarView(
+              children: [
+                resultsAsync.when(
               data: (results) {
                 if (results.isEmpty && _controller.text.isNotEmpty) {
                   return const Center(child: Text('No results found.'));
@@ -136,11 +149,11 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
                       Expanded(
                         child: TabBarView(
                           children: [
-                            _ResultsList(results: verses),
-                            _ResultsList(results: notes),
-                            _ResultsList(results: sermons),
-                            _GroupedResultsList(results: commentaries),
-                            _GroupedResultsList(results: dictionaries),
+                            SearchResultsList(results: verses),
+                            SearchResultsList(results: notes),
+                            SearchResultsList(results: sermons),
+                            GroupedSearchResultsList(results: commentaries),
+                            GroupedSearchResultsList(results: dictionaries),
                           ],
                         ),
                       ),
@@ -151,16 +164,20 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (err, stack) => Center(child: Text('Error: $err')),
             ),
-          ),
-        ],
+            const TagsTabView(),
+          ],
+        ),
       ),
+      ],
+    ),
+    ),
     );
   }
 }
 
-class _ResultsList extends ConsumerWidget {
+class SearchResultsList extends ConsumerWidget {
   final List<SearchResult> results;
-  const _ResultsList({required this.results});
+  const SearchResultsList({required this.results});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -271,6 +288,17 @@ class _ResultsList extends ConsumerWidget {
                     .read(activeToolProvider.notifier)
                     .setTool(ActiveTool.dictionary);
               }
+            } else if (item.type == 'journal') {
+              ref.read(selectedJournalIdProvider.notifier).setId(item.referenceId);
+              if (MediaQuery.sizeOf(context).width <= 800) {
+                Navigator.of(context).pop();
+              }
+              ref.read(appModuleProvider.notifier).setModule(AppModule.journalsPrayers);
+            } else if (item.type == 'prayer') {
+              if (MediaQuery.sizeOf(context).width <= 800) {
+                Navigator.of(context).pop();
+              }
+              ref.read(appModuleProvider.notifier).setModule(AppModule.journalsPrayers);
             } else if (item.type == 'commentary') {
               if (item.book != null && item.book != 'General') {
                 ref.read(selectedBookNameProvider.notifier).set(item.book!);
@@ -329,9 +357,9 @@ class _ResultsList extends ConsumerWidget {
   }
 }
 
-class _GroupedResultsList extends ConsumerWidget {
+class GroupedSearchResultsList extends ConsumerWidget {
   final List<SearchResult> results;
-  const _GroupedResultsList({required this.results});
+  const GroupedSearchResultsList({required this.results});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

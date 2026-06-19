@@ -10,6 +10,7 @@ import 'note_editor.dart';
 import 'cross_reference_panel.dart';
 import 'commentary_panel.dart';
 import 'compare_panel.dart';
+import '../tags/tag_editor_dialog.dart';
 
 class VerseActionBar extends ConsumerWidget {
   const VerseActionBar({super.key});
@@ -49,6 +50,28 @@ class VerseActionBar extends ConsumerWidget {
                   showDialog(
                     context: context,
                     builder: (_) => NoteEditorDialog(verses: selected),
+                  );
+                  ref.read(selectedVersesProvider.notifier).clear();
+                },
+              ),
+              const SizedBox(width: 12),
+              _ActionIcon(
+                icon: Icons.label,
+                label: 'Tag',
+                onTap: () {
+                  final selected = ref.read(selectedVersesProvider).toList()..sort();
+                  if (selected.isEmpty) return;
+                  
+                  final book = ref.read(selectedBookNameProvider);
+                  final chapter = ref.read(selectedChapterProvider);
+                  final verse = selected.first;
+
+                  showDialog(
+                    context: context,
+                    builder: (_) => TagEditorDialog(
+                      entityId: 'Verse:$book|$chapter|$verse',
+                      entityType: 'verse',
+                    ),
                   );
                   ref.read(selectedVersesProvider.notifier).clear();
                 },
