@@ -24,6 +24,23 @@ class ContentStore extends _$ContentStore {
   @override
   int get schemaVersion => 1;
 
+  @override
+  MigrationStrategy get migration {
+    return MigrationStrategy(
+      onCreate: (Migrator m) async {
+        await m.createAll();
+        await customStatement('''
+          CREATE VIRTUAL TABLE IF NOT EXISTS content_search USING fts5(type UNINDEXED, reference_id UNINDEXED, text_content);
+        ''');
+      },
+      onUpgrade: (Migrator m, int from, int to) async {
+        if (from < 2) {
+          // Future upgrades
+        }
+      },
+    );
+  }
+
   Future<void> deleteVersion(String versionId) async {
     await transaction(() async {
       await customStatement("DELETE FROM content_search WHERE type='verse' AND reference_id IN (SELECT v.id FROM verses v JOIN books b ON v.book_id = b.id WHERE b.version_id = ?)", [versionId]);
