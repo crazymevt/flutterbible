@@ -4,6 +4,8 @@ import '../../app/dashboard_providers.dart';
 import '../app_drawer.dart';
 import 'reading_progress_dialog.dart';
 import 'time_analytics_dialog.dart';
+import 'achievements_dialog.dart';
+import '../../data/models/achievement_def.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -172,33 +174,90 @@ class DashboardScreen extends ConsumerWidget {
 
   Widget _buildAchievementsCard(BuildContext context, AsyncValue achievementsAsync) {
     return Card(
-      child: Container(
-        width: 300,
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Achievements', style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 16),
-            achievementsAsync.when(
-              data: (list) {
-                if (list.isEmpty) return const Text('Keep reading to unlock badges!');
-                return Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: list.map<Widget>((a) {
-                    return Chip(
-                      avatar: const Icon(Icons.star, size: 16, color: Colors.yellow),
-                      label: Text(a.id),
-                    );
-                  }).toList(),
-                );
-              },
-              loading: () => const CircularProgressIndicator(),
-              error: (err, _) => Text('Error: $err'),
-            ),
-          ],
+      child: InkWell(
+        onTap: () {
+          achievementsAsync.whenData((unlockedList) {
+            showDialog(
+              context: context,
+              builder: (_) => AchievementsDialog(unlockedAchievements: unlockedList),
+            );
+          });
+        },
+        child: Container(
+          width: 300,
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Achievements', style: Theme.of(context).textTheme.titleLarge),
+              const SizedBox(height: 16),
+              achievementsAsync.when(
+                data: (unlockedList) {
+                  final totalCount = allAchievements.length;
+                  final unlockedCount = unlockedList.length;
+                  final percent = totalCount > 0 ? (unlockedCount / totalCount) : 0.0;
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('$unlockedCount / $totalCount Completed'),
+                          Text('${(percent * 100).toInt()}%', style: const TextStyle(fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      LinearProgressIndicator(
+                        value: percent,
+                        backgroundColor: Colors.grey.withOpacity(0.2),
+                        minHeight: 8,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      const SizedBox(height: 16),
+                      if (unlockedList.isEmpty)
+                        const Text('Keep reading to unlock badges!', style: TextStyle(color: Colors.grey))
+                      else
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: unlockedList.take(5).map<Widget>((a) {
+                            final def = allAchievements.firstWhere(
+                              (d) => d.id == a.id,
+                              orElse: () => AchievementDef(
+                                id: a.id,
+                                name: a.id,
+                                description: '',
+                                icon: Icons.star,
+                                color: Colors.blue,
+                              ),
+                            );
+                            return Tooltip(
+                              message: def.name,
+                              child: CircleAvatar(
+                                radius: 16,
+                                backgroundColor: def.color.withOpacity(0.2),
+                                child: Icon(def.icon, size: 16, color: def.color),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      if (unlockedList.length > 5)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Text('+${unlockedList.length - 5} more', style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                        ),
+                      const SizedBox(height: 8),
+                      const Text('Tap to view all', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                    ],
+                  );
+                },
+                loading: () => const CircularProgressIndicator(),
+                error: (err, _) => Text('Error: $err'),
+              ),
+            ],
+          ),
         ),
       ),
     );
