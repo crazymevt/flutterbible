@@ -194,14 +194,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
               }
             },
           ),
-          if (MediaQuery.sizeOf(context).width <= 800)
-            Builder(
-              builder: (context) => IconButton(
-                icon: const Icon(Icons.build),
-                tooltip: 'Tools',
-                onPressed: () => Scaffold.of(context).openEndDrawer(),
-              ),
-            ),
+
           IconButton(
             icon: const Icon(Icons.library_books),
             tooltip: 'Versions',
