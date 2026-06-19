@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/sermon_providers.dart';
 import '../../app/user_providers.dart';
 import 'export_dialog.dart';
+import 'sermon_presentation_screen.dart';
 
 
 class SermonEditorScreen extends ConsumerStatefulWidget {
@@ -141,6 +142,22 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
           title: const Text('Edit Sermon'),
           actions: [
             IconButton(
+              icon: const Icon(Icons.slideshow),
+              tooltip: 'Presentation Mode',
+              onPressed: () {
+                final store = ref.read(userStoreProvider);
+                store.select(store.sermons)
+                  ..where((t) => t.id.equals(widget.sermonId))
+                  ..getSingleOrNull().then((sermon) {
+                    if (sermon != null && context.mounted) {
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (_) => SermonPresentationScreen(sermon: sermon),
+                      ));
+                    }
+                  });
+              },
+            ),
+            IconButton(
               icon: const Icon(Icons.file_upload),
               tooltip: 'Export',
               onPressed: () {
@@ -199,6 +216,22 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    IconButton(
+                      icon: const Icon(Icons.slideshow),
+                      tooltip: 'Presentation Mode',
+                      onPressed: () {
+                        final store = ref.read(userStoreProvider);
+                        store.select(store.sermons)
+                          ..where((t) => t.id.equals(widget.sermonId))
+                          ..getSingleOrNull().then((sermon) {
+                            if (sermon != null && context.mounted) {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                builder: (_) => SermonPresentationScreen(sermon: sermon),
+                              ));
+                            }
+                          });
+                      },
+                    ),
                     IconButton(
                       icon: const Icon(Icons.file_upload),
                       tooltip: 'Export',
