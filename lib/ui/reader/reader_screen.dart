@@ -119,7 +119,6 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     final savedHighlightsAsync = ref.watch(chapterHighlightsProvider);
     final savedHighlights = savedHighlightsAsync.value ?? <int, String>{};
     final selectedVerses = ref.watch(selectedVersesProvider);
-    final activeVersions = ref.watch(activeVersionsProvider);
 
     // Auto-tracking logic
     ref.listen<String>(selectedBookNameProvider, (prev, next) {
@@ -238,8 +237,9 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
           }
 
           Widget content;
-          if (activeVersions.length == 1) {
-            final versionId = activeVersions.first;
+          final trueActiveVersions = versesMap.keys.toList();
+          if (trueActiveVersions.length == 1) {
+            final versionId = trueActiveVersions.first;
             final verses = versesMap[versionId] ?? [];
             content = _isFlowing
                 ? FlowingParagraphView(

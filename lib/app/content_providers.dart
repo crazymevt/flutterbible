@@ -52,8 +52,21 @@ final bookByNameProvider = FutureProvider.family<Book?, ({String versionId, Stri
   }).firstOrNull;
 });
 
+final validActiveVersionsProvider = FutureProvider<List<String>>((ref) async {
+  final activeVersions = ref.watch(activeVersionsProvider);
+  final installedVersions = await ref.watch(versionsProvider.future);
+  
+  if (installedVersions.isEmpty) return [];
+  
+  final valid = activeVersions.where((av) => installedVersions.any((iv) => iv.id == av)).toList();
+  if (valid.isEmpty) {
+    return [installedVersions.first.id];
+  }
+  return valid;
+});
+
 final parallelVersesProvider = FutureProvider<Map<String, List<Verse>>>((ref) async {
-  final versions = ref.watch(activeVersionsProvider);
+  final versions = await ref.watch(validActiveVersionsProvider.future);
   final bookName = ref.watch(selectedBookNameProvider);
   final chapter = ref.watch(selectedChapterProvider);
 
