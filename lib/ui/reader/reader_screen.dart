@@ -12,6 +12,7 @@ import 'book_chooser_sheet.dart';
 import 'study_pane.dart';
 import 'history_panel.dart';
 import 'media_panel.dart';
+import 'audio_player_widget.dart';
 import '../../app/app_state.dart';
 import '../app_drawer.dart';
 import '../../app/dashboard_providers.dart';
@@ -293,12 +294,18 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
             children: [
               Positioned.fill(child: content),
               if (selectedVerses.isNotEmpty)
-                const Positioned(
-                  bottom: 32,
-                  left: 0,
-                  right: 0,
-                  child: Center(child: VerseActionBar()),
-                ),
+              const Positioned(
+                bottom: 32,
+                left: 0,
+                right: 0,
+                child: Center(child: VerseActionBar()),
+              ),
+            Positioned(
+              bottom: 16,
+              left: 0,
+              right: 0,
+              child: const AudioPlayerWidget(),
+            ),
             ],
           );
         },
