@@ -13,9 +13,21 @@ class DictionaryPanel extends ConsumerStatefulWidget {
 
 class _DictionaryPanelState extends ConsumerState<DictionaryPanel> {
   final TextEditingController _controller = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _focusNode.requestFocus();
+      }
+    });
+  }
 
   @override
   void dispose() {
+    _focusNode.dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -60,6 +72,7 @@ class _DictionaryPanelState extends ConsumerState<DictionaryPanel> {
                 const SizedBox(height: 8),
                 TextField(
                   controller: _controller,
+                  focusNode: _focusNode,
                   autofocus: true,
                   decoration: InputDecoration(
                     hintText: 'Search for a word...',
