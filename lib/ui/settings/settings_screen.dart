@@ -88,6 +88,31 @@ class SettingsScreen extends ConsumerWidget {
               ],
             ),
           ),
+          ListTile(
+            title: const Text('Verse Spacing'),
+            subtitle: const Text('Adjust the space between verses in the reader'),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              children: [
+                const Icon(Icons.format_line_spacing, size: 16),
+                Expanded(
+                  child: Slider(
+                    value: ref.watch(appVerseSpacingProvider),
+                    min: 0.0,
+                    max: 32.0,
+                    divisions: 8,
+                    label: ref.watch(appVerseSpacingProvider).toInt().toString(),
+                    onChanged: (double value) {
+                      ref.read(appVerseSpacingProvider.notifier).set(value);
+                    },
+                  ),
+                ),
+                const Icon(Icons.format_line_spacing, size: 28),
+              ],
+            ),
+          ),
         ],
       ),
     );

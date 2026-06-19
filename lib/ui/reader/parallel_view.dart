@@ -5,23 +5,28 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../../data/content_store.dart';
 import '../../data/models/verse_segment.dart';
 import '../../app/reader_state.dart';
+import '../../app/app_state.dart';
 import 'flowing_paragraph_view.dart';
 import 'chapter_navigation_footer.dart';
 
 class ParallelView extends ConsumerStatefulWidget {
   final Map<String, List<Verse>> versesMap;
-  final bool isFlowing;
   final Set<int> selectedVerses;
   final Map<int, String> savedHighlights;
-  final ValueChanged<int> onVerseTap;
+  final Function(int) onVerseTap;
+  final bool isFlowing;
+  final ItemScrollController? externalScrollController;
+  final ItemPositionsListener? externalPositionsListener;
 
   const ParallelView({
     super.key,
     required this.versesMap,
-    required this.isFlowing,
     required this.selectedVerses,
     required this.savedHighlights,
     required this.onVerseTap,
+    this.isFlowing = false,
+    this.externalScrollController,
+    this.externalPositionsListener,
   });
 
   @override
@@ -201,44 +206,49 @@ class _ParallelViewState extends ConsumerState<ParallelView> {
                   ? Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5)
                   : highlightColor?.withValues(alpha: 0.2);
 
-              return Container(
-                color: bgColor,
-                child: IntrinsicHeight(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: keys.map((versionId) {
-                      final verses = widget.versesMap[versionId] ?? [];
-                      // Find the verse or return a fallback
-                      final verse = verses.firstWhere(
-                        (v) => v.verse == verseNum, 
-                        orElse: () => Verse(id: -1, bookId: -1, chapter: -1, verse: verseNum, textContent: '', segments: '[]')
-                      );
+              final verseSpacing = ref.watch(appVerseSpacingProvider);
 
-                      return Expanded(
-                        child: InkWell(
-                           onTap: () => widget.onVerseTap(verseNum),
-                           child: Padding(
-                             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                             child: verse.id == -1 
-                                 ? const SizedBox.shrink() // empty cell if verse is missing in this translation
-                                 : Text.rich(
-                                     TextSpan(
-                                       children: [
-                                         TextSpan(
-                                           text: '${verse.verse} ',
-                                           style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                                 color: Theme.of(context).colorScheme.primary,
-                                                 fontWeight: FontWeight.bold,
-                                               ),
-                                         ),
-                                         ..._buildVerseSpans(context, verse),
-                                       ],
+              return Padding(
+                padding: EdgeInsets.symmetric(vertical: verseSpacing / 2),
+                child: Container(
+                  color: bgColor,
+                  child: IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: keys.map((versionId) {
+                        final verses = widget.versesMap[versionId] ?? [];
+                        // Find the verse or return a fallback
+                        final verse = verses.firstWhere(
+                          (v) => v.verse == verseNum, 
+                          orElse: () => Verse(id: -1, bookId: -1, chapter: -1, verse: verseNum, textContent: '', segments: '[]')
+                        );
+
+                        return Expanded(
+                          child: InkWell(
+                             onTap: () => widget.onVerseTap(verseNum),
+                             child: Padding(
+                               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                               child: verse.id == -1 
+                                   ? const SizedBox.shrink() // empty cell if verse is missing in this translation
+                                   : Text.rich(
+                                       TextSpan(
+                                         children: [
+                                           TextSpan(
+                                             text: '${verse.verse} ',
+                                             style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                                   color: Theme.of(context).colorScheme.primary,
+                                                   fontWeight: FontWeight.bold,
+                                                 ),
+                                           ),
+                                           ..._buildVerseSpans(context, verse),
+                                         ],
+                                       ),
                                      ),
-                                   ),
-                           ),
-                        ),
-                      );
-                    }).toList(),
+                             ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
                   ),
                 ),
               );

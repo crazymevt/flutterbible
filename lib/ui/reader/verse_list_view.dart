@@ -5,6 +5,7 @@ import '../../data/models/verse_segment.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/reader_state.dart';
+import '../../app/app_state.dart';
 
 import 'chapter_navigation_footer.dart';
 
@@ -12,7 +13,9 @@ class VerseListView extends ConsumerStatefulWidget {
   final List<Verse> verses;
   final Set<int> selectedVerses;
   final Map<int, String> savedHighlights;
-  final ValueChanged<int> onVerseTap;
+  final Function(int) onVerseTap;
+  final ItemScrollController? externalScrollController;
+  final ItemPositionsListener? externalPositionsListener;
   final bool showFooter;
 
   const VerseListView({
@@ -21,6 +24,8 @@ class VerseListView extends ConsumerStatefulWidget {
     required this.selectedVerses,
     required this.savedHighlights,
     required this.onVerseTap,
+    this.externalScrollController,
+    this.externalPositionsListener,
     this.showFooter = true,
   });
 
@@ -129,25 +134,31 @@ class _VerseListViewState extends ConsumerState<VerseListView> {
             ? Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5)
             : highlightColor?.withValues(alpha: 0.2);
 
-        return ListTile(
-          tileColor: bgColor,
-          title: Text.rich(
-            TextSpan(
-              children: [
+          final verseSpacing = ref.watch(appVerseSpacingProvider);
+
+          return Padding(
+            padding: EdgeInsets.symmetric(vertical: verseSpacing / 2),
+            child: ListTile(
+              tileColor: bgColor,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
+              title: Text.rich(
                 TextSpan(
-                  text: '${verse.verse} ',
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  children: [
+                    TextSpan(
+                      text: '${verse.verse} ',
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                    ..._buildVerseSpans(context, verse),
+                  ],
                 ),
-                ..._buildVerseSpans(context, verse),
-              ],
+              ),
+              onTap: () => widget.onVerseTap(verse.verse),
             ),
-          ),
-          onTap: () => widget.onVerseTap(verse.verse),
-        );
-      },
-    );
+          );
+        },
+      );
   }
 }

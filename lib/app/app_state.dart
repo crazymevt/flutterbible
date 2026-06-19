@@ -87,6 +87,21 @@ class AppFontSizeDeltaNotifier extends Notifier<double> {
 
 final appFontSizeDeltaProvider = NotifierProvider<AppFontSizeDeltaNotifier, double>(() => AppFontSizeDeltaNotifier());
 
+class AppVerseSpacingNotifier extends Notifier<double> {
+  @override
+  double build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getDouble('appVerseSpacing') ?? 8.0;
+  }
+
+  void set(double value) {
+    state = value;
+    ref.read(sharedPreferencesProvider).setDouble('appVerseSpacing', value);
+  }
+}
+
+final appVerseSpacingProvider = NotifierProvider<AppVerseSpacingNotifier, double>(() => AppVerseSpacingNotifier());
+
 class AppModuleNotifier extends Notifier<AppModule> {
   AppModule build() {
     final showDashboard = ref.watch(showDashboardOnStartProvider);
