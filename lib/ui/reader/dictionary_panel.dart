@@ -125,6 +125,8 @@ class _DictionaryPanelState extends ConsumerState<DictionaryPanel> {
                         HtmlWidget(
                           item.entry.definition,
                           textStyle: Theme.of(context).textTheme.bodyMedium,
+                          onErrorBuilder: (context, element, error) => const SizedBox.shrink(),
+                          onLoadingBuilder: (context, element, progress) => const SizedBox.shrink(),
                         ),
                       ],
                     );

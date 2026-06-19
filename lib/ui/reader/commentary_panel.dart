@@ -153,6 +153,8 @@ class CommentaryPanel extends ConsumerWidget {
                           child: HtmlWidget(
                             entry.textContent,
                             textStyle: Theme.of(context).textTheme.bodyMedium,
+                            onErrorBuilder: (context, element, error) => const SizedBox.shrink(),
+                            onLoadingBuilder: (context, element, progress) => const SizedBox.shrink(),
                             onTapUrl: (url) {
                               try {
                                 int? b, c, v;
