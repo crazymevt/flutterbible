@@ -10,8 +10,22 @@ import 'sync_service.dart';
 import 'dart:async';
 import 'package:collection/collection.dart';
 
+import '../domain/importer/cross_reference_importer.dart';
+import 'package:flutter/foundation.dart';
+
 final contentStoreProvider = Provider<ContentStore>((ref) {
-  return ContentStore();
+  final store = ContentStore();
+  
+  Future.microtask(() async {
+    try {
+      final importer = CrossReferenceImporter(store);
+      await importer.importIfEmpty();
+    } catch (e) {
+      debugPrint('Failed to import cross references: $e');
+    }
+  });
+  
+  return store;
 });
 
 final versionsProvider = FutureProvider<List<Version>>((ref) {

@@ -4,6 +4,7 @@ import '../../app/content_providers.dart';
 import '../../app/reader_state.dart';
 import '../../data/content_store.dart';
 import '../../app/app_state.dart';
+import '../../domain/importer/mybible_verse_parser.dart';
 
 class CrossReferencePanel extends ConsumerWidget {
   const CrossReferencePanel({super.key});
@@ -127,6 +128,17 @@ class _CrossReferenceItem extends ConsumerWidget {
 
   const _CrossReferenceItem({required this.xref});
 
+  String _getCleanText(Verse verse) {
+    final parser = MyBibleVerseParser();
+    return parser
+        .parseVerse(verse.textContent)
+        .where((s) => !s.isFootnote)
+        .map((s) => s.text)
+        .join('')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final targetVerseAsync = ref.watch(crossReferenceVerseProvider(xref));
@@ -199,7 +211,7 @@ class _CrossReferenceItem extends ConsumerWidget {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            targetVerse.textContent,
+                            _getCleanText(targetVerse),
                             style: Theme.of(context).textTheme.bodyMedium,
                           ),
                         ],
