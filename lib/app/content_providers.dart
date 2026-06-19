@@ -280,6 +280,24 @@ final showBookIntroProvider = NotifierProvider<ShowBookIntroNotifier, bool>(
   () => ShowBookIntroNotifier(),
 );
 
+final hasBookIntroProvider = FutureProvider<bool>((ref) async {
+  final store = ref.watch(contentStoreProvider);
+  final bookName = ref.watch(selectedBookNameProvider);
+  final selectedCommentaryId = ref.watch(selectedCommentaryProvider);
+  
+  if (selectedCommentaryId == null) return false;
+  
+  final countExp = store.commentaryEntries.id.count();
+  final query = store.selectOnly(store.commentaryEntries)
+    ..addColumns([countExp])
+    ..where(store.commentaryEntries.commentaryId.equals(selectedCommentaryId) &
+            store.commentaryEntries.bookName.equals(bookName) &
+            (store.commentaryEntries.chapter.equals(0) | store.commentaryEntries.chapter.isNull()));
+            
+  final result = await query.getSingle();
+  return (result.read(countExp) ?? 0) > 0;
+});
+
 final commentaryEntriesProvider = FutureProvider<List<CommentaryEntry>>((
   ref,
 ) async {

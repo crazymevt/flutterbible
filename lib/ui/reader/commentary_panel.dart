@@ -81,18 +81,25 @@ class CommentaryPanel extends ConsumerWidget {
                       },
                     ),
                     const SizedBox(width: 8),
-                    IconButton(
-                      icon: Icon(
-                        ref.watch(showBookIntroProvider)
-                            ? Icons.auto_stories
-                            : Icons.info_outline,
-                        color: ref.watch(showBookIntroProvider)
-                            ? Theme.of(context).colorScheme.primary
-                            : null,
-                      ),
-                      tooltip: 'Toggle Book Introduction',
-                      onPressed: () {
-                        ref.read(showBookIntroProvider.notifier).toggle();
+                    Consumer(
+                      builder: (context, ref, _) {
+                        final hasIntro = ref.watch(hasBookIntroProvider).value ?? false;
+                        if (!hasIntro) return const SizedBox.shrink();
+                        
+                        return IconButton(
+                          icon: Icon(
+                            ref.watch(showBookIntroProvider)
+                                ? Icons.auto_stories
+                                : Icons.info_outline,
+                            color: ref.watch(showBookIntroProvider)
+                                ? Theme.of(context).colorScheme.primary
+                                : null,
+                          ),
+                          tooltip: 'Toggle Book Introduction',
+                          onPressed: () {
+                            ref.read(showBookIntroProvider.notifier).toggle();
+                          },
+                        );
                       },
                     ),
                     IconButton(

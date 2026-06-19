@@ -18,6 +18,7 @@ import '../app_drawer.dart';
 import '../../app/dashboard_providers.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ReaderScreen extends ConsumerStatefulWidget {
   const ReaderScreen({super.key});
@@ -251,6 +252,18 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
             return KeyEventResult.handled;
           }
         }
+        
+        if (event is KeyDownEvent) {
+          if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+            ref.read(navigationControllerProvider).previousChapter();
+            return KeyEventResult.handled;
+          }
+          if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
+            ref.read(navigationControllerProvider).nextChapter();
+            return KeyEventResult.handled;
+          }
+        }
+        
         return KeyEventResult.ignored;
       },
       child: Scaffold(
@@ -412,16 +425,29 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
             return const Center(child: Text('No verses found.'));
           }
 
-          final headerWidget = Padding(
-            padding: const EdgeInsets.only(top: 24.0, bottom: 8.0),
-            child: Text(
-              '$bookName $chapter',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.primary,
+          final headerWidget = Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 40.0, bottom: 16.0),
+                child: Text(
+                  '$bookName $chapter',
+                  style: GoogleFonts.lora(
+                    textStyle: Theme.of(context).textTheme.displaySmall,
+                    fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.85),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
               ),
-              textAlign: TextAlign.center,
-            ),
+              Container(
+                width: 250,
+                height: 1,
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+                margin: const EdgeInsets.only(bottom: 32.0),
+              ),
+            ],
           );
 
           Widget content;
@@ -625,15 +651,6 @@ class _BreadcrumbBar extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          IconButton(
-            icon: const Icon(Icons.chevron_left),
-            tooltip: 'Previous Chapter',
-            iconSize: 20,
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-            onPressed: () => ref.read(navigationControllerProvider).previousChapter(),
-          ),
-          const SizedBox(width: 8),
           InkWell(
             borderRadius: BorderRadius.circular(4),
             onTap: onVersionTap,
@@ -686,6 +703,15 @@ class _BreadcrumbBar extends ConsumerWidget {
             ),
           ),
           const Spacer(),
+          IconButton(
+            icon: const Icon(Icons.chevron_left),
+            tooltip: 'Previous Chapter',
+            iconSize: 20,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            onPressed: () => ref.read(navigationControllerProvider).previousChapter(),
+          ),
+          const SizedBox(width: 8),
           IconButton(
             icon: const Icon(Icons.chevron_right),
             tooltip: 'Next Chapter',
