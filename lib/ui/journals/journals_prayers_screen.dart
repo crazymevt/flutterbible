@@ -25,24 +25,31 @@ class _JournalsPrayersScreenState extends ConsumerState<JournalsPrayersScreen> {
         body: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const SizedBox(
-              width: 300,
-              child: Card(
-                margin: EdgeInsets.all(8),
-                child: JournalsListPanel(),
+            Expanded(
+              flex: 2,
+              child: _buildPanelCard(
+                context,
+                title: 'Journal Entries',
+                icon: Icons.book,
+                child: const JournalsListPanel(),
               ),
             ),
-            const Expanded(
-              child: Card(
-                margin: EdgeInsets.symmetric(vertical: 8),
-                child: JournalEditorPanel(),
+            Expanded(
+              flex: 4,
+              child: _buildPanelCard(
+                context,
+                title: 'Editor',
+                icon: Icons.edit_document,
+                child: const JournalEditorPanel(),
               ),
             ),
-            const SizedBox(
-              width: 350,
-              child: Card(
-                margin: EdgeInsets.all(8),
-                child: PrayerTrackerPanel(),
+            Expanded(
+              flex: 3,
+              child: _buildPanelCard(
+                context,
+                title: 'Prayer Tracker',
+                icon: Icons.volunteer_activism,
+                child: const PrayerTrackerPanel(),
               ),
             ),
           ],
@@ -66,6 +73,56 @@ class _JournalsPrayersScreenState extends ConsumerState<JournalsPrayersScreen> {
         body: const TabBarView(
           children: [JournalsListPanel(), PrayerTrackerPanel()],
         ),
+      ),
+    );
+  }
+
+  Widget _buildPanelCard(
+    BuildContext context, {
+    required String title,
+    required IconData icon,
+    required Widget child,
+  }) {
+    final theme = Theme.of(context);
+    return Card(
+      margin: const EdgeInsets.all(8),
+      clipBehavior: Clip.antiAlias,
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: theme.colorScheme.outlineVariant.withOpacity(0.5),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+              border: Border(
+                bottom: BorderSide(
+                  color: theme.colorScheme.outlineVariant.withOpacity(0.5),
+                ),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(icon, size: 20, color: theme.colorScheme.primary),
+                const SizedBox(width: 8),
+                Text(
+                  title,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(child: child),
+        ],
       ),
     );
   }
