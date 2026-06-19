@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../app/app_state.dart';
 
+import 'settings/settings_screen.dart';
+
 class AppDrawer extends ConsumerWidget {
   const AppDrawer({super.key});
 
@@ -88,10 +90,11 @@ class AppDrawer extends ConsumerWidget {
           ListTile(
             leading: const Icon(Icons.settings),
             title: const Text('Settings'),
-            selected: currentModule == AppModule.settings,
             onTap: () {
-              ref.read(appModuleProvider.notifier).setModule(AppModule.settings);
-              Navigator.of(context).pop();
+              Navigator.of(context).pop(); // close drawer
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const SettingsScreen()),
+              );
             },
           ),
         ],
