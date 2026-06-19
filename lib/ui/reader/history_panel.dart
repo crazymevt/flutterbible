@@ -76,6 +76,7 @@ class HistoryPanel extends ConsumerWidget {
                         ref.read(selectedBookNameProvider.notifier).set(item.bookName);
                         ref.read(selectedChapterProvider.notifier).set(item.chapter);
                         if (item.verse != null) {
+                          ref.read(targetVerseToScrollProvider.notifier).set(item.verse!);
                           ref.read(selectedVersesProvider.notifier).clear();
                           ref.read(selectedVersesProvider.notifier).toggle(item.verse!);
                         }

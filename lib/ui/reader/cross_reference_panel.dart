@@ -158,6 +158,7 @@ class _CrossReferenceItem extends ConsumerWidget {
                     onTap: () {
                       ref.read(selectedBookNameProvider.notifier).set(xref.targetBookName);
                       ref.read(selectedChapterProvider.notifier).set(xref.targetChapter);
+                      ref.read(targetVerseToScrollProvider.notifier).set(xref.targetVerse);
                       ref.read(selectedVersesProvider.notifier).clear();
                       ref.read(selectedVersesProvider.notifier).toggle(xref.targetVerse);
                       ref.read(navigationControllerProvider).recordHistory(verse: xref.targetVerse);
