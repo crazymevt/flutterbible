@@ -85,6 +85,15 @@ class AppDrawer extends ConsumerWidget {
               Navigator.of(context).pop();
             },
           ),
+          ListTile(
+            leading: const Icon(Icons.settings),
+            title: const Text('Settings'),
+            selected: currentModule == AppModule.settings,
+            onTap: () {
+              ref.read(appModuleProvider.notifier).setModule(AppModule.settings);
+              Navigator.of(context).pop();
+            },
+          ),
         ],
       ),
     );

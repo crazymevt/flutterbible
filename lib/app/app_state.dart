@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'shared_prefs.dart';
 
 enum ActiveTool {
   none,
@@ -39,11 +40,15 @@ enum AppModule {
   contentManager,
   backupRestore,
   readingPlans,
+  settings,
 }
 
 class AppModuleNotifier extends Notifier<AppModule> {
-  @override
-  AppModule build() => AppModule.reader;
+  AppModule build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    final showDashboard = prefs.getBool('showDashboardOnStart') ?? false;
+    return showDashboard ? AppModule.dashboard : AppModule.reader;
+  }
 
   void setModule(AppModule module) {
     state = module;
