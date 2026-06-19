@@ -19,6 +19,8 @@ import 'settings/backup_restore_screen.dart';
 import 'reader/study_pane.dart';
 import 'reader/reading_plan_panel.dart';
 import 'settings/settings_panel.dart';
+import 'onboarding/onboarding_screen.dart';
+import '../app/content_providers.dart';
 
 class MainShell extends ConsumerWidget {
   const MainShell({super.key});
@@ -26,14 +28,30 @@ class MainShell extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentModule = ref.watch(appModuleProvider);
+    final versionsAsync = ref.watch(versionsProvider);
+
+    // Ensure we can still access these modules even if database is empty
+    if (currentModule == AppModule.contentManager) {
+      return const ContentManagerScreen();
+    } else if (currentModule == AppModule.backupRestore) {
+      return const BackupRestoreScreen();
+    }
+
+    // Intercept with OnboardingScreen if no bibles are installed
+    final hasNoBibles = versionsAsync.when(
+      data: (versions) => versions.isEmpty,
+      loading: () => false, // Don't show while loading
+      error: (_, __) => false,
+    );
+
+    if (hasNoBibles) {
+      return const OnboardingScreen();
+    }
+
     if (currentModule == AppModule.journalsPrayers) {
       return const JournalsPrayersScreen();
     } else if (currentModule == AppModule.dashboard) {
       return const DashboardScreen();
-    } else if (currentModule == AppModule.contentManager) {
-      return const ContentManagerScreen();
-    } else if (currentModule == AppModule.backupRestore) {
-      return const BackupRestoreScreen();
     }
 
     return LayoutBuilder(
