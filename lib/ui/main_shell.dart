@@ -18,6 +18,7 @@ import 'content_manager/content_manager_screen.dart';
 import 'settings/backup_restore_screen.dart';
 import 'reader/study_pane.dart';
 import 'reader/reading_plan_panel.dart';
+import 'settings/settings_panel.dart';
 
 class MainShell extends ConsumerWidget {
   const MainShell({super.key});
@@ -94,6 +95,8 @@ class _DesktopLayout extends ConsumerWidget {
                         }
                         if (activeTool == ActiveTool.readingPlans)
                           return const ReadingPlanPanel();
+                        if (activeTool == ActiveTool.settings)
+                          return const SettingsPanel();
                         return const SizedBox.shrink();
                       },
                     ),
@@ -170,6 +173,13 @@ class _DesktopLayout extends ConsumerWidget {
                 ),
                 label: Text('Sermons'),
               ),
+              NavigationRailDestination(
+                icon: Tooltip(
+                  message: 'Settings',
+                  child: Icon(Icons.settings),
+                ),
+                label: Text('Settings'),
+              ),
             ],
             selectedIndex: _getSelectedIndex(activeTool),
             onDestinationSelected: (index) {
@@ -204,6 +214,8 @@ class _DesktopLayout extends ConsumerWidget {
         return 8;
       case ActiveTool.sermons:
         return 9;
+      case ActiveTool.settings:
+        return 10;
       case ActiveTool.none:
       case ActiveTool.compare:
         return null;
@@ -232,6 +244,8 @@ class _DesktopLayout extends ConsumerWidget {
         return ActiveTool.readingPlans;
       case 9:
         return ActiveTool.sermons;
+      case 10:
+        return ActiveTool.settings;
       default:
         return ActiveTool.none;
     }

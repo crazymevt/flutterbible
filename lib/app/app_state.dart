@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'shared_prefs.dart';
 
@@ -14,6 +15,7 @@ enum ActiveTool {
   readingPlans,
   compare,
   sermons,
+  settings,
 }
 
 class ActiveToolNotifier extends Notifier<ActiveTool> {
@@ -129,4 +131,46 @@ class AppModuleNotifier extends Notifier<AppModule> {
 
 final appModuleProvider = NotifierProvider<AppModuleNotifier, AppModule>(
   () => AppModuleNotifier(),
+);
+
+class ThemeModeNotifier extends Notifier<ThemeMode> {
+  @override
+  ThemeMode build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    final value = prefs.getString('themeMode') ?? 'system';
+    switch (value) {
+      case 'light':
+        return ThemeMode.light;
+      case 'dark':
+        return ThemeMode.dark;
+      default:
+        return ThemeMode.system;
+    }
+  }
+
+  void setMode(ThemeMode mode) {
+    state = mode;
+    ref.read(sharedPreferencesProvider).setString('themeMode', mode.name);
+  }
+}
+
+final themeModeProvider = NotifierProvider<ThemeModeNotifier, ThemeMode>(
+  () => ThemeModeNotifier(),
+);
+
+class AppColorThemeNotifier extends Notifier<String> {
+  @override
+  String build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getString('appColorTheme') ?? 'default';
+  }
+
+  void setTheme(String theme) {
+    state = theme;
+    ref.read(sharedPreferencesProvider).setString('appColorTheme', theme);
+  }
+}
+
+final appColorThemeProvider = NotifierProvider<AppColorThemeNotifier, String>(
+  () => AppColorThemeNotifier(),
 );

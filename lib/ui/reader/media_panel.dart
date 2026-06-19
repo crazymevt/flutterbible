@@ -152,6 +152,9 @@ class MediaPanel extends ConsumerWidget {
                                             'https://img.youtube.com/vi/${item.id}/hqdefault.jpg',
                                           ),
                                           fit: BoxFit.cover,
+                                          onError: (exception, stackTrace) {
+                                            // Ignore image loading errors
+                                          },
                                         )
                                       : null,
                                 ),

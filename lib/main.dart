@@ -9,8 +9,9 @@ import 'package:window_manager/window_manager.dart';
 import 'ui/main_shell.dart';
 import 'app/shared_prefs.dart';
 import 'app/app_state.dart';
+import 'theme/app_themes.dart';
 
-import 'package:google_fonts/google_fonts.dart';
+
 
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
@@ -111,44 +112,26 @@ class _StudyBibleAppState extends ConsumerState<StudyBibleApp>
   Widget build(BuildContext context) {
     final fontFamily = ref.watch(appFontFamilyProvider);
     final fontSizeDelta = ref.watch(appFontSizeDeltaProvider);
-
-    final String? actualFontFamily = fontFamily == 'System Default'
-        ? null
-        : fontFamily;
-
-    ThemeData buildTheme(Brightness brightness, Color seedColor) {
-      final typography = Typography.material2021(
-        platform: defaultTargetPlatform,
-      );
-      final colorTextTheme = brightness == Brightness.light
-          ? typography.black
-          : typography.white;
-
-      var textTheme = typography.englishLike
-          .apply(fontSizeDelta: fontSizeDelta)
-          .merge(colorTextTheme);
-
-      if (actualFontFamily != null) {
-        textTheme = GoogleFonts.getTextTheme(actualFontFamily, textTheme);
-      }
-
-      return ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: seedColor,
-          brightness: brightness,
-        ),
-        useMaterial3: true,
-        textTheme: textTheme,
-      );
-    }
+    final themeMode = ref.watch(themeModeProvider);
+    final appColorTheme = ref.watch(appColorThemeProvider);
 
     return MaterialApp(
       title: 'Study Bible',
       debugShowCheckedModeBanner: false,
       scaffoldMessengerKey: scaffoldMessengerKey,
-      theme: buildTheme(Brightness.light, const Color(0xFF6750A4)),
-      darkTheme: buildTheme(Brightness.dark, const Color(0xFFD0BCFF)),
-      themeMode: ThemeMode.system,
+      theme: AppThemes.buildTheme(
+        brightness: Brightness.light,
+        themeScheme: appColorTheme,
+        fontFamily: fontFamily,
+        fontSizeDelta: fontSizeDelta,
+      ),
+      darkTheme: AppThemes.buildTheme(
+        brightness: Brightness.dark,
+        themeScheme: appColorTheme,
+        fontFamily: fontFamily,
+        fontSizeDelta: fontSizeDelta,
+      ),
+      themeMode: themeMode,
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
