@@ -170,7 +170,8 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
               tooltip: 'Next Chapter',
               onPressed: () => ref.read(navigationControllerProvider).nextChapter(),
             ),
-            const Expanded(child: AudioPlayerWidget()),
+            if (MediaQuery.sizeOf(context).width > 800)
+              const Expanded(child: AudioPlayerWidget()),
           ],
         ),
         actions: [
@@ -265,7 +266,22 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
 
           return Stack(
             children: [
-              Positioned.fill(child: content),
+              Positioned.fill(
+                child: Column(
+                  children: [
+                    if (MediaQuery.sizeOf(context).width <= 800)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surfaceContainerHighest.withAlpha(128),
+                          border: Border(bottom: BorderSide(color: Theme.of(context).dividerColor)),
+                        ),
+                        child: const AudioPlayerWidget(),
+                      ),
+                    Expanded(child: content),
+                  ],
+                ),
+              ),
               if (selectedVerses.isNotEmpty)
                 const Positioned(
                   bottom: 32,
