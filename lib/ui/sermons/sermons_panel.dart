@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/app_state.dart';
 import '../../app/sermon_providers.dart';
+import 'export_dialog.dart';
 import 'sermon_editor_screen.dart';
 
 class SermonsPanel extends ConsumerWidget {
@@ -38,6 +39,21 @@ class SermonsPanel extends ConsumerWidget {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    IconButton(
+                      icon: const Icon(Icons.file_upload),
+                      tooltip: 'Export All',
+                      onPressed: () {
+                        sermonsAsync.whenData((sermons) {
+                          if (sermons.isNotEmpty) {
+                            ExportDialog.show(context, sermons);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('No sermons to export.')),
+                            );
+                          }
+                        });
+                      },
+                    ),
                     IconButton(
                       icon: const Icon(Icons.add),
                       tooltip: 'New Sermon',

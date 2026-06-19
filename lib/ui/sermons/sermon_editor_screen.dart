@@ -5,6 +5,7 @@ import 'package:flutter_quill/quill_delta.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/sermon_providers.dart';
 import '../../app/user_providers.dart';
+import 'export_dialog.dart';
 
 
 class SermonEditorScreen extends ConsumerStatefulWidget {
@@ -139,6 +140,20 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
         appBar: AppBar(
           title: const Text('Edit Sermon'),
           actions: [
+            IconButton(
+              icon: const Icon(Icons.file_upload),
+              tooltip: 'Export',
+              onPressed: () {
+                final store = ref.read(userStoreProvider);
+                store.select(store.sermons)
+                  ..where((t) => t.id.equals(widget.sermonId))
+                  ..getSingleOrNull().then((sermon) {
+                    if (sermon != null && context.mounted) {
+                      ExportDialog.show(context, [sermon]);
+                    }
+                  });
+              },
+            ),
             TextButton.icon(
               icon: const Icon(Icons.list_alt),
               label: const Text('Outline'),
@@ -184,6 +199,20 @@ class _SermonEditorScreenState extends ConsumerState<SermonEditorScreen> {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    IconButton(
+                      icon: const Icon(Icons.file_upload),
+                      tooltip: 'Export',
+                      onPressed: () {
+                        final store = ref.read(userStoreProvider);
+                        store.select(store.sermons)
+                          ..where((t) => t.id.equals(widget.sermonId))
+                          ..getSingleOrNull().then((sermon) {
+                            if (sermon != null && context.mounted) {
+                              ExportDialog.show(context, [sermon]);
+                            }
+                          });
+                      },
+                    ),
                     IconButton(
                       icon: const Icon(Icons.list_alt),
                       tooltip: 'Outline',
