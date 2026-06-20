@@ -1,5 +1,16 @@
 [
   {
+    "version": "26.6.20+5",
+    "date": "2026-06-20",
+    "features": [
+      {
+        "title": "Minor bug fixes and improvements.",
+        "description": "",
+        "icon": "new_releases"
+      }
+    ]
+  },
+  {
     "version": "26.6.20+4",
     "date": "2026-06-20",
     "features": [
