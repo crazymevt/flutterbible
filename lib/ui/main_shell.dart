@@ -17,7 +17,6 @@ import 'journals/journals_prayers_screen.dart';
 import 'dashboard/dashboard_screen.dart';
 import 'content_manager/content_manager_screen.dart';
 import 'settings/backup_restore_screen.dart';
-import 'reader/study_pane.dart';
 import 'reader/reading_plan_panel.dart';
 
 import 'onboarding/onboarding_screen.dart';
@@ -128,8 +127,6 @@ class _DesktopLayout extends ConsumerWidget {
                           return const SermonsPanel();
                         if (activeTool == ActiveTool.crossReference)
                           return const CrossReferencePanel();
-                        if (activeTool == ActiveTool.library)
-                          return const StudyPane();
                         if (activeTool == ActiveTool.commentaries)
                           return const CommentaryPanel();
                         if (activeTool == ActiveTool.notes)
@@ -164,13 +161,6 @@ class _DesktopLayout extends ConsumerWidget {
             selectedIconTheme: const IconThemeData(color: Colors.white),
             indicatorColor: Colors.white24,
             destinations: const [
-              NavigationRailDestination(
-                icon: Tooltip(
-                  message: 'Library',
-                  child: Icon(Icons.library_books),
-                ),
-                label: Text('Library'),
-              ),
               NavigationRailDestination(
                 icon: Tooltip(
                   message: 'Cross-References',
@@ -246,28 +236,26 @@ class _DesktopLayout extends ConsumerWidget {
 
   int? _getSelectedIndex(ActiveTool tool) {
     switch (tool) {
-      case ActiveTool.library:
-        return 0;
       case ActiveTool.crossReference:
-        return 1;
+        return 0;
       case ActiveTool.notes:
-        return 2;
+        return 1;
       case ActiveTool.search:
-        return 3;
+        return 2;
       case ActiveTool.dictionary:
-        return 4;
+        return 3;
       case ActiveTool.commentaries:
-        return 5;
+        return 4;
       case ActiveTool.history:
-        return 6;
+        return 5;
       case ActiveTool.media:
-        return 7;
+        return 6;
       case ActiveTool.readingPlans:
-        return 8;
+        return 7;
       case ActiveTool.sermons:
-        return 9;
+        return 8;
       case ActiveTool.devotionals:
-        return 10;
+        return 9;
       case ActiveTool.none:
       case ActiveTool.compare:
         return null;
@@ -277,26 +265,24 @@ class _DesktopLayout extends ConsumerWidget {
   ActiveTool _getToolFromIndex(int index) {
     switch (index) {
       case 0:
-        return ActiveTool.library;
-      case 1:
         return ActiveTool.crossReference;
-      case 2:
+      case 1:
         return ActiveTool.notes;
-      case 3:
+      case 2:
         return ActiveTool.search;
-      case 4:
+      case 3:
         return ActiveTool.dictionary;
-      case 5:
+      case 4:
         return ActiveTool.commentaries;
-      case 6:
+      case 5:
         return ActiveTool.history;
-      case 7:
+      case 6:
         return ActiveTool.media;
-      case 8:
+      case 7:
         return ActiveTool.readingPlans;
-      case 9:
+      case 8:
         return ActiveTool.sermons;
-      case 10:
+      case 9:
         return ActiveTool.devotionals;
       default:
         return ActiveTool.none;

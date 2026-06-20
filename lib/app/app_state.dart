@@ -8,7 +8,6 @@ enum ActiveTool {
   notes,
   search,
   dictionary,
-  library,
   commentaries,
   history,
   media,
