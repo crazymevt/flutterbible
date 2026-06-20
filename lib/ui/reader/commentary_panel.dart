@@ -31,7 +31,6 @@ class CommentaryPanel extends ConsumerWidget {
               color: Theme.of(context).colorScheme.surfaceContainerHighest,
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   'Commentaries',
@@ -39,86 +38,93 @@ class CommentaryPanel extends ConsumerWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Row(
-                  children: [
-                    Consumer(
-                      builder: (context, ref, _) {
-                        final commentariesAsync = ref.watch(
-                          commentariesProvider,
-                        );
-                        final selectedId = ref.watch(
-                          selectedCommentaryProvider,
-                        );
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Flexible(
+                        child: Consumer(
+                          builder: (context, ref, _) {
+                            final commentariesAsync = ref.watch(
+                              commentariesProvider,
+                            );
+                            final selectedId = ref.watch(
+                              selectedCommentaryProvider,
+                            );
 
-                        return commentariesAsync.when(
-                          data: (commentaries) {
-                            if (commentaries.isEmpty)
-                              return const SizedBox.shrink();
+                            return commentariesAsync.when(
+                              data: (commentaries) {
+                                if (commentaries.isEmpty)
+                                  return const SizedBox.shrink();
 
-                            // Auto-select first if none selected
-                            if (selectedId == null) {
-                              Future.microtask(
-                                () => ref
-                                    .read(selectedCommentaryProvider.notifier)
-                                    .set(commentaries.first.id),
-                              );
-                            }
+                                // Auto-select first if none selected
+                                if (selectedId == null) {
+                                  Future.microtask(
+                                    () => ref
+                                        .read(selectedCommentaryProvider.notifier)
+                                        .set(commentaries.first.id),
+                                  );
+                                }
 
-                            return DropdownButton<int>(
-                              value: selectedId ?? commentaries.first.id,
-                              underline: const SizedBox(),
-                              items: commentaries
-                                  .map(
-                                    (c) => DropdownMenuItem(
-                                      value: c.id,
-                                      child: Text(c.abbreviation),
-                                    ),
-                                  )
-                                  .toList(),
-                              onChanged: (val) {
-                                ref
-                                    .read(selectedCommentaryProvider.notifier)
-                                    .set(val);
+                                return DropdownButton<int>(
+                                  isExpanded: true,
+                                  value: selectedId ?? commentaries.first.id,
+                                  underline: const SizedBox(),
+                                  items: commentaries
+                                      .map(
+                                        (c) => DropdownMenuItem(
+                                          value: c.id,
+                                          child: Text(c.abbreviation, overflow: TextOverflow.ellipsis),
+                                        ),
+                                      )
+                                      .toList(),
+                                  onChanged: (val) {
+                                    ref
+                                        .read(selectedCommentaryProvider.notifier)
+                                        .set(val);
+                                  },
+                                );
                               },
+                              loading: () => const SizedBox.shrink(),
+                              error: (_, __) => const SizedBox.shrink(),
                             );
                           },
-                          loading: () => const SizedBox.shrink(),
-                          error: (_, __) => const SizedBox.shrink(),
-                        );
-                      },
-                    ),
-                    const SizedBox(width: 8),
-                    Consumer(
-                      builder: (context, ref, _) {
-                        final hasIntro = ref.watch(hasBookIntroProvider).value ?? false;
-                        if (!hasIntro) return const SizedBox.shrink();
-                        
-                        return IconButton(
-                          icon: Icon(
-                            ref.watch(showBookIntroProvider)
-                                ? Icons.auto_stories
-                                : Icons.info_outline,
-                            color: ref.watch(showBookIntroProvider)
-                                ? Theme.of(context).colorScheme.primary
-                                : null,
-                          ),
-                          tooltip: 'Toggle Book Introduction',
-                          onPressed: () {
-                            ref.read(showBookIntroProvider.notifier).toggle();
-                          },
-                        );
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () {
-                        ref.read(activeToolProvider.notifier).close();
-                        if (Navigator.of(context).canPop()) {
-                          Navigator.of(context).pop();
-                        }
-                      },
-                    ),
-                  ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Consumer(
+                        builder: (context, ref, _) {
+                          final hasIntro = ref.watch(hasBookIntroProvider).value ?? false;
+                          if (!hasIntro) return const SizedBox.shrink();
+                          
+                          return IconButton(
+                            icon: Icon(
+                              ref.watch(showBookIntroProvider)
+                                  ? Icons.auto_stories
+                                  : Icons.info_outline,
+                              color: ref.watch(showBookIntroProvider)
+                                  ? Theme.of(context).colorScheme.primary
+                                  : null,
+                            ),
+                            tooltip: 'Toggle Book Introduction',
+                            onPressed: () {
+                              ref.read(showBookIntroProvider.notifier).toggle();
+                            },
+                          );
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () {
+                          ref.read(activeToolProvider.notifier).close();
+                          if (Navigator.of(context).canPop()) {
+                            Navigator.of(context).pop();
+                          }
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
