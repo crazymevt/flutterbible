@@ -1,5 +1,23 @@
 [
   {
+    "version": "26.6.20+4",
+    "date": "2026-06-20",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "Use external browser for media on Windows and Linux",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "Suppress Node.js 20 deprecation warning in GitHub Actions",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.6.20+3",
     "date": "2026-06-20",
     "features": [
