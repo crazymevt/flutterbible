@@ -41,14 +41,8 @@ jobs:
       - name: Build Linux
         run: flutter build linux --release
 
-      - name: Build Web
-        run: flutter build web --release
-
       - name: Compress Linux Build
         run: tar -czf StudyBible-Linux.tar.gz -C build/linux/x64/release/bundle .
-
-      - name: Compress Web Build
-        run: zip -r StudyBible-Web.zip build/web
 
       - name: Rename APK
         run: mv build/app/outputs/flutter-apk/app-release.apk StudyBible-Android.apk
@@ -59,7 +53,6 @@ jobs:
           files: |
             StudyBible-Android.apk
             StudyBible-Linux.tar.gz
-            StudyBible-Web.zip
 
   build-macos:
     name: Build macOS
