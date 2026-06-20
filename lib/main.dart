@@ -43,7 +43,6 @@ void main() async {
     WindowOptions windowOptions = WindowOptions(
       size: Size(width, height),
       center: x == null || y == null,
-      backgroundColor: Colors.transparent,
       skipTaskbar: false,
       titleBarStyle: TitleBarStyle.normal,
     );
