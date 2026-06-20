@@ -153,9 +153,9 @@ class _CrossReferenceItem extends ConsumerWidget {
         return Container(
           margin: const EdgeInsets.only(bottom: 12.0),
           decoration: BoxDecoration(
-            color: Colors.white, // From mockup
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey.shade300),
+            border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
           ),
           clipBehavior: Clip.antiAlias,
           child: IntrinsicHeight(
