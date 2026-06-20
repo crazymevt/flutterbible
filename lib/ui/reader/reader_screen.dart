@@ -151,14 +151,37 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
               itemBuilder: (context, index) {
                 final version = availableVersions[index];
                 final isActive = activeVersions.contains(version.id);
-                return CheckboxListTile(
-                  title: Text('${version.name} (${version.id})'),
-                  value: isActive,
-                  onChanged: (checked) {
-                    ref
-                        .read(activeVersionsProvider.notifier)
-                        .toggle(version.id);
+                return ListTile(
+                  title: Text(
+                    '${version.name} (${version.id})',
+                    style: TextStyle(
+                      fontWeight: isActive && activeVersions.length == 1 ? FontWeight.bold : FontWeight.normal,
+                    ),
+                  ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Parallel',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      Checkbox(
+                        value: isActive,
+                        onChanged: (checked) {
+                          ref
+                              .read(activeVersionsProvider.notifier)
+                              .toggle(version.id);
+                        },
+                      ),
+                    ],
+                  ),
+                  onTap: () {
+                    // Replace active versions with ONLY this version
+                    ref.read(activeVersionsProvider.notifier).set([version.id]);
+                    Navigator.of(context).pop();
                   },
+                  selected: isActive && activeVersions.length == 1,
+                  selectedTileColor: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5),
                 );
               },
             );
