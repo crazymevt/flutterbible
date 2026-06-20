@@ -608,24 +608,6 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
               Positioned.fill(
                 child: Column(
                   children: [
-                    if (MediaQuery.sizeOf(context).width <= 800)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8.0,
-                          vertical: 4.0,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.surfaceContainerHighest.withAlpha(128),
-                          border: Border(
-                            bottom: BorderSide(
-                              color: Theme.of(context).dividerColor,
-                            ),
-                          ),
-                        ),
-                        child: const AudioPlayerWidget(),
-                      ),
                     Expanded(child: content),
                   ],
                 ),
