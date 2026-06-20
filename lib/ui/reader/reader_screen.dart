@@ -295,20 +295,22 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
       child: Scaffold(
         drawer: const AppDrawer(),
         appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+          foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
           centerTitle: true,
           title: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 400),
             child: Container(
               height: 40,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12.0),
-                    child: Icon(Icons.search, size: 20, color: Colors.grey),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                    child: Icon(Icons.search, size: 20, color: Theme.of(context).colorScheme.onSurfaceVariant),
                   ),
                   Expanded(
                     child: TextField(
