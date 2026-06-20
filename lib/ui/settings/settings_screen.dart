@@ -5,6 +5,7 @@ import '../../app/app_state.dart';
 import '../../app/content_providers.dart';
 import '../../app/sync_service.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../whats_new_dialog.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -259,6 +260,33 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           _buildSyncFolderSelector(context, ref),
+          const Divider(),
+
+          // ── Support ──
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8.0),
+            child: Text(
+              'Support',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.favorite, color: Colors.redAccent),
+            title: const Text('Support the Developer'),
+            subtitle: const Text('Buy me a coffee on Ko-fi to support development!'),
+            trailing: const Icon(Icons.open_in_new, size: 16),
+            onTap: () async {
+              final url = Uri.parse('https://ko-fi.com/jessiehughart');
+              if (!await launchUrl(url)) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Could not open Ko-fi link')),
+                  );
+                }
+              }
+            },
+          ),
+          const SizedBox(height: 24),
         ],
       ),
     );
