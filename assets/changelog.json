@@ -1,5 +1,17 @@
 [
   {
+    "version": "26.6.20+7",
+    "date": "2026-06-20",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "Ensure close button is visible and tappable in media player on mobile",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.6.20+6",
     "date": "2026-06-20",
     "features": [
