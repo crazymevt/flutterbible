@@ -64,7 +64,6 @@ List<InlineSpan> buildVerseSpans({
             alignment: PlaceholderAlignment.top,
             child: GestureDetector(
               onTap: () {
-                onVerseTap(verse.verse);
                 onFootnoteTap?.call(verse.verse);
               },
               child: Container(
