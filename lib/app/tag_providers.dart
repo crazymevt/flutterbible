@@ -154,6 +154,17 @@ class TagController {
       );
     }
   }
+
+  Future<void> removeAllTagsFromEntity(String entityId) async {
+    final db = ref.read(userStoreProvider);
+    final links = await (db.select(db.entityTags)
+          ..where((et) => et.entityId.equals(entityId))
+          ..where((et) => et.deleted.equals(false)))
+        .get();
+    for (final link in links) {
+      await removeTagFromEntity(link.id);
+    }
+  }
 }
 
 final tagControllerProvider = Provider<TagController>((ref) {

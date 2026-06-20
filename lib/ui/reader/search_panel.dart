@@ -9,9 +9,11 @@ import '../../app/sermon_providers.dart';
 import 'dictionary_panel.dart';
 import 'commentary_panel.dart';
 import 'notes_panel.dart';
+import '../../app/user_providers.dart';
 import '../sermons/sermon_editor_screen.dart';
 import '../tags/tags_tab_view.dart';
 import '../journals/journals_list_panel.dart';
+import '../journals/journal_editor_panel.dart';
 
 class SearchPanel extends ConsumerStatefulWidget {
   const SearchPanel({super.key});
@@ -296,8 +298,28 @@ class SearchResultsList extends ConsumerWidget {
               }
             } else if (item.type == 'journal') {
               ref.read(selectedJournalIdProvider.notifier).setId(item.referenceId);
+              
+              final dateNotifier = ref.read(selectedJournalDateProvider.notifier);
+              final store = ref.read(userStoreProvider);
+              (store.select(store.journals)
+                ..where((j) => j.id.equals(item.referenceId)))
+                .getSingleOrNull().then((journal) {
+                  if (journal != null) {
+                    final d = DateTime.fromMillisecondsSinceEpoch(journal.updatedAt).toLocal();
+                    dateNotifier.setDate(d);
+                  }
+                });
+
               if (MediaQuery.sizeOf(context).width <= 900) {
                 Navigator.of(context).pop();
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => Scaffold(
+                      appBar: AppBar(title: const Text('Journal Editor')),
+                      body: const JournalEditorPanel(),
+                    ),
+                  ),
+                );
               }
               ref.read(appModuleProvider.notifier).setModule(AppModule.journalsPrayers);
             } else if (item.type == 'prayer') {

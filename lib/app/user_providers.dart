@@ -6,6 +6,7 @@ import 'app_state.dart';
 import 'reader_state.dart';
 import 'sync_service.dart';
 import 'achievement_service.dart';
+import 'tag_providers.dart';
 
 final userStoreProvider = Provider<UserStore>((ref) {
   return UserStore();
@@ -234,6 +235,7 @@ class NoteAction {
             ),
             mode: InsertMode.replace,
           );
+      await ref.read(tagControllerProvider).removeAllTagsFromEntity(id);
     }
   }
 }

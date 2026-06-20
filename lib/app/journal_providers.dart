@@ -5,6 +5,7 @@ import '../data/user_store.dart';
 import 'user_providers.dart';
 import 'sync_service.dart';
 import 'achievement_service.dart';
+import 'tag_providers.dart';
 
 // JOURNALS
 final journalsProvider = StreamProvider<List<Journal>>((ref) {
@@ -89,6 +90,7 @@ class JournalAction {
             ),
             mode: InsertMode.replace,
           );
+      await ref.read(tagControllerProvider).removeAllTagsFromEntity(id);
     }
   }
 }
@@ -186,6 +188,7 @@ class PrayerAction {
             ),
             mode: InsertMode.replace,
           );
+      await ref.read(tagControllerProvider).removeAllTagsFromEntity(id);
     }
   }
 }

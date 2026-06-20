@@ -154,10 +154,10 @@ final globalSearchResultsProvider = FutureProvider<List<SearchResult>>((
       f.type, 
       f.reference_id, 
       f.text_content,
-      n.book_name as note_book, n.chapter as note_chapter, n.verse as note_verse, n.selected_verses as note_selected_verses,
-      s.title as sermon_title, s.series as sermon_series,
-      j.title as journal_title,
-      p.name as prayer_name
+      n.book_name as note_book, n.chapter as note_chapter, n.verse as note_verse, n.selected_verses as note_selected_verses, n.deleted as note_deleted,
+      s.title as sermon_title, s.series as sermon_series, s.deleted as sermon_deleted,
+      j.title as journal_title, j.deleted as journal_deleted,
+      p.name as prayer_name, p.deleted as prayer_deleted
     FROM user_search f
     LEFT JOIN notes n ON f.type = 'note' AND f.reference_id = n.id
     LEFT JOIN sermons s ON f.type = 'sermon' AND f.reference_id = s.id
@@ -203,6 +203,8 @@ final globalSearchResultsProvider = FutureProvider<List<SearchResult>>((
           }
         }
       } else if (type == 'journal') {
+        final isDeleted = row.readNullable<bool>('journal_deleted') ?? false;
+        if (isDeleted) continue;
         final jTitle = row.readNullable<String>('journal_title') ?? 'Journal';
         results.add(SearchResult(
           type: type,
@@ -211,6 +213,8 @@ final globalSearchResultsProvider = FutureProvider<List<SearchResult>>((
           title: 'Journal: $jTitle',
         ));
       } else if (type == 'prayer') {
+        final isDeleted = row.readNullable<bool>('prayer_deleted') ?? false;
+        if (isDeleted) continue;
         final pName = row.readNullable<String>('prayer_name') ?? 'Prayer';
         results.add(SearchResult(
           type: type,
@@ -219,6 +223,8 @@ final globalSearchResultsProvider = FutureProvider<List<SearchResult>>((
           title: 'Prayer: $pName',
         ));
       } else if (type == 'note') {
+        final isDeleted = row.readNullable<bool>('note_deleted') ?? false;
+        if (isDeleted) continue;
         final bName = row.readNullable<String>('note_book') ?? 'Unknown Book';
         final cNum = row.readNullable<int>('note_chapter') ?? 1;
         final vNum = row.readNullable<int>('note_verse');
@@ -244,6 +250,8 @@ final globalSearchResultsProvider = FutureProvider<List<SearchResult>>((
           ),
         );
       } else if (type == 'sermon') {
+        final isDeleted = row.readNullable<bool>('sermon_deleted') ?? false;
+        if (isDeleted) continue;
         final sTitle = row.readNullable<String>('sermon_title') ?? 'Sermon';
         final sSeries = row.readNullable<String>('sermon_series');
         final displayTitle = sSeries != null ? '$sTitle ($sSeries)' : sTitle;

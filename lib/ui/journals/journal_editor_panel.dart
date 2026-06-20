@@ -115,6 +115,9 @@ class _JournalEditorPanelState extends ConsumerState<JournalEditorPanel> {
                   IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),
                   onPressed: () async {
+                    final targetId = _currentId;
+                    if (targetId == null) return;
+                    
                     final confirm = await showDialog<bool>(
                       context: context,
                       builder: (c) => AlertDialog(
@@ -137,7 +140,7 @@ class _JournalEditorPanelState extends ConsumerState<JournalEditorPanel> {
                     if (confirm == true) {
                       await ref
                           .read(journalActionProvider)
-                          .deleteJournal(_currentId!);
+                          .deleteJournal(targetId);
                       ref.read(selectedJournalIdProvider.notifier).setId(null);
                       final isDesktop = MediaQuery.sizeOf(context).width > 900;
                       if (!isDesktop && mounted) {

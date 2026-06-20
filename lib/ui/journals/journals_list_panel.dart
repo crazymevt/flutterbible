@@ -45,6 +45,7 @@ class JournalsListPanel extends ConsumerWidget {
 
     ref.listen<AsyncValue<List<Journal>>>(journalsProvider, (previous, next) {
       if (previous?.value == null && next.value != null) {
+        if (ref.read(selectedJournalIdProvider) != null) return;
         final journals = next.value!;
         final today = DateTime.now();
         final todayEntry = journals.where((j) {

@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import 'package:drift/drift.dart' as drift;
 import '../data/user_store.dart';
+import 'tag_providers.dart';
 import 'user_providers.dart';
 import 'sync_service.dart';
 import 'achievement_service.dart';
@@ -70,6 +71,7 @@ class SermonActionNotifier {
         updatedAt: drift.Value(now),
       ),
     );
+    await _ref.read(tagControllerProvider).removeAllTagsFromEntity(id);
   }
 }
 
