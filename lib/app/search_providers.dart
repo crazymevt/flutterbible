@@ -1,8 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:drift/drift.dart';
 import '../domain/importer/mybible_verse_parser.dart';
+import '../domain/search/reference_parser.dart';
 import 'content_providers.dart';
 import 'user_providers.dart';
+import 'reader_state.dart';
 
 class SearchResult {
   final String type; // 'verse', 'note', 'commentary', 'dictionary'
@@ -43,6 +45,36 @@ final globalSearchQueryProvider = NotifierProvider<SearchQueryNotifier, String>(
   () => SearchQueryNotifier(),
 );
 
+
+
+final autocompleteWordsProvider = FutureProvider<List<String>>((ref) async {
+  final query = ref.watch(globalSearchQueryProvider).trim();
+  if (query.isEmpty) return [];
+
+  // Get the last word the user is typing
+  final words = query.split(RegExp(r'\s+'));
+  final lastWord = words.last.toLowerCase();
+  
+  // Only suggest if at least 2 characters are typed
+  if (lastWord.length < 2) return [];
+
+  final contentStore = ref.watch(contentStoreProvider);
+
+  try {
+    // Escape single quotes for SQL
+    final safeWord = lastWord.replaceAll("'", "''");
+    final rows = await contentStore.customSelect(
+      "SELECT term FROM content_vocab WHERE term LIKE ? ORDER BY cnt DESC LIMIT 15",
+      variables: [Variable.withString('$safeWord%')],
+    ).get();
+
+    return rows.map((row) => row.read<String>('term')).toList();
+  } catch (e) {
+    // If table doesn't exist yet (migration not run), just return empty
+    return [];
+  }
+});
+
 final globalSearchResultsProvider = FutureProvider<List<SearchResult>>((
   ref,
 ) async {
@@ -57,6 +89,33 @@ final globalSearchResultsProvider = FutureProvider<List<SearchResult>>((
   final searchPattern = '"$cleanQuery"*'; // Match prefix as phrase
 
   final List<SearchResult> results = [];
+
+  // Check if query is a reference for quick navigation
+  final activeVersions = ref.watch(activeVersionsProvider);
+  if (activeVersions.isNotEmpty) {
+    try {
+      final books = await ref.watch(booksForVersionProvider(activeVersions.first).future);
+      final parsed = ReferenceParser.parse(query, books);
+      if (parsed != null) {
+        String titleStr = parsed.book.name;
+        if (parsed.chapter > 0) titleStr += ' ${parsed.chapter}';
+        if (parsed.verse != null) titleStr += ':${parsed.verse}';
+        results.add(
+          SearchResult(
+            type: 'navigation',
+            referenceId: 'nav',
+            textContent: 'Tap to open $titleStr',
+            title: 'Navigate to $titleStr',
+            book: parsed.book.name,
+            chapter: parsed.chapter,
+            verse: parsed.verse,
+          ),
+        );
+      }
+    } catch (e) {
+      // Ignore parsing errors
+    }
+  }
 
   // 1. Query Content Database
   final contentQuery = '''

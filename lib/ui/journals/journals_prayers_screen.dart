@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../app_drawer.dart';
-import '../../app/search_providers.dart';
-import '../../app/app_state.dart';
 import 'journals_list_panel.dart';
 import 'journal_editor_panel.dart';
 import 'prayer_tracker_panel.dart';
+import '../common/global_search_bar.dart';
 
 class JournalsPrayersScreen extends ConsumerStatefulWidget {
   const JournalsPrayersScreen({super.key});
@@ -41,22 +40,8 @@ class _JournalsPrayersScreenState extends ConsumerState<JournalsPrayersScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 12.0),
                     child: Icon(Icons.search, size: 20, color: Theme.of(context).colorScheme.onSurfaceVariant),
                   ),
-                  Expanded(
-                    child: TextField(
-                      decoration: const InputDecoration(
-                        hintText: 'Search entire library...',
-                        border: InputBorder.none,
-                        isDense: true,
-                        contentPadding: EdgeInsets.symmetric(vertical: 10),
-                      ),
-                      onSubmitted: (value) {
-                        if (value.isNotEmpty) {
-                          ref.read(globalSearchQueryProvider.notifier).setQuery(value);
-                          ref.read(activeToolProvider.notifier).openTool(ActiveTool.search);
-                          ref.read(appModuleProvider.notifier).setModule(AppModule.reader);
-                        }
-                      },
-                    ),
+                  const Expanded(
+                    child: GlobalSearchBar(),
                   ),
                 ],
               ),
@@ -120,22 +105,8 @@ class _JournalsPrayersScreenState extends ConsumerState<JournalsPrayersScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 12.0),
                     child: Icon(Icons.search, size: 20, color: Theme.of(context).colorScheme.onSurfaceVariant),
                   ),
-                  Expanded(
-                    child: TextField(
-                      decoration: const InputDecoration(
-                        hintText: 'Search entire library...',
-                        border: InputBorder.none,
-                        isDense: true,
-                        contentPadding: EdgeInsets.symmetric(vertical: 10),
-                      ),
-                      onSubmitted: (value) {
-                        if (value.isNotEmpty) {
-                          ref.read(globalSearchQueryProvider.notifier).setQuery(value);
-                          ref.read(activeToolProvider.notifier).openTool(ActiveTool.search);
-                          ref.read(appModuleProvider.notifier).setModule(AppModule.reader);
-                        }
-                      },
-                    ),
+                  const Expanded(
+                    child: GlobalSearchBar(),
                   ),
                 ],
               ),

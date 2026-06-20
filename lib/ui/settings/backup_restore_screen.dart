@@ -5,10 +5,9 @@ import 'package:file_picker/file_picker.dart';
 import 'package:path/path.dart' as p;
 
 import '../../app/backup_providers.dart';
-import '../../app/search_providers.dart';
-import '../../app/app_state.dart';
 import '../../domain/backup/backup_restore_service.dart';
 import '../app_drawer.dart';
+import '../common/global_search_bar.dart';
 
 class BackupRestoreScreen extends ConsumerStatefulWidget {
   const BackupRestoreScreen({super.key});
@@ -193,22 +192,8 @@ class _BackupRestoreScreenState extends ConsumerState<BackupRestoreScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 12.0),
                   child: Icon(Icons.search, size: 20, color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
-                Expanded(
-                  child: TextField(
-                    decoration: const InputDecoration(
-                      hintText: 'Search entire library...',
-                      border: InputBorder.none,
-                      isDense: true,
-                      contentPadding: EdgeInsets.symmetric(vertical: 10),
-                    ),
-                    onSubmitted: (value) {
-                      if (value.isNotEmpty) {
-                        ref.read(globalSearchQueryProvider.notifier).setQuery(value);
-                        ref.read(activeToolProvider.notifier).openTool(ActiveTool.search);
-                        ref.read(appModuleProvider.notifier).setModule(AppModule.reader);
-                      }
-                    },
-                  ),
+                const Expanded(
+                  child: GlobalSearchBar(),
                 ),
               ],
             ),

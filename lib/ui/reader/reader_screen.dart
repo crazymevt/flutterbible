@@ -4,7 +4,7 @@ import '../../app/content_providers.dart';
 import '../../app/reader_state.dart';
 import '../../app/user_providers.dart';
 import '../../app/tag_providers.dart';
-import '../../app/search_providers.dart';
+import '../../app/content_providers.dart';
 import '../../app/sync_service.dart';
 import 'verse_list_view.dart';
 import 'flowing_paragraph_view.dart';
@@ -22,6 +22,7 @@ import '../../app/app_state.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../common/global_search_bar.dart';
 
 class ReaderScreen extends ConsumerStatefulWidget {
   const ReaderScreen({super.key});
@@ -335,29 +336,8 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 12.0),
                     child: Icon(Icons.search, size: 20, color: Theme.of(context).colorScheme.onSurfaceVariant),
                   ),
-                  Expanded(
-                    child: TextField(
-                      decoration: const InputDecoration(
-                        hintText: 'Search entire library...',
-                        border: InputBorder.none,
-                        isDense: true,
-                        contentPadding: EdgeInsets.symmetric(vertical: 10),
-                      ),
-                      onSubmitted: (value) {
-                        if (value.isNotEmpty) {
-                          ref.read(globalSearchQueryProvider.notifier).setQuery(value);
-                          if (MediaQuery.sizeOf(context).width > 900) {
-                            ref.read(activeToolProvider.notifier).openTool(ActiveTool.search);
-                            Scaffold.of(context).openEndDrawer();
-                          } else {
-                            Scaffold.of(context).openEndDrawer();
-                            Future.delayed(const Duration(milliseconds: 100), () {
-                              ref.read(activeToolProvider.notifier).openTool(ActiveTool.search);
-                            });
-                          }
-                        }
-                      },
-                    ),
+                  const Expanded(
+                    child: GlobalSearchBar(),
                   ),
                 ],
               ),

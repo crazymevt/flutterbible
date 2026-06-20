@@ -3,9 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/content_manager_providers.dart';
 import '../../app/content_providers.dart';
-import '../../app/search_providers.dart';
-import '../../app/app_state.dart';
 import '../app_drawer.dart';
+import '../common/global_search_bar.dart';
 
 class ContentManagerScreen extends ConsumerStatefulWidget {
   const ContentManagerScreen({super.key});
@@ -55,22 +54,8 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
                   padding: const EdgeInsets.symmetric(horizontal: 12.0),
                   child: Icon(Icons.search, size: 20, color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
-                Expanded(
-                  child: TextField(
-                    decoration: const InputDecoration(
-                      hintText: 'Search entire library...',
-                      border: InputBorder.none,
-                      isDense: true,
-                      contentPadding: EdgeInsets.symmetric(vertical: 10),
-                    ),
-                    onSubmitted: (value) {
-                      if (value.isNotEmpty) {
-                        ref.read(globalSearchQueryProvider.notifier).setQuery(value);
-                        ref.read(activeToolProvider.notifier).openTool(ActiveTool.search);
-                        ref.read(appModuleProvider.notifier).setModule(AppModule.reader);
-                      }
-                    },
-                  ),
+                const Expanded(
+                  child: GlobalSearchBar(),
                 ),
               ],
             ),

@@ -27,7 +27,7 @@ class ContentStore extends _$ContentStore {
   ContentStore([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration {
@@ -58,6 +58,11 @@ class ContentStore extends _$ContentStore {
         if (from < 5) {
           await m.addColumn(crossReferences, crossReferences.votes);
           await customStatement('DELETE FROM cross_references');
+        }
+        if (from < 6) {
+          await customStatement('''
+            CREATE VIRTUAL TABLE IF NOT EXISTS content_vocab USING fts5vocab(content_search, 'row');
+          ''');
         }
       },
     );

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
@@ -25,6 +26,7 @@ class SearchPanel extends ConsumerStatefulWidget {
 class _SearchPanelState extends ConsumerState<SearchPanel> {
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
+  Timer? _debounce;
 
   @override
   void initState() {
@@ -38,6 +40,7 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _focusNode.dispose();
     _controller.dispose();
     super.dispose();
@@ -97,7 +100,14 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
                       borderSide: BorderSide.none,
                     ),
                   ),
+                  onChanged: (value) {
+                    if (_debounce?.isActive ?? false) _debounce?.cancel();
+                    _debounce = Timer(const Duration(milliseconds: 300), () {
+                      ref.read(globalSearchQueryProvider.notifier).setQuery(value);
+                    });
+                  },
                   onSubmitted: (value) {
+                    if (_debounce?.isActive ?? false) _debounce?.cancel();
                     ref
                         .read(globalSearchQueryProvider.notifier)
                         .setQuery(value);
@@ -124,26 +134,29 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
                   return const Center(child: Text('Type a word to search.'));
                 }
 
-                final verses = results.where((r) => r.type == 'verse').toList();
-                final notes = results.where((r) => r.type == 'note').toList();
-                final sermons = results.where((r) => r.type == 'sermon').toList();
-                final journals = results.where((r) => r.type == 'journal').toList();
-                final prayers = results.where((r) => r.type == 'prayer').toList();
-                final commentaries = results
-                    .where((r) => r.type == 'commentary')
-                    .toList();
-                final dictionaries = results
-                    .where((r) => r.type == 'dictionary')
-                    .toList();
+                 final navigation = results.where((r) => r.type == 'navigation').toList();
+                 final verses = results.where((r) => r.type == 'verse').toList();
+                 final notes = results.where((r) => r.type == 'note').toList();
+                 final sermons = results.where((r) => r.type == 'sermon').toList();
+                 final journals = results.where((r) => r.type == 'journal').toList();
+                 final prayers = results.where((r) => r.type == 'prayer').toList();
+                 final commentaries = results
+                     .where((r) => r.type == 'commentary')
+                     .toList();
+                 final dictionaries = results
+                     .where((r) => r.type == 'dictionary')
+                     .toList();
 
-                return DefaultTabController(
-                  length: 7,
-                  child: Column(
-                    children: [
-                      TabBar(
-                        isScrollable: true,
-                        tabs: [
-                          Tab(text: 'Verses (${verses.length})'),
+                 final combinedVerses = [...navigation, ...verses];
+
+                 return DefaultTabController(
+                   length: 7,
+                   child: Column(
+                     children: [
+                       TabBar(
+                         isScrollable: true,
+                         tabs: [
+                           Tab(text: 'Verses (${combinedVerses.length})'),
                           Tab(text: 'Notes (${notes.length})'),
                           Tab(text: 'Sermons (${sermons.length})'),
                           Tab(text: 'Journals (${journals.length})'),
@@ -155,7 +168,7 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
                       Expanded(
                         child: TabBarView(
                           children: [
-                            SearchResultsList(results: verses),
+                            SearchResultsList(results: combinedVerses),
                             SearchResultsList(results: notes),
                             SearchResultsList(results: sermons),
                             SearchResultsList(results: journals),
@@ -200,7 +213,26 @@ class SearchResultsList extends ConsumerWidget {
         final item = results[index];
         return InkWell(
           onTap: () {
-            if (item.type == 'verse' || item.type == 'note') {
+            if (item.type == 'navigation') {
+              if (item.book != null) {
+                ref.read(selectedBookNameProvider.notifier).set(item.book!);
+                if (item.chapter != null) {
+                  ref.read(selectedChapterProvider.notifier).set(item.chapter!);
+                }
+                if (item.verse != null) {
+                  ref.read(targetVerseToScrollProvider.notifier).set(item.verse!);
+                  ref.read(selectedVersesProvider.notifier).clear();
+                  ref.read(selectedVersesProvider.notifier).toggle(item.verse!);
+                  ref.read(navigationControllerProvider).recordHistory(verse: item.verse);
+                } else {
+                  ref.read(navigationControllerProvider).recordHistory();
+                }
+                ref.read(activeToolProvider.notifier).close();
+                if (Navigator.of(context).canPop()) {
+                  Navigator.of(context).pop();
+                }
+              }
+            } else if (item.type == 'verse' || item.type == 'note') {
               if (item.book != null) {
                 ref.read(selectedBookNameProvider.notifier).set(item.book!);
                 if (item.chapter != null) {
@@ -359,14 +391,31 @@ class SearchResultsList extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                item.title,
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: Theme.of(context).colorScheme.primary,
-                  fontWeight: FontWeight.bold,
+              if (item.type == 'navigation') ...[
+                Row(
+                  children: [
+                    Icon(Icons.turn_right, color: Theme.of(context).colorScheme.primary),
+                    const SizedBox(width: 8),
+                    Text(
+                      item.title,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 8),
+                const SizedBox(height: 4),
+              ] else ...[
+                Text(
+                  item.title,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+              ],
               if (item.type == 'commentary' || item.type == 'dictionary')
                 HtmlWidget(
                   item.textContent,
