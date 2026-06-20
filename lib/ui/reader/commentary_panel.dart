@@ -12,6 +12,13 @@ class CommentaryPanel extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final entriesAsync = ref.watch(commentaryEntriesProvider);
+    final commentariesAsync = ref.watch(commentariesProvider);
+    final selectedVerses = ref.watch(selectedVersesProvider);
+
+    final commentariesMap = commentariesAsync.value?.fold<Map<int, String>>(
+      {},
+      (map, c) => map..[c.id] = c.abbreviation,
+    ) ?? {};
 
     return Material(
       color: Theme.of(context).colorScheme.surface,
@@ -138,7 +145,9 @@ class CommentaryPanel extends ConsumerWidget {
                               bottom: 4.0,
                             ),
                             child: Text(
-                              'Verse ${entry.verse}',
+                              selectedVerses.isNotEmpty
+                                  ? '${commentariesMap[entry.commentaryId] ?? 'Commentary'} - Verse ${entry.verse}'
+                                  : 'Verse ${entry.verse}',
                               style: Theme.of(context).textTheme.titleSmall
                                   ?.copyWith(
                                     fontWeight: FontWeight.bold,

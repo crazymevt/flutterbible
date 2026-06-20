@@ -345,12 +345,14 @@ final commentaryEntriesProvider = FutureProvider<List<CommentaryEntry>>((
     return (store.select(store.commentaryEntries)
           ..where(
             (c) =>
-                c.commentaryId.equals(selectedCommentaryId) &
                 c.bookName.equals(bookName) &
                 c.chapter.equals(chapter) &
                 c.verse.isIn(selectedVerses),
           )
-          ..orderBy([(c) => OrderingTerm.asc(c.verse)]))
+          ..orderBy([
+            (c) => OrderingTerm.asc(c.verse),
+            (c) => OrderingTerm.asc(c.commentaryId)
+          ]))
         .get();
   } else {
     // Show all commentaries for the chapter
