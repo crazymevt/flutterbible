@@ -33,6 +33,27 @@ final versionsProvider = FutureProvider<List<Version>>((ref) {
   return store.select(store.versions).get();
 });
 
+final installedModuleIdsProvider = FutureProvider<Set<String>>((ref) async {
+  final store = ref.watch(contentStoreProvider);
+  
+  final versions = await store.select(store.versions).get();
+  final commentaries = await store.select(store.commentaries).get();
+  final dictionaries = await store.select(store.dictionaries).get();
+  
+  final set = <String>{};
+  for (final v in versions) {
+    set.add(v.id.toUpperCase());
+    set.add(v.abbreviation.toUpperCase());
+  }
+  for (final c in commentaries) {
+    set.add(c.abbreviation.toUpperCase());
+  }
+  for (final d in dictionaries) {
+    set.add(d.abbreviation.toUpperCase());
+  }
+  return set;
+});
+
 final bibleVersionsProvider = FutureProvider<List<Version>>((ref) async {
   final store = ref.watch(contentStoreProvider);
   final allVersions = await store.select(store.versions).get();

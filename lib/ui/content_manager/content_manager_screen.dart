@@ -91,6 +91,8 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
   Widget _buildPh4Tab() {
     final catalogAsync = ref.watch(ph4CatalogProvider);
     final downloadStates = ref.watch(contentManagerControllerProvider);
+    final installedIdsAsync = ref.watch(installedModuleIdsProvider);
+    final installedIds = installedIdsAsync.value ?? {};
 
     return Column(
       children: [
@@ -127,6 +129,8 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
                   final dlState = downloadStates[m.abbr];
 
                   Widget trailing;
+                  final isInstalled = installedIds.contains(m.abbr.toUpperCase());
+
                   if (dlState != null) {
                     if (dlState.status == 'Done') {
                       trailing = const Icon(Icons.check, color: Colors.green);
@@ -152,9 +156,26 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
                         ),
                       );
                     }
+                  } else if (isInstalled) {
+                    trailing = Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.check_circle, color: Colors.green),
+                        IconButton(
+                          icon: const Icon(Icons.refresh),
+                          tooltip: 'Redownload',
+                          onPressed: () {
+                            ref
+                                .read(contentManagerControllerProvider.notifier)
+                                .downloadAndImportPh4(m);
+                          },
+                        ),
+                      ],
+                    );
                   } else {
                     trailing = IconButton(
                       icon: const Icon(Icons.download),
+                      tooltip: 'Download',
                       onPressed: () {
                         ref
                             .read(contentManagerControllerProvider.notifier)
@@ -203,6 +224,8 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
   Widget _buildOsisTab() {
     final languagesAsync = ref.watch(osisLanguagesProvider);
     final downloadStates = ref.watch(contentManagerControllerProvider);
+    final installedIdsAsync = ref.watch(installedModuleIdsProvider);
+    final installedIds = installedIdsAsync.value ?? {};
 
     return Column(
       children: [
@@ -269,6 +292,8 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
                                     final dlState = downloadStates[stateKey];
 
                                     Widget trailing;
+                                    final isInstalled = installedIds.contains(t.basename.toUpperCase());
+
                                     if (dlState != null) {
                                       if (dlState.status == 'Done') {
                                         trailing = const Icon(
@@ -307,9 +332,29 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
                                           ),
                                         );
                                       }
+                                    } else if (isInstalled) {
+                                      trailing = Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(Icons.check_circle, color: Colors.green),
+                                          IconButton(
+                                            icon: const Icon(Icons.refresh),
+                                            tooltip: 'Redownload',
+                                            onPressed: () {
+                                              ref
+                                                  .read(
+                                                    contentManagerControllerProvider
+                                                        .notifier,
+                                                  )
+                                                  .downloadAndImportOsis(t, l.code);
+                                            },
+                                          ),
+                                        ],
+                                      );
                                     } else {
                                       trailing = IconButton(
                                         icon: const Icon(Icons.download),
+                                        tooltip: 'Download',
                                         onPressed: () {
                                           ref
                                               .read(
