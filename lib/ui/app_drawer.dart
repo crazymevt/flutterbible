@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../app/app_state.dart';
 import '../app/version.dart';
+import 'whats_new_dialog.dart';
 
 import 'settings/settings_screen.dart';
 
@@ -135,14 +136,24 @@ class AppDrawer extends ConsumerWidget {
             },
           ),
           const Divider(),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: Text(
-              'Version $appVersion ($buildNumber)',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(150),
+          InkWell(
+            onTap: () {
+              Navigator.of(context).pop(); // close drawer
+              showDialog(
+                context: context,
+                builder: (context) => const WhatsNewDialog(),
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+              child: Text(
+                'Version $appVersion ($buildNumber)',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
             ),
           ),
           const SizedBox(height: 16),

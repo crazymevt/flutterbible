@@ -5,6 +5,7 @@ import '../../app/app_state.dart';
 import '../../app/content_providers.dart';
 import '../../app/sync_service.dart';
 import 'package:file_picker/file_picker.dart';
+import '../whats_new_dialog.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -38,6 +39,17 @@ class SettingsScreen extends ConsumerWidget {
             value: showDashboardOnStart,
             onChanged: (value) {
               ref.read(showDashboardOnStartProvider.notifier).set(value);
+            },
+          ),
+          ListTile(
+            title: const Text("What's New"),
+            subtitle: const Text('View the latest features and updates'),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) => const WhatsNewDialog(),
+              );
             },
           ),
           const Divider(),

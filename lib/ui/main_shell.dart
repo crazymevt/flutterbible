@@ -21,12 +21,45 @@ import 'reader/reading_plan_panel.dart';
 
 import 'onboarding/onboarding_screen.dart';
 import '../app/content_providers.dart';
+import '../app/shared_prefs.dart';
+import '../app/version.dart';
+import 'whats_new_dialog.dart';
 
-class MainShell extends ConsumerWidget {
+class MainShell extends ConsumerStatefulWidget {
   const MainShell({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MainShell> createState() => _MainShellState();
+}
+
+class _MainShellState extends ConsumerState<MainShell> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkWhatsNew();
+    });
+  }
+
+  Future<void> _checkWhatsNew() async {
+    final prefs = ref.read(sharedPreferencesProvider);
+    final lastSeen = prefs.getString('lastSeenVersion');
+
+    if (lastSeen != appVersion) {
+      // Show dialog
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => const WhatsNewDialog(),
+        );
+      }
+      // Update prefs
+      await prefs.setString('lastSeenVersion', appVersion);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final currentModule = ref.watch(appModuleProvider);
     final versionsAsync = ref.watch(bibleVersionsProvider);
 
