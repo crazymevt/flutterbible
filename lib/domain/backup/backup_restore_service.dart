@@ -129,6 +129,7 @@ class BackupRestoreService {
     final backupFile = File(
       p.join(tempDir.path, 'studybible_backup_$timestamp.$_backupExtension'),
     );
+    await backupFile.parent.create(recursive: true);
     await backupFile.writeAsBytes(zipBytes);
 
     onProgress?.call('Backup created successfully');
@@ -188,10 +189,12 @@ class BackupRestoreService {
       if (file.name == 'user.db') {
         onProgress?.call('Restoring user data...');
         final targetFile = File(p.join(dbDir, 'user.db'));
+        await targetFile.parent.create(recursive: true);
         await targetFile.writeAsBytes(file.content as List<int>);
       } else if (file.name == 'content.db') {
         onProgress?.call('Restoring downloaded content...');
         final targetFile = File(p.join(dbDir, 'content.db'));
+        await targetFile.parent.create(recursive: true);
         await targetFile.writeAsBytes(file.content as List<int>);
       }
       // Skip manifest.json and anything else

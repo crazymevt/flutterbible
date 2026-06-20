@@ -17,6 +17,16 @@ subprojects {
 }
 subprojects {
     project.evaluationDependsOn(":app")
+
+    if (name != "app") {
+        afterEvaluate {
+            if (hasProperty("android")) {
+                configure<com.android.build.gradle.LibraryExtension> {
+                    compileSdk = 36
+                }
+            }
+        }
+    }
 }
 
 tasks.register<Delete>("clean") {
