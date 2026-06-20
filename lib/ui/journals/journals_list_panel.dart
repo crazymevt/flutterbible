@@ -80,12 +80,33 @@ class JournalsListPanel extends ConsumerWidget {
       children: [
         // Date Picker (visual only for now, or filters by date)
         if (isDesktop)
-          CalendarDatePicker(
-            key: ValueKey(selectedDate),
-            initialDate: selectedDate,
-            firstDate: DateTime(2000),
-            lastDate: DateTime(2100),
-            onDateChanged: selectDate,
+          Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 8, 0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Calendar',
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.today),
+                      tooltip: 'Go to Today',
+                      onPressed: () => selectDate(DateTime.now()),
+                    ),
+                  ],
+                ),
+              ),
+              CalendarDatePicker(
+                key: ValueKey(selectedDate),
+                initialDate: selectedDate,
+                firstDate: DateTime(2000),
+                lastDate: DateTime(2100),
+                onDateChanged: selectDate,
+              ),
+            ],
           ),
         if (isDesktop) const Divider(),
         Padding(
@@ -100,12 +121,6 @@ class JournalsListPanel extends ConsumerWidget {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (isDesktop)
-                    IconButton(
-                      icon: const Icon(Icons.today),
-                      tooltip: 'Go to Today',
-                      onPressed: () => selectDate(DateTime.now()),
-                    ),
                   if (!isDesktop)
                     IconButton(
                       icon: const Icon(Icons.calendar_month),
