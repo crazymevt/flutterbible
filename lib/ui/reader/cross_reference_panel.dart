@@ -207,26 +207,32 @@ class _CrossReferenceItem extends ConsumerWidget {
                                       fontWeight: FontWeight.bold,
                                     ),
                               ),
-                              if (xref.votes != null && xref.votes! > 0)
+                              if (xref.votes != null)
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                   decoration: BoxDecoration(
-                                    color: Theme.of(context).colorScheme.secondaryContainer,
+                                    color: xref.votes! >= 0 
+                                      ? Theme.of(context).colorScheme.secondaryContainer
+                                      : Theme.of(context).colorScheme.errorContainer,
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Icon(
-                                        Icons.thumb_up_alt_outlined, 
+                                        xref.votes! >= 0 ? Icons.thumb_up_alt_outlined : Icons.thumb_down_alt_outlined, 
                                         size: 12, 
-                                        color: Theme.of(context).colorScheme.onSecondaryContainer
+                                        color: xref.votes! >= 0 
+                                          ? Theme.of(context).colorScheme.onSecondaryContainer
+                                          : Theme.of(context).colorScheme.onErrorContainer,
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
                                         '${xref.votes}',
                                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                          color: Theme.of(context).colorScheme.onSecondaryContainer,
+                                          color: xref.votes! >= 0 
+                                            ? Theme.of(context).colorScheme.onSecondaryContainer
+                                            : Theme.of(context).colorScheme.onErrorContainer,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
