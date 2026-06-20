@@ -27,7 +27,7 @@ class ContentStore extends _$ContentStore {
   ContentStore([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration {
@@ -54,6 +54,10 @@ class ContentStore extends _$ContentStore {
         if (from < 4) {
           await m.createTable(devotionals);
           await m.createTable(devotionalEntries);
+        }
+        if (from < 5) {
+          await m.addColumn(crossReferences, crossReferences.votes);
+          await customStatement('DELETE FROM cross_references');
         }
       },
     );
