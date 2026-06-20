@@ -87,14 +87,19 @@ final timeAnalyticsProvider = Provider<Map<String, int>>((ref) {
 
 final readingPaceProvider = Provider<Map<String, int>>((ref) {
   final progress = ref.watch(readingProgressProvider).value ?? [];
+  final trackers = ref.watch(timeTrackerProvider).value ?? [];
 
-  final daysRead = <DateTime>{};
+  final daysActive = <DateTime>{};
   for (final p in progress) {
     final d = DateTime.fromMillisecondsSinceEpoch(p.readAt).toLocal();
-    daysRead.add(DateTime(d.year, d.month, d.day));
+    daysActive.add(DateTime(d.year, d.month, d.day));
+  }
+  for (final t in trackers) {
+    final d = DateTime.fromMillisecondsSinceEpoch(t.endTime).toLocal();
+    daysActive.add(DateTime(d.year, d.month, d.day));
   }
 
-  final sortedDays = daysRead.toList()..sort((a, b) => b.compareTo(a));
+  final sortedDays = daysActive.toList()..sort((a, b) => b.compareTo(a));
 
   int currentStreak = 0;
   int longestStreak = 0;
@@ -105,7 +110,7 @@ final readingPaceProvider = Provider<Map<String, int>>((ref) {
   final todayDate = DateTime(today.year, today.month, today.day);
   final yesterdayDate = todayDate.subtract(const Duration(days: 1));
 
-  final ascDays = daysRead.toList()..sort((a, b) => a.compareTo(b));
+  final ascDays = daysActive.toList()..sort((a, b) => a.compareTo(b));
   for (final d in ascDays) {
     if (prevDate == null) {
       currentRun = 1;
@@ -147,7 +152,7 @@ final readingPaceProvider = Provider<Map<String, int>>((ref) {
   return {
     'currentStreak': currentStreak,
     'longestStreak': longestStreak,
-    'daysActive': daysRead.length,
+    'daysActive': daysActive.length,
     'chaptersThisWeek': chaptersThisWeek,
     'totalChaptersRead': progress.length,
   };
