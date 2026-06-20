@@ -14,8 +14,10 @@ import 'study_pane.dart';
 import 'mobile_tools_drawer.dart';
 import 'audio_player_widget.dart';
 import 'commentary_panel.dart';
+import 'dictionary_panel.dart';
 import '../app_drawer.dart';
 import '../../app/dashboard_providers.dart';
+import '../../app/app_state.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -180,11 +182,34 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     );
   }
 
+  void _openStrongDictionary(String strongNumber) {
+    ref.read(dictionarySearchQueryProvider.notifier).setQuery(strongNumber);
+    if (MediaQuery.sizeOf(context).width > 800) {
+      ref.read(activeToolProvider.notifier).openTool(ActiveTool.dictionary);
+    } else {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (_) => Container(
+          height: MediaQuery.sizeOf(context).height * 0.8,
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          ),
+          child: const DictionaryPanel(),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final parallelVersesAsync = ref.watch(parallelVersesProvider);
     final bookName = ref.watch(selectedBookNameProvider);
     final chapter = ref.watch(selectedChapterProvider);
+    final showStrongNumbers = ref.watch(appShowStrongNumbersProvider);
     final savedHighlightsAsync = ref.watch(chapterHighlightsProvider);
     final savedHighlights = savedHighlightsAsync.value ?? <int, String>{};
     final selectedVerses = ref.watch(selectedVersesProvider);
@@ -467,6 +492,8 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                         .read(selectedVersesProvider.notifier)
                         .toggle(verseId),
                     onFootnoteTap: (verseId) => _openCommentaryPanel(),
+                    onStrongTap: _openStrongDictionary,
+                    showStrongNumbers: showStrongNumbers,
                     searchQuery: _searchQuery,
                     headerWidget: headerWidget,
                   )
@@ -481,6 +508,8 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                         .read(selectedVersesProvider.notifier)
                         .toggle(verseId),
                     onFootnoteTap: (verseId) => _openCommentaryPanel(),
+                    onStrongTap: _openStrongDictionary,
+                    showStrongNumbers: showStrongNumbers,
                     searchQuery: _searchQuery,
                     headerWidget: headerWidget,
                   );
@@ -496,6 +525,8 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
               onVerseTap: (verseId) =>
                   ref.read(selectedVersesProvider.notifier).toggle(verseId),
               onFootnoteTap: (verseId) => _openCommentaryPanel(),
+              onStrongTap: _openStrongDictionary,
+              showStrongNumbers: showStrongNumbers,
               searchQuery: _searchQuery,
               headerWidget: headerWidget,
             );

@@ -160,6 +160,14 @@ class SettingsScreen extends ConsumerWidget {
                   }).toList(),
             ),
           ),
+          SwitchListTile(
+            title: const Text('Show Strong Numbers'),
+            subtitle: const Text('Display clickable Strong numbers in the text'),
+            value: ref.watch(appShowStrongNumbersProvider),
+            onChanged: (bool value) {
+              ref.read(appShowStrongNumbersProvider.notifier).set(value);
+            },
+          ),
           ListTile(
             title: const Text('Subheadings Source'),
             subtitle: const Text('Select which module to use for inline subheadings'),

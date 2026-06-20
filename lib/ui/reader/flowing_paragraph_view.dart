@@ -17,6 +17,8 @@ class FlowingParagraphView extends ConsumerStatefulWidget {
   final Set<int> versesWithTags;
   final ValueChanged<int> onVerseTap;
   final ValueChanged<int>? onFootnoteTap;
+  final ValueChanged<String>? onStrongTap;
+  final bool showStrongNumbers;
   final bool showFooter;
   final Map<int, List<String>> subheadings;
   final String? searchQuery;
@@ -31,6 +33,8 @@ class FlowingParagraphView extends ConsumerStatefulWidget {
     this.versesWithTags = const {},
     required this.onVerseTap,
     this.onFootnoteTap,
+    this.onStrongTap,
+    this.showStrongNumbers = false,
     this.showFooter = true,
     this.subheadings = const {},
     this.searchQuery,
@@ -203,6 +207,8 @@ class _FlowingParagraphViewState extends ConsumerState<FlowingParagraphView> {
         bgColor: bgColor,
         onVerseTap: widget.onVerseTap,
         onFootnoteTap: widget.onFootnoteTap,
+        onStrongTap: widget.onStrongTap,
+        showStrongNumbers: widget.showStrongNumbers,
         onWordRightClick: _openDictionary,
         verseNumberSpan: verseNumberSpan,
         ignoreLeadingBreaks: verseSubheadings.isNotEmpty,

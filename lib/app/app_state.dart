@@ -121,6 +121,24 @@ final appVerseSpacingProvider =
       () => AppVerseSpacingNotifier(),
     );
 
+class AppShowStrongNumbersNotifier extends Notifier<bool> {
+  @override
+  bool build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getBool('appShowStrongNumbers') ?? false;
+  }
+
+  void set(bool value) {
+    state = value;
+    ref.read(sharedPreferencesProvider).setBool('appShowStrongNumbers', value);
+  }
+}
+
+final appShowStrongNumbersProvider =
+    NotifierProvider<AppShowStrongNumbersNotifier, bool>(
+      () => AppShowStrongNumbersNotifier(),
+    );
+
 class AppModuleNotifier extends Notifier<AppModule> {
   AppModule build() {
     final showDashboard = ref.watch(showDashboardOnStartProvider);

@@ -18,6 +18,8 @@ class ParallelView extends ConsumerStatefulWidget {
   final Set<int> versesWithTags;
   final Function(int) onVerseTap;
   final ValueChanged<int>? onFootnoteTap;
+  final ValueChanged<String>? onStrongTap;
+  final bool showStrongNumbers;
   final bool isFlowing;
   final bool showFooter;
   final Map<int, List<String>> subheadings;
@@ -35,6 +37,8 @@ class ParallelView extends ConsumerStatefulWidget {
     required this.savedHighlights,
     required this.onVerseTap,
     this.onFootnoteTap,
+    this.onStrongTap,
+    this.showStrongNumbers = false,
     this.isFlowing = false,
     this.showFooter = true,
     this.subheadings = const {},
@@ -170,6 +174,8 @@ class _ParallelViewState extends ConsumerState<ParallelView> {
                     subheadings: widget.subheadings,
                     onVerseTap: widget.onVerseTap,
                     onFootnoteTap: widget.onFootnoteTap,
+                    onStrongTap: widget.onStrongTap,
+                    showStrongNumbers: widget.showStrongNumbers,
                     showFooter: false,
                     searchQuery: widget.searchQuery,
                     headerWidget: widget.headerWidget,
@@ -305,6 +311,8 @@ class _ParallelViewState extends ConsumerState<ParallelView> {
                                                 bgColor: null,
                                                 onVerseTap: widget.onVerseTap,
                                                 onFootnoteTap: widget.onFootnoteTap,
+                                                onStrongTap: widget.onStrongTap,
+                                                showStrongNumbers: widget.showStrongNumbers,
                                                 onWordRightClick: _openDictionary,
                                                 searchQuery: widget.searchQuery,
                                               ),

@@ -12,6 +12,8 @@ List<InlineSpan> buildVerseSpans({
   required Function(int) onVerseTap,
   required Function(String, Offset) onWordRightClick,
   Function(int)? onFootnoteTap,
+  Function(String)? onStrongTap,
+  bool showStrongNumbers = false,
   InlineSpan? verseNumberSpan,
   bool ignoreLeadingBreaks = false,
   String? searchQuery,
@@ -77,6 +79,33 @@ List<InlineSpan> buildVerseSpans({
                   seg.footnoteText ?? 'f',
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
                     color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 10,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      } else if (showStrongNumbers && seg.strongs != null && seg.strongs!.isNotEmpty) {
+        spans.add(
+          WidgetSpan(
+            alignment: PlaceholderAlignment.top,
+            child: GestureDetector(
+              onTap: () {
+                onStrongTap?.call(seg.strongs!);
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+                margin: const EdgeInsets.only(left: 2, right: 2),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.secondaryContainer,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  seg.strongs!,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSecondaryContainer,
                     fontWeight: FontWeight.bold,
                     fontSize: 10,
                   ),

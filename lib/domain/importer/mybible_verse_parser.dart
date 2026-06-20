@@ -18,8 +18,14 @@ class MyBibleVerseParser {
 
     for (final match in regex.allMatches(text)) {
       final textBefore = text.substring(lastMatchEnd, match.start);
-      if (textBefore.isNotEmpty && !_inStrongsNumber) {
-        if (_inFootnote) {
+      if (textBefore.isNotEmpty) {
+        if (_inStrongsNumber) {
+          segments.add(
+            VerseSegment(
+              strongs: _decodeEntities(textBefore),
+            ),
+          );
+        } else if (_inFootnote) {
           segments.add(
             VerseSegment(
               isFootnote: true,
@@ -53,8 +59,9 @@ class MyBibleVerseParser {
         if (!isSelfClosing) _inJesusWords = !isClosing;
       } else if (tagName == 's') {
         if (!isClosing && !isSelfClosing) {
-          if (attrsStr.toLowerCase().contains('n=')) {
-            // safe
+          final nMatch = RegExp(r'n="([^"]+)"', caseSensitive: false).firstMatch(attrsStr);
+          if (nMatch != null) {
+            segments.add(VerseSegment(strongs: nMatch.group(1)));
           } else {
             _inStrongsNumber = true;
           }
@@ -69,8 +76,14 @@ class MyBibleVerseParser {
     }
 
     final textAfter = text.substring(lastMatchEnd);
-    if (textAfter.isNotEmpty && !_inStrongsNumber) {
-      if (_inFootnote) {
+    if (textAfter.isNotEmpty) {
+      if (_inStrongsNumber) {
+        segments.add(
+          VerseSegment(
+            strongs: _decodeEntities(textAfter),
+          ),
+        );
+      } else if (_inFootnote) {
         segments.add(
           VerseSegment(
             isFootnote: true,

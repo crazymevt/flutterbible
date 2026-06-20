@@ -17,6 +17,8 @@ class VerseListView extends ConsumerStatefulWidget {
   final Set<int> versesWithTags;
   final Function(int) onVerseTap;
   final ValueChanged<int>? onFootnoteTap;
+  final ValueChanged<String>? onStrongTap;
+  final bool showStrongNumbers;
   final ItemScrollController? externalScrollController;
   final ItemPositionsListener? externalPositionsListener;
   final bool showFooter;
@@ -33,6 +35,8 @@ class VerseListView extends ConsumerStatefulWidget {
     this.versesWithTags = const {},
     required this.onVerseTap,
     this.onFootnoteTap,
+    this.onStrongTap,
+    this.showStrongNumbers = false,
     this.externalScrollController,
     this.externalPositionsListener,
     this.showFooter = true,
@@ -127,6 +131,8 @@ class _VerseListViewState extends ConsumerState<VerseListView> {
       bgColor: null, // List view tileColor handles background
       onVerseTap: widget.onVerseTap,
       onFootnoteTap: widget.onFootnoteTap,
+      onStrongTap: widget.onStrongTap,
+      showStrongNumbers: widget.showStrongNumbers,
       onWordRightClick: _openDictionary,
       ignoreLeadingBreaks: true,
       searchQuery: widget.searchQuery,
