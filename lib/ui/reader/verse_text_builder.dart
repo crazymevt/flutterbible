@@ -19,6 +19,8 @@ List<InlineSpan> buildVerseSpans({
   String? searchQuery,
 }) {
   final spans = <InlineSpan>[];
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+  final jesusWordsColor = isDark ? Colors.red.shade300 : Colors.red.shade700;
   final bodyStyle = Theme.of(context).textTheme.bodyLarge?.copyWith(
     height: 1.8,
     backgroundColor: bgColor,
@@ -120,7 +122,7 @@ List<InlineSpan> buildVerseSpans({
           height: 1.8,
           backgroundColor: bgColor,
           fontStyle: seg.isItalic ? FontStyle.italic : null,
-          color: seg.isJesusWords ? Colors.red.shade700 : null,
+          color: seg.isJesusWords ? jesusWordsColor : null,
         );
 
         spans.addAll(_buildHighlightedSpans(

@@ -182,6 +182,8 @@ class _CompareResultCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final jesusWordsColor = isDark ? Colors.red.shade300 : Colors.red.shade700;
     final parser = MyBibleVerseParser();
     
     // Build text spans for the verses
@@ -201,7 +203,7 @@ class _CompareResultCard extends ConsumerWidget {
             text: s.text,
             style: TextStyle(
               fontStyle: s.isItalic ? FontStyle.italic : FontStyle.normal,
-              color: s.isJesusWords ? Colors.red.shade300 : null,
+              color: s.isJesusWords ? jesusWordsColor : null,
             ),
           ),
         );
