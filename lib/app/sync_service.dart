@@ -47,9 +47,14 @@ class SyncService {
     final customBookmark = _ref.read(syncFolderBookmarkProvider);
     Directory syncDir;
 
-    if (Platform.isMacOS && customBookmark != null && customBookmark.isNotEmpty) {
+    if (Platform.isMacOS &&
+        customBookmark != null &&
+        customBookmark.isNotEmpty) {
       final secureBookmarks = SecureBookmarks();
-      _resolvedBookmarkEntity = await secureBookmarks.resolveBookmark(customBookmark, isDirectory: true);
+      _resolvedBookmarkEntity = await secureBookmarks.resolveBookmark(
+        customBookmark,
+        isDirectory: true,
+      );
       syncDir = Directory(_resolvedBookmarkEntity!.path);
     } else if (customPath != null && customPath.isNotEmpty) {
       syncDir = Directory(customPath);
@@ -71,66 +76,284 @@ class SyncService {
 
     if (_resolvedBookmarkEntity != null) {
       final secureBookmarks = SecureBookmarks();
-      await secureBookmarks.startAccessingSecurityScopedResource(_resolvedBookmarkEntity!);
+      await secureBookmarks.startAccessingSecurityScopedResource(
+        _resolvedBookmarkEntity!,
+      );
     }
 
     try {
       // 1. Get all local records
-      final localHighlights = await _store.select(_store.highlights).get();
-      final localNotes = await _store.select(_store.notes).get();
-      final localBookmarks = await _store.select(_store.bookmarks).get();
+      final local_highlights = await _store.select(_store.highlights).get();
+      final local_notes = await _store.select(_store.notes).get();
+      final local_bookmarks = await _store.select(_store.bookmarks).get();
+      final local_journals = await _store.select(_store.journals).get();
+      final local_sermons = await _store.select(_store.sermons).get();
+      final local_prayers = await _store.select(_store.prayers).get();
+      final local_readingProgresses = await _store
+          .select(_store.readingProgresses)
+          .get();
+      final local_timeTrackers = await _store.select(_store.timeTrackers).get();
+      final local_achievements = await _store.select(_store.achievements).get();
+      final local_navigationHistories = await _store
+          .select(_store.navigationHistories)
+          .get();
+      final local_readingPlans = await _store.select(_store.readingPlans).get();
+      final local_readingPlanDays = await _store
+          .select(_store.readingPlanDays)
+          .get();
+      final local_readingPlanItems = await _store
+          .select(_store.readingPlanItems)
+          .get();
+      final local_tags = await _store.select(_store.tags).get();
+      final local_entityTags = await _store.select(_store.entityTags).get();
 
       final localRecords = <GenericSyncRecord>[];
 
       localRecords.addAll(
-        localHighlights.map(
-          (h) => GenericSyncRecord(
-            id: h.id,
-            updatedAt: h.updatedAt,
-            deviceId: h.deviceId,
-            deleted: h.deleted,
+        local_highlights.map(
+          (item) => GenericSyncRecord(
+            id: item.id,
+            updatedAt: item.updatedAt,
+            deviceId: item.deviceId,
+            deleted: item.deleted,
             payload: {
               'type': 'highlight',
-              'bookName': h.bookName,
-              'chapter': h.chapter,
-              'verse': h.verse,
-              'colorHex': h.colorHex,
+              'bookName': item.bookName,
+              'chapter': item.chapter,
+              'verse': item.verse,
+              'colorHex': item.colorHex,
             },
           ),
         ),
       );
-
       localRecords.addAll(
-        localNotes.map(
-          (n) => GenericSyncRecord(
-            id: n.id,
-            updatedAt: n.updatedAt,
-            deviceId: n.deviceId,
-            deleted: n.deleted,
+        local_notes.map(
+          (item) => GenericSyncRecord(
+            id: item.id,
+            updatedAt: item.updatedAt,
+            deviceId: item.deviceId,
+            deleted: item.deleted,
             payload: {
               'type': 'note',
-              'bookName': n.bookName,
-              'chapter': n.chapter,
-              'verse': n.verse,
-              'content': n.content,
+              'bookName': item.bookName,
+              'chapter': item.chapter,
+              'verse': item.verse,
+              'selectedVerses': item.selectedVerses,
+              'content': item.content,
             },
           ),
         ),
       );
-
       localRecords.addAll(
-        localBookmarks.map(
-          (b) => GenericSyncRecord(
-            id: b.id,
-            updatedAt: b.updatedAt,
-            deviceId: b.deviceId,
-            deleted: b.deleted,
+        local_bookmarks.map(
+          (item) => GenericSyncRecord(
+            id: item.id,
+            updatedAt: item.updatedAt,
+            deviceId: item.deviceId,
+            deleted: item.deleted,
             payload: {
               'type': 'bookmark',
-              'bookName': b.bookName,
-              'chapter': b.chapter,
-              'verse': b.verse,
-              'label': b.label,
+              'bookName': item.bookName,
+              'chapter': item.chapter,
+              'verse': item.verse,
+              'label': item.label,
+            },
+          ),
+        ),
+      );
+      localRecords.addAll(
+        local_journals.map(
+          (item) => GenericSyncRecord(
+            id: item.id,
+            updatedAt: item.updatedAt,
+            deviceId: item.deviceId,
+            deleted: item.deleted,
+            payload: {
+              'type': 'journal',
+              'title': item.title,
+              'content': item.content,
+              'tags': item.tags,
+            },
+          ),
+        ),
+      );
+      localRecords.addAll(
+        local_sermons.map(
+          (item) => GenericSyncRecord(
+            id: item.id,
+            updatedAt: item.updatedAt,
+            deviceId: item.deviceId,
+            deleted: item.deleted,
+            payload: {
+              'type': 'sermon',
+              'createdAt': item.createdAt,
+              'title': item.title,
+              'series': item.series,
+              'content': item.content,
+            },
+          ),
+        ),
+      );
+      localRecords.addAll(
+        local_prayers.map(
+          (item) => GenericSyncRecord(
+            id: item.id,
+            updatedAt: item.updatedAt,
+            deviceId: item.deviceId,
+            deleted: item.deleted,
+            payload: {
+              'type': 'prayer',
+              'name': item.name,
+              'description': item.description,
+              'createdAt': item.createdAt,
+              'answeredAt': item.answeredAt,
+            },
+          ),
+        ),
+      );
+      localRecords.addAll(
+        local_readingProgresses.map(
+          (item) => GenericSyncRecord(
+            id: item.id,
+            updatedAt: item.updatedAt,
+            deviceId: item.deviceId,
+            deleted: item.deleted,
+            payload: {
+              'type': 'readingProgress',
+              'bookName': item.bookName,
+              'chapter': item.chapter,
+              'readAt': item.readAt,
+              'iteration': item.iteration,
+            },
+          ),
+        ),
+      );
+      localRecords.addAll(
+        local_timeTrackers.map(
+          (item) => GenericSyncRecord(
+            id: item.id,
+            updatedAt: item.updatedAt,
+            deviceId: item.deviceId,
+            deleted: item.deleted,
+            payload: {
+              'type': 'timeTracker',
+              'startTime': item.startTime,
+              'endTime': item.endTime,
+              'durationMs': item.durationMs,
+              'activityType': item.activityType,
+            },
+          ),
+        ),
+      );
+      localRecords.addAll(
+        local_achievements.map(
+          (item) => GenericSyncRecord(
+            id: item.id,
+            updatedAt: item.updatedAt,
+            deviceId: item.deviceId,
+            deleted: item.deleted,
+            payload: {'type': 'achievement', 'unlockedAt': item.unlockedAt},
+          ),
+        ),
+      );
+      localRecords.addAll(
+        local_navigationHistories.map(
+          (item) => GenericSyncRecord(
+            id: item.id,
+            updatedAt: item.updatedAt,
+            deviceId: item.deviceId,
+            deleted: item.deleted,
+            payload: {
+              'type': 'navigationHistory',
+              'bookName': item.bookName,
+              'chapter': item.chapter,
+              'verse': item.verse,
+              'verseText': item.verseText,
+            },
+          ),
+        ),
+      );
+      localRecords.addAll(
+        local_readingPlans.map(
+          (item) => GenericSyncRecord(
+            id: item.id,
+            updatedAt: item.updatedAt,
+            deviceId: item.deviceId,
+            deleted: item.deleted,
+            payload: {
+              'type': 'readingPlan',
+              'title': item.title,
+              'description': item.description,
+              'startDate': item.startDate,
+              'targetEndDate': item.targetEndDate,
+            },
+          ),
+        ),
+      );
+      localRecords.addAll(
+        local_readingPlanDays.map(
+          (item) => GenericSyncRecord(
+            id: item.id,
+            updatedAt: item.updatedAt,
+            deviceId: item.deviceId,
+            deleted: item.deleted,
+            payload: {
+              'type': 'readingPlanDay',
+              'planId': item.planId,
+              'dayNumber': item.dayNumber,
+              'date': item.date,
+              'completed': item.completed,
+            },
+          ),
+        ),
+      );
+      localRecords.addAll(
+        local_readingPlanItems.map(
+          (item) => GenericSyncRecord(
+            id: item.id,
+            updatedAt: item.updatedAt,
+            deviceId: item.deviceId,
+            deleted: item.deleted,
+            payload: {
+              'type': 'readingPlanItem',
+              'dayId': item.dayId,
+              'bookName': item.bookName,
+              'startChapter': item.startChapter,
+              'endChapter': item.endChapter,
+              'startVerse': item.startVerse,
+              'endVerse': item.endVerse,
+              'completed': item.completed,
+            },
+          ),
+        ),
+      );
+      localRecords.addAll(
+        local_tags.map(
+          (item) => GenericSyncRecord(
+            id: item.id,
+            updatedAt: item.updatedAt,
+            deviceId: item.deviceId,
+            deleted: item.deleted,
+            payload: {
+              'type': 'tag',
+              'name': item.name,
+              'colorHex': item.colorHex,
+            },
+          ),
+        ),
+      );
+      localRecords.addAll(
+        local_entityTags.map(
+          (item) => GenericSyncRecord(
+            id: item.id,
+            updatedAt: item.updatedAt,
+            deviceId: item.deviceId,
+            deleted: item.deleted,
+            payload: {
+              'type': 'entityTag',
+              'tagId': item.tagId,
+              'entityId': item.entityId,
+              'entityType': item.entityType,
             },
           ),
         ),
@@ -148,47 +371,212 @@ class SyncService {
         for (final rec in merged) {
           final type = rec.payload['type'] as String?;
           if (type == 'highlight') {
-            final highlight = Highlight(
+            final item = Highlight(
               id: rec.id,
               updatedAt: rec.updatedAt,
               deviceId: rec.deviceId,
               deleted: rec.deleted,
               bookName: rec.payload['bookName'] as String,
-              chapter: rec.payload['chapter'] as int,
-              verse: rec.payload['verse'] as int,
+              chapter: (rec.payload['chapter'] as num).toInt(),
+              verse: (rec.payload['verse'] as num).toInt(),
               colorHex: rec.payload['colorHex'] as String,
             );
             await _store
                 .into(_store.highlights)
-                .insert(highlight, mode: InsertMode.replace);
+                .insert(item, mode: InsertMode.replace);
           } else if (type == 'note') {
-            final note = Note(
+            final item = Note(
               id: rec.id,
               updatedAt: rec.updatedAt,
               deviceId: rec.deviceId,
               deleted: rec.deleted,
               bookName: rec.payload['bookName'] as String,
-              chapter: rec.payload['chapter'] as int,
-              verse: rec.payload['verse'] as int?,
+              chapter: (rec.payload['chapter'] as num).toInt(),
+              verse: (rec.payload['verse'] as num?)?.toInt(),
+              selectedVerses: rec.payload['selectedVerses'] as String?,
               content: rec.payload['content'] as String,
             );
             await _store
                 .into(_store.notes)
-                .insert(note, mode: InsertMode.replace);
+                .insert(item, mode: InsertMode.replace);
           } else if (type == 'bookmark') {
-            final bookmark = Bookmark(
+            final item = Bookmark(
               id: rec.id,
               updatedAt: rec.updatedAt,
               deviceId: rec.deviceId,
               deleted: rec.deleted,
               bookName: rec.payload['bookName'] as String,
-              chapter: rec.payload['chapter'] as int,
-              verse: rec.payload['verse'] as int,
+              chapter: (rec.payload['chapter'] as num).toInt(),
+              verse: (rec.payload['verse'] as num).toInt(),
               label: rec.payload['label'] as String,
             );
             await _store
                 .into(_store.bookmarks)
-                .insert(bookmark, mode: InsertMode.replace);
+                .insert(item, mode: InsertMode.replace);
+          } else if (type == 'journal') {
+            final item = Journal(
+              id: rec.id,
+              updatedAt: rec.updatedAt,
+              deviceId: rec.deviceId,
+              deleted: rec.deleted,
+              title: rec.payload['title'] as String,
+              content: rec.payload['content'] as String,
+              tags: rec.payload['tags'] as String?,
+            );
+            await _store
+                .into(_store.journals)
+                .insert(item, mode: InsertMode.replace);
+          } else if (type == 'sermon') {
+            final item = Sermon(
+              id: rec.id,
+              updatedAt: rec.updatedAt,
+              deviceId: rec.deviceId,
+              deleted: rec.deleted,
+              createdAt: (rec.payload['createdAt'] as num).toInt(),
+              title: rec.payload['title'] as String,
+              series: rec.payload['series'] as String?,
+              content: rec.payload['content'] as String,
+            );
+            await _store
+                .into(_store.sermons)
+                .insert(item, mode: InsertMode.replace);
+          } else if (type == 'prayer') {
+            final item = Prayer(
+              id: rec.id,
+              updatedAt: rec.updatedAt,
+              deviceId: rec.deviceId,
+              deleted: rec.deleted,
+              name: rec.payload['name'] as String,
+              description: rec.payload['description'] as String,
+              createdAt: (rec.payload['createdAt'] as num).toInt(),
+              answeredAt: (rec.payload['answeredAt'] as num?)?.toInt(),
+            );
+            await _store
+                .into(_store.prayers)
+                .insert(item, mode: InsertMode.replace);
+          } else if (type == 'readingProgress') {
+            final item = ReadingProgress(
+              id: rec.id,
+              updatedAt: rec.updatedAt,
+              deviceId: rec.deviceId,
+              deleted: rec.deleted,
+              bookName: rec.payload['bookName'] as String,
+              chapter: (rec.payload['chapter'] as num).toInt(),
+              readAt: (rec.payload['readAt'] as num).toInt(),
+              iteration: (rec.payload['iteration'] as num).toInt(),
+            );
+            await _store
+                .into(_store.readingProgresses)
+                .insert(item, mode: InsertMode.replace);
+          } else if (type == 'timeTracker') {
+            final item = TimeTracker(
+              id: rec.id,
+              updatedAt: rec.updatedAt,
+              deviceId: rec.deviceId,
+              deleted: rec.deleted,
+              startTime: (rec.payload['startTime'] as num).toInt(),
+              endTime: (rec.payload['endTime'] as num).toInt(),
+              durationMs: (rec.payload['durationMs'] as num).toInt(),
+              activityType: rec.payload['activityType'] as String,
+            );
+            await _store
+                .into(_store.timeTrackers)
+                .insert(item, mode: InsertMode.replace);
+          } else if (type == 'achievement') {
+            final item = Achievement(
+              id: rec.id,
+              updatedAt: rec.updatedAt,
+              deviceId: rec.deviceId,
+              deleted: rec.deleted,
+              unlockedAt: (rec.payload['unlockedAt'] as num).toInt(),
+            );
+            await _store
+                .into(_store.achievements)
+                .insert(item, mode: InsertMode.replace);
+          } else if (type == 'navigationHistory') {
+            final item = NavigationHistory(
+              id: rec.id,
+              updatedAt: rec.updatedAt,
+              deviceId: rec.deviceId,
+              deleted: rec.deleted,
+              bookName: rec.payload['bookName'] as String,
+              chapter: (rec.payload['chapter'] as num).toInt(),
+              verse: (rec.payload['verse'] as num?)?.toInt(),
+              verseText: rec.payload['verseText'] as String?,
+            );
+            await _store
+                .into(_store.navigationHistories)
+                .insert(item, mode: InsertMode.replace);
+          } else if (type == 'readingPlan') {
+            final item = ReadingPlan(
+              id: rec.id,
+              updatedAt: rec.updatedAt,
+              deviceId: rec.deviceId,
+              deleted: rec.deleted,
+              title: rec.payload['title'] as String,
+              description: rec.payload['description'] as String?,
+              startDate: (rec.payload['startDate'] as num).toInt(),
+              targetEndDate: (rec.payload['targetEndDate'] as num?)?.toInt(),
+            );
+            await _store
+                .into(_store.readingPlans)
+                .insert(item, mode: InsertMode.replace);
+          } else if (type == 'readingPlanDay') {
+            final item = ReadingPlanDay(
+              id: rec.id,
+              updatedAt: rec.updatedAt,
+              deviceId: rec.deviceId,
+              deleted: rec.deleted,
+              planId: rec.payload['planId'] as String,
+              dayNumber: (rec.payload['dayNumber'] as num).toInt(),
+              date: (rec.payload['date'] as num?)?.toInt(),
+              completed: rec.payload['completed'] == true,
+            );
+            await _store
+                .into(_store.readingPlanDays)
+                .insert(item, mode: InsertMode.replace);
+          } else if (type == 'readingPlanItem') {
+            final item = ReadingPlanItem(
+              id: rec.id,
+              updatedAt: rec.updatedAt,
+              deviceId: rec.deviceId,
+              deleted: rec.deleted,
+              dayId: rec.payload['dayId'] as String,
+              bookName: rec.payload['bookName'] as String,
+              startChapter: (rec.payload['startChapter'] as num).toInt(),
+              endChapter: (rec.payload['endChapter'] as num).toInt(),
+              startVerse: (rec.payload['startVerse'] as num?)?.toInt(),
+              endVerse: (rec.payload['endVerse'] as num?)?.toInt(),
+              completed: rec.payload['completed'] == true,
+            );
+            await _store
+                .into(_store.readingPlanItems)
+                .insert(item, mode: InsertMode.replace);
+          } else if (type == 'tag') {
+            final item = Tag(
+              id: rec.id,
+              updatedAt: rec.updatedAt,
+              deviceId: rec.deviceId,
+              deleted: rec.deleted,
+              name: rec.payload['name'] as String,
+              colorHex: rec.payload['colorHex'] as String?,
+            );
+            await _store
+                .into(_store.tags)
+                .insert(item, mode: InsertMode.replace);
+          } else if (type == 'entityTag') {
+            final item = EntityTag(
+              id: rec.id,
+              updatedAt: rec.updatedAt,
+              deviceId: rec.deviceId,
+              deleted: rec.deleted,
+              tagId: rec.payload['tagId'] as String,
+              entityId: rec.payload['entityId'] as String,
+              entityType: rec.payload['entityType'] as String,
+            );
+            await _store
+                .into(_store.entityTags)
+                .insert(item, mode: InsertMode.replace);
           }
         }
       });
@@ -198,7 +586,9 @@ class SyncService {
     } finally {
       if (_resolvedBookmarkEntity != null) {
         final secureBookmarks = SecureBookmarks();
-        await secureBookmarks.stopAccessingSecurityScopedResource(_resolvedBookmarkEntity!);
+        await secureBookmarks.stopAccessingSecurityScopedResource(
+          _resolvedBookmarkEntity!,
+        );
       }
     }
   }
