@@ -237,3 +237,24 @@ class SyncFolderPathNotifier extends Notifier<String?> {
 final syncFolderPathProvider = NotifierProvider<SyncFolderPathNotifier, String?>(
   () => SyncFolderPathNotifier(),
 );
+
+class SyncFolderBookmarkNotifier extends Notifier<String?> {
+  @override
+  String? build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getString('syncFolderBookmark');
+  }
+
+  void setBookmark(String? bookmark) {
+    state = bookmark;
+    if (bookmark == null) {
+      ref.read(sharedPreferencesProvider).remove('syncFolderBookmark');
+    } else {
+      ref.read(sharedPreferencesProvider).setString('syncFolderBookmark', bookmark);
+    }
+  }
+}
+
+final syncFolderBookmarkProvider = NotifierProvider<SyncFolderBookmarkNotifier, String?>(
+  () => SyncFolderBookmarkNotifier(),
+);

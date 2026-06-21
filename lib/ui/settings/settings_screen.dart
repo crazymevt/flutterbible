@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../whats_new_dialog.dart';
 import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:macos_secure_bookmarks/macos_secure_bookmarks.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -345,6 +346,16 @@ class SettingsScreen extends ConsumerWidget {
                   if (selectedDirectory != null) {
                     ref.read(syncFolderPathProvider.notifier).setPath(selectedDirectory);
                     
+                    if (Platform.isMacOS) {
+                      try {
+                        final secureBookmarks = SecureBookmarks();
+                        final bookmark = await secureBookmarks.bookmark(File(selectedDirectory));
+                        ref.read(syncFolderBookmarkProvider.notifier).setBookmark(bookmark);
+                      } catch (e) {
+                        debugPrint('Error creating secure bookmark: $e');
+                      }
+                    }
+
                     try {
                       await ref.read(syncServiceProvider).sync();
                       if (context.mounted) {
@@ -369,6 +380,7 @@ class SettingsScreen extends ConsumerWidget {
                 TextButton(
                   onPressed: () {
                     ref.read(syncFolderPathProvider.notifier).setPath(null);
+                    ref.read(syncFolderBookmarkProvider.notifier).setBookmark(null);
                   },
                   child: const Text('Reset'),
                 ),
