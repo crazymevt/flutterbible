@@ -53,3 +53,6 @@ scratch/
 
 # Generated analyzer output
 analyze.txt
+
+# Locally generated sample content DB (see test/starter_importer_test.dart)
+assets/content.db
