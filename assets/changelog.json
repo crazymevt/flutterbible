@@ -1,5 +1,17 @@
 [
   {
+    "version": "26.6.20+16",
+    "date": "2026-06-20",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "progress dialog shows all books and chapters",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.6.20+15",
     "date": "2026-06-20",
     "features": [
