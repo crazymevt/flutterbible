@@ -49,7 +49,9 @@ class MyBibleImporter {
     final buffer = StringBuffer();
     if (detailedInfo != null) {
       buffer.writeln('detailed_info:\n$detailedInfo\n');
-    } else if (description != null) {
+    }
+    
+    if (description != null) {
       buffer.writeln('description:\n$description\n');
     }
     
