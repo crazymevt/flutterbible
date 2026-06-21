@@ -112,7 +112,10 @@ class AppThemes {
     );
     final colorTextTheme = brightness == Brightness.light
         ? typography.black
-        : typography.white;
+        : typography.white.apply(
+            bodyColor: const Color(0xFFD4D4D8), // Muted off-white for body text
+            displayColor: const Color(0xFFE4E4E7), // Slightly brighter for headings
+          );
 
     var textTheme = typography.englishLike
         .apply(fontSizeDelta: fontSizeDelta)
