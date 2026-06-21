@@ -11,6 +11,7 @@ import '../data/sync/file_sync_engine.dart';
 import '../domain/sync/lww_merge.dart';
 import 'user_providers.dart';
 import 'app_state.dart';
+import 'achievement_service.dart';
 import 'package:macos_secure_bookmarks/macos_secure_bookmarks.dart';
 
 final deviceIdProvider = FutureProvider<String>((ref) async {
@@ -39,7 +40,6 @@ class SyncService {
   SyncService(this._store, this._ref);
 
   Future<void> _ensureInit() async {
-    if (_engine != null) return;
 
     final deviceId = await _ref.read(deviceIdProvider.future);
 
@@ -583,6 +583,9 @@ class SyncService {
 
       // 5. Push the resulting state
       await _engine!.push(merged);
+
+      // 6. Evaluate achievements locally in case new progress was synced
+      _ref.read(achievementServiceProvider).evaluateAchievements();
     } finally {
       if (_resolvedBookmarkEntity != null) {
         final secureBookmarks = SecureBookmarks();
