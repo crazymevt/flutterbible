@@ -1,5 +1,35 @@
 [
   {
+    "version": "26.6.21+1",
+    "date": "2026-06-21",
+    "features": [
+      {
+        "category": "New Features",
+        "title": "Add custom theme import and export functionality",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "Add fully customizable theme draft state and App Bar colors",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "Hide audio icon when no audio is available",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Updates",
+        "title": "Improve contrast of Jesus words in dark mode",
+        "description": "",
+        "icon": "update"
+      }
+    ]
+  },
+  {
     "version": "26.6.20+16",
     "date": "2026-06-20",
     "features": [
