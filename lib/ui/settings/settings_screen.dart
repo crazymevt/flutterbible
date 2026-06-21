@@ -7,6 +7,8 @@ import '../../app/sync_service.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../whats_new_dialog.dart';
+import 'dart:io';
+import 'package:permission_handler/permission_handler.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -325,6 +327,19 @@ class SettingsScreen extends ConsumerWidget {
             children: [
               ElevatedButton.icon(
                 onPressed: () async {
+                  if (Platform.isAndroid) {
+                    final status = await Permission.manageExternalStorage.request();
+                    if (!status.isGranted) {
+                      final storageStatus = await Permission.storage.request();
+                      if (!storageStatus.isGranted && context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Storage permission is required to select a sync folder.')),
+                        );
+                        return;
+                      }
+                    }
+                  }
+                  
                   final String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
 
                   if (selectedDirectory != null) {
