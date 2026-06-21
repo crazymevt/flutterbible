@@ -1,5 +1,53 @@
 [
   {
+    "version": "26.6.20+14",
+    "date": "2026-06-20",
+    "features": [
+      {
+        "category": "Updates",
+        "title": "style: mute text color in dark mode",
+        "description": "",
+        "icon": "update"
+      },
+      {
+        "category": "New Features",
+        "title": "add full JESUS film links to all four Gospels",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "remove broken Jesus Film URLs after upstream redesign",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "add Acknowledgments screen to settings",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Updates",
+        "title": "docs: add acknowledgments to credit ph4.org, MyBible, OSIS, and original app",
+        "description": "",
+        "icon": "update"
+      },
+      {
+        "category": "Updates",
+        "title": "docs: rewrite README.md to reflect actual project features and architecture",
+        "description": "",
+        "icon": "update"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "Fix static analysis warnings and deprecations",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.6.20+13",
     "date": "2026-06-20",
     "features": [
