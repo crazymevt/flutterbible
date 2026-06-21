@@ -47,6 +47,8 @@ This project is made possible thanks to several upstream resources and formats:
 - **[Berean Study Bible](https://berean.bible/)**: Public domain Bible text and audio resources.
 - **Clojure/JavaFX Study Bible**: The original desktop application that inspired and provided the feature foundation for this Flutter reimplementation.
 
+*Note: Individual Bible modules, commentaries, and dictionaries downloaded or imported into this application are subject to their respective copyright holders and licenses. Please review the specific copyright information provided within each module.*
+
 ## Getting Started
 
 1. Install [Flutter](https://docs.flutter.dev/get-started/install).

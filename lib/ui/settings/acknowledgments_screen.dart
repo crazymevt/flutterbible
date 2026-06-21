@@ -68,6 +68,14 @@ class AcknowledgmentsScreen extends StatelessWidget {
             url: null, // No URL known for this
           ),
           const Divider(),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Text(
+              'Note: Individual Bible modules, commentaries, and dictionaries downloaded or imported into this application are subject to their respective copyright holders and licenses. Please review the specific copyright information provided within each module.',
+              style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
+            ),
+          ),
+          const Divider(),
           ListTile(
             leading: const Icon(Icons.receipt_long),
             title: const Text('Open Source Licenses'),
