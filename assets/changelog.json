@@ -1,5 +1,17 @@
 [
   {
+    "version": "26.6.21+3",
+    "date": "2026-06-21",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "Invalidate non-bible module providers on successful download",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.6.21+2",
     "date": "2026-06-21",
     "features": [
