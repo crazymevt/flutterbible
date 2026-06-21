@@ -1,5 +1,17 @@
 [
   {
+    "version": "26.6.20+15",
+    "date": "2026-06-20",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "add busy_timeout to sqlite to prevent database is locked errors",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.6.20+14",
     "date": "2026-06-20",
     "features": [
