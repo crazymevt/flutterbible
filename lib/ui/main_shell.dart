@@ -45,6 +45,14 @@ class _MainShellState extends ConsumerState<MainShell> {
     final prefs = ref.read(sharedPreferencesProvider);
     final lastSeen = prefs.getString('lastSeenVersion');
 
+    // Fresh install: nothing is "new" to a first-time user, and the dialog
+    // would collide with onboarding. Record the current version silently so
+    // the next genuine upgrade is what triggers the dialog.
+    if (lastSeen == null) {
+      await prefs.setString('lastSeenVersion', appVersion);
+      return;
+    }
+
     if (lastSeen != appVersion) {
       // Show dialog
       if (mounted) {
