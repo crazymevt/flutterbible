@@ -6,7 +6,7 @@ import '../../app/app_state.dart';
 import '../../app/content_providers.dart';
 import '../../app/sync_service.dart';
 import '../../theme/app_themes.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../whats_new_dialog.dart';
@@ -102,13 +102,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     };
     final jsonStr = jsonEncode(themeData);
     
-    String? outputFile = await FilePicker.platform.saveFile(
-      dialogTitle: 'Export Theme',
-      fileName: 'custom_theme.json',
-      type: FileType.custom,
-      allowedExtensions: ['json'],
+    const XTypeGroup jsonGroup = XTypeGroup(label: 'JSON', extensions: ['json']);
+    final FileSaveLocation? saveLocation = await getSaveLocation(
+      acceptedTypeGroups: const [jsonGroup],
+      suggestedName: 'custom_theme.json',
     );
-    
+    final String? outputFile = saveLocation?.path;
+
     if (outputFile != null) {
       await File(outputFile).writeAsString(jsonStr);
       if (mounted) {
@@ -120,16 +120,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _importTheme() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      dialogTitle: 'Import Theme',
-      type: FileType.custom,
-      allowedExtensions: ['json'],
-    );
-    
-    if (result != null && result.files.single.path != null) {
+    const XTypeGroup jsonGroup = XTypeGroup(label: 'JSON', extensions: ['json']);
+    final XFile? picked = await openFile(acceptedTypeGroups: const [jsonGroup]);
+
+    if (picked != null) {
       try {
-        final file = File(result.files.single.path!);
-        final jsonStr = await file.readAsString();
+        final jsonStr = await picked.readAsString();
         final Map<String, dynamic> themeData = jsonDecode(jsonStr);
         
         setState(() {
@@ -709,7 +705,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     }
                   }
                   
-                  final String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
+                  final String? selectedDirectory = await getDirectoryPath();
 
                   if (selectedDirectory != null) {
                     ref.read(syncFolderPathProvider.notifier).setPath(selectedDirectory);

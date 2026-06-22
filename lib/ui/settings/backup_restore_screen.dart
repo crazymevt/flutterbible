@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:file_selector/file_selector.dart';
 import 'package:path/path.dart' as p;
 
 import '../../app/backup_providers.dart';
@@ -40,11 +40,10 @@ class _BackupRestoreScreenState extends ConsumerState<BackupRestoreScreen> {
       if (!mounted) return;
 
       // Let user pick where to save
-      final result = await FilePicker.platform.saveFile(
-        dialogTitle: 'Save Backup',
-        fileName: service.defaultFilename,
-        type: FileType.any,
+      final saveLocation = await getSaveLocation(
+        suggestedName: service.defaultFilename,
       );
+      final result = saveLocation?.path;
 
       if (result != null) {
         // Copy the temp backup to the chosen location
@@ -81,14 +80,11 @@ class _BackupRestoreScreenState extends ConsumerState<BackupRestoreScreen> {
 
   Future<void> _restoreBackup() async {
     // 1. Pick a file
-    final result = await FilePicker.platform.pickFiles(
-      dialogTitle: 'Select Backup File',
-      type: FileType.any,
-    );
+    final picked = await openFile();
 
-    if (result == null || result.files.single.path == null) return;
+    if (picked == null) return;
 
-    final backupFile = File(result.files.single.path!);
+    final backupFile = File(picked.path);
     final service = ref.read(backupRestoreServiceProvider);
 
     // 2. Inspect the backup
