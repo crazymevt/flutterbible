@@ -12,12 +12,19 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 
 import '../data/importer/cross_reference_importer.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 
 final contentStoreProvider = Provider<ContentStore>((ref) {
   final store = ContentStore();
-  
-  Future.microtask(() async {
+
+  // Close the underlying connection (and its background isolate) when the
+  // provider is disposed, so a recreated app/engine never opens a second
+  // connection to the same WAL database and deadlocks it.
+  ref.onDispose(() => store.close());
+
+  // Defer the (potentially large) first-install cross-reference import until
+  // after the first frame so it doesn't contend with startup DB access.
+  WidgetsBinding.instance.addPostFrameCallback((_) async {
     try {
       final importer = CrossReferenceImporter(store);
       await importer.importIfEmpty();
@@ -25,7 +32,7 @@ final contentStoreProvider = Provider<ContentStore>((ref) {
       debugPrint('Failed to import cross references: $e');
     }
   });
-  
+
   return store;
 });
 

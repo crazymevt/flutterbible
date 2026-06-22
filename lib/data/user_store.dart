@@ -268,7 +268,7 @@ LazyDatabase _openConnection() {
     final file = File(p.join(dbFolder.path, 'user.db'));
     return NativeDatabase.createInBackground(file, setup: (db) {
       db.execute('PRAGMA journal_mode=WAL;');
-      db.execute('PRAGMA busy_timeout=5000;');
+      db.execute('PRAGMA busy_timeout=10000;');
       db.execute('PRAGMA synchronous=NORMAL;');
     });
   });

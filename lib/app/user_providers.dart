@@ -8,7 +8,11 @@ import 'achievement_service.dart';
 import 'tag_providers.dart';
 
 final userStoreProvider = Provider<UserStore>((ref) {
-  return UserStore();
+  final store = UserStore();
+  // Close the connection (and its background isolate) on dispose so a recreated
+  // app/engine can't open a second connection to the same WAL database.
+  ref.onDispose(() => store.close());
+  return store;
 });
 
 // A stream provider that emits the Map of highlighted verses for the current book/chapter.
