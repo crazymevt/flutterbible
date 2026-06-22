@@ -1,5 +1,17 @@
 [
   {
+    "version": "26.6.21+9",
+    "date": "2026-06-21",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "prevent intermittent database lock on startup after update",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.6.21+8",
     "date": "2026-06-21",
     "features": [
