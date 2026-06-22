@@ -17,6 +17,9 @@ void main() async {
   const hiddenPrefixes = ['chore', 'dev', 'doc', 'docs'];
   bool isHidden(String commit) {
     final lower = commit.toLowerCase();
+    // Git-generated merge commits ("Merge pull request ...", "Merge branch ...")
+    // are not user-facing changes and must never appear in the changelog.
+    if (lower.startsWith('merge ')) return true;
     return hiddenPrefixes
         .any((p) => lower.startsWith('$p:') || lower.startsWith('$p '));
   }
