@@ -148,13 +148,10 @@ class _BackupRestoreScreenState extends ConsumerState<BackupRestoreScreen> {
       final picked = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['studybible'],
-        withReadStream: true,
       );
 
       if (picked == null || picked.files.isEmpty) return;
-      final pickedFile = picked.files.single;
-      readStream = pickedFile.readStream;
-      pickedFilePath = pickedFile.path;
+      pickedFilePath = picked.files.single.path;
     }
 
     final service = ref.read(backupRestoreServiceProvider);
@@ -165,23 +162,34 @@ class _BackupRestoreScreenState extends ConsumerState<BackupRestoreScreen> {
     });
 
     File backupFile;
+    File? tempFile;
     try {
-      if (Platform.isAndroid && pickedFileUri != null) {
-        readStream = await SafStream().readFileStream(pickedFileUri);
-      }
-
-      if (readStream != null) {
+      if (pickedFilePath != null) {
+        // Desktop/iOS: the picker returns a real file path, so read it
+        // directly — no need to copy the (potentially large) backup.
+        backupFile = File(pickedFilePath);
+      } else {
+        // Android SAF: we only have a content:// URI, so stream it to a
+        // temp file rather than loading the whole backup into memory.
+        if (Platform.isAndroid && pickedFileUri != null) {
+          readStream = await SafStream().readFileStream(pickedFileUri);
+        }
+        if (readStream == null) {
+          throw Exception('Could not read picked file');
+        }
         final tempDir = await getTemporaryDirectory();
-        backupFile = File(p.join(tempDir.path, 'temp_restore.studybible'));
-        final sink = backupFile.openWrite();
+        tempFile = File(
+          p.join(
+            tempDir.path,
+            'temp_restore_${DateTime.now().microsecondsSinceEpoch}.studybible',
+          ),
+        );
+        final sink = tempFile.openWrite();
         await for (final chunk in readStream) {
           sink.add(chunk);
         }
         await sink.close();
-      } else if (pickedFilePath != null) {
-        backupFile = File(pickedFilePath);
-      } else {
-        throw Exception('Could not read picked file');
+        backupFile = tempFile;
       }
 
       // 2. Inspect the backup
@@ -258,12 +266,8 @@ class _BackupRestoreScreenState extends ConsumerState<BackupRestoreScreen> {
       
       // Clean up temp file if we created one
       try {
-        if (readStream != null) {
-          final tempDir = await getTemporaryDirectory();
-          final tempFile = File(p.join(tempDir.path, 'temp_restore.studybible'));
-          if (await tempFile.exists()) {
-            await tempFile.delete();
-          }
+        if (tempFile != null && await tempFile.exists()) {
+          await tempFile.delete();
         }
       } catch (_) {}
     }
