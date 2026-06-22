@@ -44,4 +44,5 @@ When you are ready to create a new release:
 1. Ensure all your changes are committed using the prefixes above (the script aborts on a dirty working tree).
 2. Run `./scripts/release.sh` from the root of the project.
 3. The script first runs the quality gate (`tool/lint_domain.sh`, `flutter analyze`, `flutter test`) and aborts if anything fails, then calculates the new version tag, writes the changelog, updates `pubspec.yaml`, and creates the Git commit and tag.
-4. Run `git push && git push --tags` to publish.
+4. Run `git push && git push --tags` to publish. The tag triggers the platform release builds, including the Linux Flatpak (`StudyBible-Linux.flatpak`).
+5. **Flathub (when maintaining the Flathub package):** once the release assets are published, run `flatpak/pin-flathub.sh <tag>` to pin the Flathub manifest to the new tarball, then commit. Once the app is live on Flathub, `flatpak-external-data-checker` auto-PRs these bumps. See [flatpak/README.md](flatpak/README.md).

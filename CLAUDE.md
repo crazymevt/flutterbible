@@ -19,7 +19,12 @@ Run `./scripts/release.sh` from the repo root. It aborts on a dirty tree,
 runs the quality gate (`tool/lint_domain.sh`, `flutter analyze`,
 `flutter test`), then bumps the version, writes the changelog, commits, and
 tags. Publish with `git push && git push --tags` (the tag triggers the
-platform release builds).
+platform release builds, including `StudyBible-Linux.flatpak`).
+
+**Flathub:** after a release, pin the Flathub manifest to the new tarball with
+`flatpak/pin-flathub.sh <tag>` and commit the result. This is only needed while
+maintaining the Flathub package — once the app is live on Flathub,
+`flatpak-external-data-checker` auto-PRs these bumps. See `flatpak/README.md`.
 
 ## Architecture & conventions
 

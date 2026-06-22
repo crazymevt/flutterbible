@@ -8,6 +8,15 @@ A clean-slate reimplementation of the Clojure/JavaFX Study Bible as a single Flu
 
 Always points to the newest version — Android (APK), Windows, macOS, and Linux builds. (Use this link rather than browsing the releases list, which may not show the newest build first.)
 
+**Linux** ships in two forms: a portable bundle (`StudyBible-Linux.tar.gz`) and a Flatpak (`StudyBible-Linux.flatpak`):
+
+```bash
+flatpak install --user StudyBible-Linux.flatpak
+flatpak run io.github.crazymevt.StudyBible
+```
+
+Flathub distribution is planned (see [flatpak/README.md](flatpak/README.md)).
+
 > iOS is supported in the codebase but isn't distributed as a signed build yet — build it from source (see [Getting Started](#getting-started)).
 
 ## Screenshots
