@@ -310,6 +310,7 @@ Status legend: ☐ todo · ◐ in progress · ☑ done
 - ☑ 6.1 Per-OS desktop packaging + Android build via `.github/workflows/release.yml` (tag-triggered); icons/metadata. iOS: simulator builds now; real-device/App-Store deferred (needs $99/yr Apple Developer + a device).
 - ☐ 6.2 Desktop auto-update check; store-based updates on Android (and iOS if/when shipped). *(Only the post-update "What's New" changelog dialog exists so far; no release-version check.)*
 - ☑ 6.3 Onboarding screen — welcome + starter-content download. (No sign-in / device pairing: the default file-sync transport needs neither — the synced folder *is* the boundary, per §10.)
+- ◐ 6.4 Linux Flatpak. ☑ Phase A: working, self-distributed Flatpak (app id `io.github.crazymevt.StudyBible`, Apache-2.0, built per release as `StudyBible-Linux.flatpak`, metadata validated). ☐ Phase B: publish on Flathub — **deferred**; remaining steps tracked in [flatpak/README.md](flatpak/README.md) ("TODO: Flathub submission").
 
 ---
 

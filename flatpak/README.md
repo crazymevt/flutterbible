@@ -43,20 +43,38 @@ the Flatpak just wraps it.
 - Audio/video playback works (`--socket=pulseaudio`).
 - Content manager can download from ph4.org (`--share=network`).
 
-## Before submitting to Flathub
+## TODO: Flathub submission (not started — deferred)
 
-1. **License.** ✅ Apache-2.0 (`LICENSE` + `NOTICE` in the repo root, and
-   `project_license` set in the metainfo).
-2. **Switch the source to a release tarball.** Replace the `type: dir` source in
-   the `studybible` module with the published `StudyBible-Linux.tar.gz` from a
-   GitHub release, pinned by `sha256` (see the comment in the manifest). A
-   release job already produces this artifact (`.github/workflows/release.yml`).
-3. **Validate metadata:**
-   ```bash
-   flatpak run org.freedesktop.appstream.cli validate io.github.crazymevt.StudyBible.metainfo.xml
-   desktop-file-validate io.github.crazymevt.StudyBible.desktop
-   ```
-4. **Submit** a PR adding the manifest to
-   [`flathub/flathub`](https://github.com/flathub/flathub). After acceptance you
-   maintain a `flathub/io.github.crazymevt.StudyBible` repo; each release =
-   bump the tarball URL + `sha256` there.
+Phase A (a working, self-distributed Flatpak) is **done**. Publishing on Flathub
+is deferred until we're ready. When we are, the remaining steps:
+
+Already in place:
+- [x] **License** — Apache-2.0 (`LICENSE` + `NOTICE`, `project_license` in metainfo).
+- [x] **Flathub manifest** — `io.github.crazymevt.StudyBible.flathub.yml` (archive
+      source), separate from the CI/local `dir` manifest so the release build is
+      unaffected.
+- [x] **Metadata validation** — `appstreamcli` + `desktop-file-validate` run in
+      the `flatpak-test` workflow (and locally, below).
+
+Remaining, in order:
+1. [ ] **Cut a release** that includes the file_selector + persistence fixes, so
+       a current `StudyBible-Linux.tar.gz` exists (run `./scripts/release.sh`,
+       push the tag — `release.yml` publishes the asset).
+2. [ ] **Pin the tarball** in `io.github.crazymevt.StudyBible.flathub.yml`:
+       set the `url` to that release's `StudyBible-Linux.tar.gz` and the `sha256`
+       to its checksum (`sha256sum StudyBible-Linux.tar.gz`). Replace the
+       `REPLACE_WITH_TAG` / zeroed-sha placeholders.
+3. [ ] **Final local validation:**
+       ```bash
+       appstreamcli validate io.github.crazymevt.StudyBible.metainfo.xml
+       desktop-file-validate io.github.crazymevt.StudyBible.desktop
+       flatpak-builder --force-clean build-dir io.github.crazymevt.StudyBible.flathub.yml  # builds from the pinned tarball
+       ```
+4. [ ] **Fork & PR** the manifest to
+       [`flathub/flathub`](https://github.com/flathub/flathub) (new-submissions
+       process). Reviewers check the app id, license, permissions, and metadata.
+5. [ ] **After acceptance** you get a `flathub/io.github.crazymevt.StudyBible`
+       repo. Each future release = bump the `url` + `sha256` there. Enable
+       `flatpak-external-data-checker` to auto-PR those bumps.
+
+Reference: <https://docs.flathub.org/docs/for-app-authors/submission>.
