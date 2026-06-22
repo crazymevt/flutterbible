@@ -8,6 +8,8 @@ A clean-slate reimplementation of the Clojure/JavaFX Study Bible as a single Flu
 
 Always points to the newest version — Android (APK), Windows, macOS, and Linux builds. (Use this link rather than browsing the releases list, which may not show the newest build first.)
 
+> iOS is supported in the codebase but isn't distributed as a signed build yet — build it from source (see [Getting Started](#getting-started)).
+
 ## Features
 
 - **Multi-version Bible reader** — parallel panels, verse selection, version swap, verse-by-verse and flowing paragraph view, highlight bands.

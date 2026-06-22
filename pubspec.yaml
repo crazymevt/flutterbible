@@ -1,5 +1,5 @@
 name: study_bible
-description: "A new Flutter project."
+description: "A cross-platform Study Bible with multi-version reading, commentaries, dictionaries, study tools, and cross-device sync."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
