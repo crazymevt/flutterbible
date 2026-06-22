@@ -1,5 +1,41 @@
 [
   {
+    "version": "26.6.22+1",
+    "date": "2026-06-22",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "scope DB relocation to Linux and fix migration race",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "store databases in app support dir so data persists in Flatpak",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "don't show \"What's New\" dialog on a fresh install",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "use file_selector so file dialogs work inside the Flatpak sandbox",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "add Flatpak build target",
+        "description": "",
+        "icon": "star"
+      }
+    ]
+  },
+  {
     "version": "26.6.21+10",
     "date": "2026-06-21",
     "features": [
