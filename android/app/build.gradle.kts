@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.study_bible"
+    namespace = "io.github.crazymevt.studybible"
     compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
