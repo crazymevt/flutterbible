@@ -9,6 +9,7 @@ import '../data/user_store.dart';
 import '../data/fts_text.dart';
 
 import '../data/sync/file_sync_engine.dart';
+import '../data/sync/sync_storage.dart';
 import '../domain/sync/lww_merge.dart';
 import 'user_providers.dart';
 import 'app_state.dart';
@@ -64,12 +65,14 @@ class SyncService {
       syncDir = Directory(p.join(docs.path, 'StudyBibleSync'));
     }
 
-    // Only re-initialize if the path changed
-    if (_engine != null && _engine!.syncFolder.path == syncDir.path) {
+    final storage = IoSyncStorage(syncDir);
+
+    // Only re-initialize if the configured target changed.
+    if (_engine != null && _engine!.storage.id == storage.id) {
       return;
     }
 
-    _engine = FileSyncEngine(syncFolder: syncDir, localDeviceId: deviceId);
+    _engine = FileSyncEngine(storage: storage, localDeviceId: deviceId);
   }
 
   Future<void> sync() async {

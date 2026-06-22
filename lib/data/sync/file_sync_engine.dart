@@ -1,8 +1,7 @@
 import 'dart:convert';
-import 'dart:io';
-import 'package:path/path.dart' as p;
 import '../../domain/sync/sync_record.dart';
 import 'sync_engine.dart';
+import 'sync_storage.dart';
 
 class GenericSyncRecord implements SyncRecord {
   @override
@@ -50,44 +49,34 @@ class GenericSyncRecord implements SyncRecord {
 }
 
 class FileSyncEngine implements SyncEngine {
-  final Directory syncFolder;
+  final SyncStorage storage;
   final String localDeviceId;
 
-  FileSyncEngine({required this.syncFolder, required this.localDeviceId});
+  FileSyncEngine({required this.storage, required this.localDeviceId});
 
-  File get _localFile =>
-      File(p.join(syncFolder.path, 'state-$localDeviceId.jsonl'));
+  String get _localName => 'state-$localDeviceId.jsonl';
 
   @override
   Future<void> push(List<SyncRecord> localRecords) async {
-    if (!await syncFolder.exists()) {
-      await syncFolder.create(recursive: true);
-    }
-
-    final sink = _localFile.openWrite();
+    final buffer = StringBuffer();
     for (final record in localRecords) {
       if (record is GenericSyncRecord) {
-        sink.writeln(jsonEncode(record.toJson()));
+        buffer.writeln(jsonEncode(record.toJson()));
       }
     }
-    await sink.close();
+    await storage.writeDocument(_localName, buffer.toString());
   }
 
   @override
   Future<List<SyncRecord>> pull() async {
-    if (!await syncFolder.exists()) {
-      return [];
-    }
-
     final List<GenericSyncRecord> allRemoteRecords = [];
 
-    final files = syncFolder.listSync().whereType<File>().where(
-      (f) => f.path.endsWith('.jsonl'),
-    );
-    for (final file in files) {
-      if (p.basename(file.path) == 'state-$localDeviceId.jsonl') continue;
+    final names = await storage.listDocuments('.jsonl');
+    for (final name in names) {
+      // Skip our own state file; we only pull other devices' records.
+      if (name == _localName) continue;
 
-      final lines = await file.readAsLines();
+      final lines = await storage.readLines(name);
       for (final line in lines) {
         if (line.trim().isEmpty) continue;
         try {
