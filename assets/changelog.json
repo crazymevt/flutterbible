@@ -1,5 +1,29 @@
 [
   {
+    "version": "26.6.22+4",
+    "date": "2026-06-22",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "Stream backup extraction to prevent out-of-memory crashes on Android",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "Deduplicate reading progress and use deterministic IDs to prevent sync overcounting",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "option to mark chapters read manually (#7)",
+        "description": "",
+        "icon": "star"
+      }
+    ]
+  },
+  {
     "version": "26.6.22+3",
     "date": "2026-06-22",
     "features": [
