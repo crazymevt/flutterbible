@@ -48,9 +48,12 @@ class TtsController extends Notifier<TtsState> {
 
   @override
   TtsState build() {
+    // Capture the service here; Riverpod forbids `ref.read` inside lifecycle
+    // callbacks such as onDispose.
+    final service = ref.watch(ttsServiceProvider);
     ref.onDispose(() {
       _gen++;
-      ref.read(ttsServiceProvider).stop();
+      service.stop();
     });
     return const TtsState();
   }
