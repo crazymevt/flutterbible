@@ -1,7 +1,6 @@
-import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/content_store.dart';
-import '../data/models/verse_segment.dart';
+import '../data/importer/mybible_verse_parser.dart';
 import '../data/tts_service.dart';
 
 enum TtsStatus { idle, playing, paused }
@@ -58,23 +57,17 @@ class TtsController extends Notifier<TtsState> {
     return const TtsState();
   }
 
-  /// Extract plain, speakable text for a verse. `textContent` is the plain
-  /// search text and is the right source for speech; fall back to parsing the
-  /// rich segments only if it is empty.
+  /// Extract plain, speakable text for a verse. `textContent` carries inline
+  /// MyBible markup (Strong's numbers, footnotes, formatting tags), so it must
+  /// be run through the verse parser — the same cleaning the Copy action uses —
+  /// before being spoken, or the engine reads the tag numbers aloud.
   String _plainText(Verse verse) {
-    if (verse.textContent.trim().isNotEmpty) return verse.textContent;
-    if (verse.segments.isEmpty || verse.segments == '[]') return '';
-    try {
-      final list = jsonDecode(verse.segments) as List<dynamic>;
-      return list
-          .map((e) => VerseSegment.fromJson(e))
-          .where((s) => !s.isFootnote && !s.isParagraphBreak && !s.isLineBreak)
-          .map((s) => s.text)
-          .join(' ')
-          .trim();
-    } catch (_) {
-      return '';
-    }
+    return MyBibleVerseParser()
+        .parseVerse(verse.textContent)
+        .map((s) => s.text)
+        .join('')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
   }
 
   /// Begin reading [verses], optionally starting at verse number [fromVerse].
