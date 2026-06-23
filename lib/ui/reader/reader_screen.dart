@@ -14,6 +14,9 @@ import '../common/breakpoints.dart';
 
 import 'mobile_tools_drawer.dart';
 import 'audio_player_widget.dart';
+import 'tts_player_widget.dart';
+import '../../app/tts_providers.dart';
+import '../../data/tts_service.dart';
 import 'commentary_panel.dart';
 import 'dictionary_panel.dart';
 import '../common/search_title_bar.dart';
@@ -371,6 +374,27 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
                     ),
                     builder: (context) => const AudioPlayerWidget(),
+                  );
+                },
+              ),
+            if (TtsService.isSupported)
+              IconButton(
+                icon: Icon(
+                  ref.watch(ttsControllerProvider).status == TtsStatus.playing
+                      ? Icons.record_voice_over
+                      : Icons.record_voice_over_outlined,
+                ),
+                tooltip: 'Read aloud',
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Theme.of(context).colorScheme.surface,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(24)),
+                    ),
+                    builder: (context) => const TtsPlayerWidget(),
                   );
                 },
               ),
