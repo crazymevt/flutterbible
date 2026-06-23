@@ -33,43 +33,31 @@ class VerseActionBar extends ConsumerWidget {
 
     final actions = _buildActions(context, ref, onBarColor);
 
-    // Stack swatches above actions, each in a Wrap, so the bar adapts to the
-    // width actually available (the reader pane, not the whole window) and
-    // never overflows or scrolls actions off-screen where they'd be
-    // undiscoverable.
-    final Widget content = Column(
+    // A single compact row that hugs its content. Swatches already carry their
+    // own 40px hit targets so they don't need extra spacing between them.
+    final Widget content = Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Wrap(
-          alignment: WrapAlignment.center,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          spacing: 8,
-          runSpacing: 4,
-          children: swatches,
-        ),
-        const SizedBox(height: 8),
-        Divider(height: 1, color: onBarColor.withValues(alpha: 0.24)),
-        const SizedBox(height: 8),
-        Wrap(
-          alignment: WrapAlignment.center,
-          spacing: 8,
-          runSpacing: 4,
-          children: actions,
-        ),
+        ...swatches,
+        const SizedBox(width: 8),
+        Container(width: 1, height: 24, color: onBarColor.withValues(alpha: 0.24)),
+        const SizedBox(width: 8),
+        for (final a in actions) ...[a, const SizedBox(width: 4)],
       ],
     );
 
-    return Material(
-      elevation: 12.0,
-      color: barColor,
-      borderRadius: BorderRadius.circular(32),
-      clipBehavior: Clip.antiAlias,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.sizeOf(context).width - 32,
-        ),
+    // FittedBox(scaleDown) keeps the bar a single centered row: at its natural
+    // size when it fits the reader pane, gently scaled down (never wrapped or
+    // overflowing) when the pane is too narrow.
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Material(
+        elevation: 12.0,
+        color: barColor,
+        borderRadius: BorderRadius.circular(32),
+        clipBehavior: Clip.antiAlias,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: content,
         ),
       ),
