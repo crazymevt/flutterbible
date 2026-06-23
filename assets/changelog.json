@@ -1,5 +1,59 @@
 [
   {
+    "version": "26.6.23+1",
+    "date": "2026-06-23",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "keep verse action bar as a single compact row",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "prevent verse action bar overflow in narrow reader pane",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "theme-aware chrome, configurable nav rail side, and reader UX polish",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "unified search on the content manager",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "improve audio player controls and harden AppBar search title",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "avoid setState during build in audio load error handling",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "harden chapter read-marking and audio playback",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "mark chapter read on audio advance",
+        "description": "",
+        "icon": "star"
+      }
+    ]
+  },
+  {
     "version": "26.6.22+8",
     "date": "2026-06-22",
     "features": [
