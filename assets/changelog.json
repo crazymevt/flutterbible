@@ -1,5 +1,29 @@
 [
   {
+    "version": "26.6.23+3",
+    "date": "2026-06-23",
+    "features": [
+      {
+        "category": "New Features",
+        "title": "add Nave's Topical Bible index",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "make TtsService test-safe and avoid ref.read in onDispose",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "add text-to-speech read-aloud for the reader",
+        "description": "",
+        "icon": "star"
+      }
+    ]
+  },
+  {
     "version": "26.6.23+2",
     "date": "2026-06-23",
     "features": [
