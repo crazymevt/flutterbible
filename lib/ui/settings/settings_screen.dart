@@ -260,6 +260,33 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
           const SizedBox(height: 16),
           ListTile(
+            title: const Text('Study tools panel'),
+            subtitle: const Text(
+                'Which side the tools navigation rail sits on (wide layouts)'),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: SegmentedButton<NavRailSide>(
+              segments: const [
+                ButtonSegment(
+                  value: NavRailSide.left,
+                  icon: Icon(Icons.view_sidebar_outlined),
+                  label: Text('Left'),
+                ),
+                ButtonSegment(
+                  value: NavRailSide.right,
+                  icon: Icon(Icons.view_sidebar),
+                  label: Text('Right'),
+                ),
+              ],
+              selected: {ref.watch(navRailSideProvider)},
+              onSelectionChanged: (Set<NavRailSide> newSelection) {
+                ref.read(navRailSideProvider.notifier).set(newSelection.first);
+              },
+            ),
+          ),
+          const SizedBox(height: 16),
+          ListTile(
             title: const Text('Color Scheme'),
             subtitle: const Text('Choose the color palette for the app'),
           ),

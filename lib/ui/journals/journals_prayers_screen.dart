@@ -5,6 +5,7 @@ import 'journals_list_panel.dart';
 import 'journal_editor_panel.dart';
 import 'prayer_tracker_panel.dart';
 import '../common/search_title_bar.dart';
+import '../common/breakpoints.dart';
 
 class JournalsPrayersScreen extends ConsumerStatefulWidget {
   const JournalsPrayersScreen({super.key});
@@ -17,7 +18,7 @@ class JournalsPrayersScreen extends ConsumerStatefulWidget {
 class _JournalsPrayersScreenState extends ConsumerState<JournalsPrayersScreen> {
   @override
   Widget build(BuildContext context) {
-    final isDesktop = MediaQuery.sizeOf(context).width > 900;
+    final isDesktop = MediaQuery.sizeOf(context).width > Breakpoints.compact;
 
     if (isDesktop) {
       return Scaffold(

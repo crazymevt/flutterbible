@@ -6,6 +6,7 @@ import '../../app/reader_state.dart';
 import '../../app/app_state.dart';
 import '../../data/importer/mybible_verse_parser.dart';
 import '../../theme/app_themes.dart';
+import '../common/breakpoints.dart';
 
 class ComparePanel extends ConsumerWidget {
   const ComparePanel({super.key});
@@ -38,7 +39,7 @@ class ComparePanel extends ConsumerWidget {
                   IconButton(
                     icon: const Icon(Icons.close),
                     onPressed: () {
-                      if (MediaQuery.sizeOf(context).width > 900) {
+                      if (MediaQuery.sizeOf(context).width > Breakpoints.compact) {
                         ref.read(activeToolProvider.notifier).close();
                       } else {
                         Navigator.of(context).pop();
@@ -85,7 +86,7 @@ class ComparePanel extends ConsumerWidget {
                 IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () {
-                    if (MediaQuery.sizeOf(context).width > 900) {
+                    if (MediaQuery.sizeOf(context).width > Breakpoints.compact) {
                       ref.read(activeToolProvider.notifier).close();
                     } else {
                       Navigator.of(context).pop();

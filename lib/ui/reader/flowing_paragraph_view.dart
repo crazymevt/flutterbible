@@ -8,6 +8,7 @@ import 'chapter_navigation_footer.dart';
 import 'dictionary_panel.dart';
 import 'verse_text_builder.dart';
 import '../../app/reader_state.dart';
+import '../common/breakpoints.dart';
 
 class FlowingParagraphView extends ConsumerStatefulWidget {
   final List<Verse> verses;
@@ -123,7 +124,7 @@ class _FlowingParagraphViewState extends ConsumerState<FlowingParagraphView> {
     if (result == 'dictionary') {
       if (!mounted) return;
       ref.read(dictionarySearchQueryProvider.notifier).setQuery(word);
-      if (MediaQuery.sizeOf(context).width > 900) {
+      if (MediaQuery.sizeOf(context).width > Breakpoints.compact) {
         ref.read(activeToolProvider.notifier).openTool(ActiveTool.dictionary);
       } else {
         showModalBottomSheet(

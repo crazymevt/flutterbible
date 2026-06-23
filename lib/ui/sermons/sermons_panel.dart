@@ -4,6 +4,7 @@ import '../../app/app_state.dart';
 import '../../app/sermon_providers.dart';
 import 'export_dialog.dart';
 import 'sermon_editor_screen.dart';
+import '../common/breakpoints.dart';
 
 class SermonsPanel extends ConsumerWidget {
   const SermonsPanel({super.key});
@@ -92,7 +93,7 @@ class SermonsPanel extends ConsumerWidget {
                         onPressed: () => ref.read(sermonActionProvider).deleteSermon(sermon.id),
                       ),
                       onTap: () {
-                        if (MediaQuery.sizeOf(context).width > 900) {
+                        if (MediaQuery.sizeOf(context).width > Breakpoints.compact) {
                           ref.read(selectedSermonIdProvider.notifier).set(sermon.id);
                         } else {
                           Navigator.of(context).push(MaterialPageRoute(
@@ -147,7 +148,7 @@ class SermonsPanel extends ConsumerWidget {
               );
               if (context.mounted) {
                 Navigator.pop(context);
-                if (MediaQuery.sizeOf(context).width > 900) {
+                if (MediaQuery.sizeOf(context).width > Breakpoints.compact) {
                   ref.read(selectedSermonIdProvider.notifier).set(sermon.id);
                 } else {
                   Navigator.of(context).push(MaterialPageRoute(

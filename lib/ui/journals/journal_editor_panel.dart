@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/journal_providers.dart';
 import 'journals_list_panel.dart';
 import '../tags/tag_editor_dialog.dart';
+import '../common/breakpoints.dart';
 
 class JournalEditorPanel extends ConsumerStatefulWidget {
   const JournalEditorPanel({super.key});
@@ -143,7 +144,7 @@ class _JournalEditorPanelState extends ConsumerState<JournalEditorPanel> {
                           .deleteJournal(targetId);
                       ref.read(selectedJournalIdProvider.notifier).setId(null);
                       if (!mounted) return;
-                      final isDesktop = MediaQuery.sizeOf(this.context).width > 900;
+                      final isDesktop = MediaQuery.sizeOf(this.context).width > Breakpoints.compact;
                       if (!isDesktop) {
                         Navigator.of(this.context).pop();
                       }

@@ -10,6 +10,7 @@ import 'flowing_paragraph_view.dart';
 import 'parallel_view.dart';
 import 'verse_action_bar.dart';
 import 'book_chooser_sheet.dart';
+import '../common/breakpoints.dart';
 
 import 'mobile_tools_drawer.dart';
 import 'audio_player_widget.dart';
@@ -45,8 +46,42 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
   bool _showSearchBox = false;
   String _searchQuery = '';
   int _currentMatchIndex = -1;
+  Timer? _searchDebounce;
   final FocusNode _searchFocusNode = FocusNode();
   final FocusNode _mainFocusNode = FocusNode();
+
+  /// Returns the sorted list of verse numbers whose text contains [query]
+  /// (case-insensitive) across all displayed versions. Single source of truth
+  /// for the in-page find — used by both the input handler and build().
+  List<int> _computeMatchVerses(
+    Map<String, List<dynamic>> versesMap,
+    String query,
+  ) {
+    if (query.isEmpty) return const [];
+    final lowerQuery = query.toLowerCase();
+    final matches = <int>{};
+    for (final verses in versesMap.values) {
+      for (final v in verses) {
+        if (v.textContent.toLowerCase().contains(lowerQuery)) {
+          matches.add(v.verse as int);
+        }
+      }
+    }
+    return matches.toList()..sort();
+  }
+
+  /// Whether a text field (e.g. the find bar) currently holds focus — used to
+  /// suppress global arrow-key chapter navigation while the user is typing.
+  bool get _isEditingText {
+    if (_searchFocusNode.hasFocus) return true;
+    final focus = FocusManager.instance.primaryFocus;
+    return focus?.context?.widget is EditableText;
+  }
+
+  void _onVerseTap(int verseId) {
+    HapticFeedback.selectionClick();
+    ref.read(selectedVersesProvider.notifier).toggle(verseId);
+  }
 
   @override
   void initState() {
@@ -101,6 +136,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     _logSession();
     _lifecycleListener.dispose();
     _chapterReadTimer?.cancel();
+    _searchDebounce?.cancel();
     _searchFocusNode.dispose();
     _mainFocusNode.dispose();
     super.dispose();
@@ -213,7 +249,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
 
   void _openStrongDictionary(String strongNumber) {
     ref.read(dictionarySearchQueryProvider.notifier).setQuery(strongNumber);
-    if (MediaQuery.sizeOf(context).width > 900) {
+    if (MediaQuery.sizeOf(context).width > Breakpoints.compact) {
       ref.read(activeToolProvider.notifier).openTool(ActiveTool.dictionary);
     } else {
       showModalBottomSheet(
@@ -269,18 +305,8 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
 
     List<int> matchVerses = [];
     if (_searchQuery.isNotEmpty && parallelVersesAsync.hasValue) {
-      final versesMap = parallelVersesAsync.value!;
-      final lowerQuery = _searchQuery.toLowerCase();
-      final Set<int> matches = {};
-      for (final verses in versesMap.values) {
-        for (final v in verses) {
-          if (v.textContent.toLowerCase().contains(lowerQuery)) {
-            matches.add(v.verse);
-          }
-        }
-      }
-      matchVerses = matches.toList()..sort();
-      
+      matchVerses = _computeMatchVerses(parallelVersesAsync.value!, _searchQuery);
+
       // Keep index in bounds if search results shrink
       if (_currentMatchIndex >= matchVerses.length) {
         _currentMatchIndex = matchVerses.isEmpty ? -1 : 0;
@@ -309,7 +335,9 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
           }
         }
         
-        if (event is KeyDownEvent) {
+        // Don't hijack arrow keys while the user is typing in a text field
+        // (e.g. the find bar) — let them move the cursor instead.
+        if (event is KeyDownEvent && !_isEditingText) {
           if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
             ref.read(navigationControllerProvider).previousChapter();
             return KeyEventResult.handled;
@@ -361,7 +389,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
               });
             },
           ),
-          if (MediaQuery.sizeOf(context).width <= 900)
+          if (MediaQuery.sizeOf(context).width <= Breakpoints.compact)
             Builder(
               builder: (context) => IconButton(
                 icon: const Icon(Icons.build),
@@ -371,7 +399,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
             ),
         ],
       ),
-      endDrawer: MediaQuery.sizeOf(context).width <= 900
+      endDrawer: MediaQuery.sizeOf(context).width <= Breakpoints.compact
           ? const MobileToolsDrawer()
           : null,
       body: Column(
@@ -409,22 +437,25 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                           _searchQuery = value;
                           _currentMatchIndex = value.isEmpty ? -1 : 0;
                         });
-                        if (value.isNotEmpty && parallelVersesAsync.hasValue) {
-                          final versesMap = parallelVersesAsync.value!;
-                          final lowerQuery = value.toLowerCase();
-                          final Set<int> matches = {};
-                          for (final verses in versesMap.values) {
-                            for (final v in verses) {
-                              if (v.textContent.toLowerCase().contains(lowerQuery)) {
-                                matches.add(v.verse);
-                              }
+                        // Debounce the scan-and-scroll so a fast typist doesn't
+                        // trigger a full chapter scan on every keystroke.
+                        _searchDebounce?.cancel();
+                        if (value.isEmpty) return;
+                        _searchDebounce = Timer(
+                          const Duration(milliseconds: 200),
+                          () {
+                            if (!mounted || !parallelVersesAsync.hasValue) return;
+                            final newMatchVerses = _computeMatchVerses(
+                              parallelVersesAsync.value!,
+                              value,
+                            );
+                            if (newMatchVerses.isNotEmpty) {
+                              ref
+                                  .read(targetVerseToScrollProvider.notifier)
+                                  .set(newMatchVerses.first);
                             }
-                          }
-                          final newMatchVerses = matches.toList()..sort();
-                          if (newMatchVerses.isNotEmpty) {
-                            ref.read(targetVerseToScrollProvider.notifier).set(newMatchVerses[0]);
-                          }
-                        }
+                          },
+                        );
                       },
                       onSubmitted: (_) => _nextMatch(matchVerses),
                     ),
@@ -478,7 +509,14 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
             child: parallelVersesAsync.when(
         data: (versesMap) {
           if (versesMap.isEmpty) {
-            return const Center(child: Text('No verses found.'));
+            return _ReaderMessage(
+              icon: Icons.menu_book_outlined,
+              title: 'Nothing to show here',
+              message:
+                  'No verses were found for $bookName $chapter in the selected version.',
+              actionLabel: 'Choose another version',
+              onAction: _showVersionPicker,
+            );
           }
 
           final headerWidget = Column(
@@ -519,9 +557,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                     versesWithNotes: versesWithNotes,
                     versesWithTags: versesWithTags,
                     subheadings: subheadings,
-                    onVerseTap: (verseId) => ref
-                        .read(selectedVersesProvider.notifier)
-                        .toggle(verseId),
+                    onVerseTap: _onVerseTap,
                     onFootnoteTap: (verseId) => _openCommentaryPanel(),
                     onStrongTap: _openStrongDictionary,
                     showStrongNumbers: showStrongNumbers,
@@ -535,9 +571,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                     versesWithNotes: versesWithNotes,
                     versesWithTags: versesWithTags,
                     subheadings: subheadings,
-                    onVerseTap: (verseId) => ref
-                        .read(selectedVersesProvider.notifier)
-                        .toggle(verseId),
+                    onVerseTap: _onVerseTap,
                     onFootnoteTap: (verseId) => _openCommentaryPanel(),
                     onStrongTap: _openStrongDictionary,
                     showStrongNumbers: showStrongNumbers,
@@ -553,8 +587,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
               versesWithNotes: versesWithNotes,
               versesWithTags: versesWithTags,
               subheadings: subheadings,
-              onVerseTap: (verseId) =>
-                  ref.read(selectedVersesProvider.notifier).toggle(verseId),
+              onVerseTap: _onVerseTap,
               onFootnoteTap: (verseId) => _openCommentaryPanel(),
               onStrongTap: _openStrongDictionary,
               showStrongNumbers: showStrongNumbers,
@@ -583,12 +616,73 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Error: $err')),
+        error: (err, stack) => _ReaderMessage(
+          icon: Icons.error_outline,
+          title: 'Couldn\'t load this chapter',
+          message: 'Something went wrong while loading $bookName $chapter.',
+          actionLabel: 'Try again',
+          onAction: () => ref.invalidate(parallelVersesProvider),
+        ),
       ),
     ),
         ],
       ),
     ));
+  }
+}
+
+/// A centered, friendly placeholder for the reader's empty and error states,
+/// with an icon, message, and an optional recovery action.
+class _ReaderMessage extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String message;
+  final String? actionLabel;
+  final VoidCallback? onAction;
+
+  const _ReaderMessage({
+    required this.icon,
+    required this.title,
+    required this.message,
+    this.actionLabel,
+    this.onAction,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 48, color: theme.colorScheme.onSurfaceVariant),
+            const SizedBox(height: 16),
+            Text(
+              title,
+              style: theme.textTheme.titleMedium,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              message,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            if (actionLabel != null && onAction != null) ...[
+              const SizedBox(height: 24),
+              FilledButton.tonal(
+                onPressed: onAction,
+                child: Text(actionLabel!),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
   }
 }
 

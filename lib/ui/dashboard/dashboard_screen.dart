@@ -12,6 +12,7 @@ import '../../data/verse_of_the_day_list.dart';
 import '../../app/reader_state.dart';
 import '../common/search_title_bar.dart';
 import '../../app/sync_service.dart';
+import '../common/breakpoints.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -55,7 +56,7 @@ class DashboardScreen extends ConsumerWidget {
       drawer: const AppDrawer(),
       body: LayoutBuilder(
         builder: (context, constraints) {
-          final isDesktop = constraints.maxWidth > 900;
+          final isDesktop = constraints.maxWidth > Breakpoints.compact;
           return SingleChildScrollView(
             padding: const EdgeInsets.all(24),
             child: Column(

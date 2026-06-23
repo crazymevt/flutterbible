@@ -5,6 +5,7 @@ import '../../app/reader_state.dart';
 import '../../data/content_store.dart';
 import '../../app/app_state.dart';
 import '../../data/importer/mybible_verse_parser.dart';
+import '../common/breakpoints.dart';
 
 class CrossReferencePanel extends ConsumerWidget {
   const CrossReferencePanel({super.key});
@@ -187,7 +188,7 @@ class _CrossReferenceItem extends ConsumerWidget {
                           .recordHistory(verse: xref.targetVerse);
 
                       // Close the panel if on mobile
-                      if (MediaQuery.sizeOf(context).width <= 900) {
+                      if (MediaQuery.sizeOf(context).width <= Breakpoints.compact) {
                         Navigator.of(context).pop();
                       }
                     },

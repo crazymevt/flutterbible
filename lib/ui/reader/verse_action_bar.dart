@@ -9,6 +9,7 @@ import '../../data/importer/mybible_verse_parser.dart';
 import 'note_editor.dart';
 import 'compare_panel.dart';
 import '../tags/tag_editor_dialog.dart';
+import '../common/breakpoints.dart';
 
 class VerseActionBar extends ConsumerWidget {
   const VerseActionBar({super.key});
@@ -18,33 +19,78 @@ class VerseActionBar extends ConsumerWidget {
     final selectedVerses = ref.watch(selectedVersesProvider);
     if (selectedVerses.isEmpty) return const SizedBox.shrink();
 
-    return Material(
-      elevation: 12.0,
-      color: const Color(0xFF2D2B3B),
-      borderRadius: BorderRadius.circular(32),
-      clipBehavior: Clip.antiAlias,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-          child: Row(
+    final theme = Theme.of(context);
+    final barColor = theme.colorScheme.inverseSurface;
+    final onBarColor = theme.colorScheme.onInverseSurface;
+
+    final swatches = [
+      const _ColorSwatch(color: Color(0xFFFBE083), hex: '#FBE083', name: 'Yellow'),
+      const _ColorSwatch(color: Color(0xFF98E2C6), hex: '#98E2C6', name: 'Green'),
+      const _ColorSwatch(color: Color(0xFFB5E2FA), hex: '#B5E2FA', name: 'Blue'),
+      const _ColorSwatch(color: Color(0xFFF4A8C4), hex: '#F4A8C4', name: 'Pink'),
+      const _ClearHighlightSwatch(),
+    ];
+
+    final actions = _buildActions(context, ref, onBarColor);
+
+    // On narrow screens, stack swatches above actions so nothing scrolls
+    // off-screen and becomes undiscoverable. On wide screens a single
+    // horizontal row reads better.
+    final Widget content = context.isWideLayout
+        ? Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const _ColorSwatch(color: Color(0xFFFBE083), hex: '#FBE083'),
+              for (final s in swatches) ...[s, const SizedBox(width: 8)],
               const SizedBox(width: 8),
-              const _ColorSwatch(color: Color(0xFF98E2C6), hex: '#98E2C6'),
-              const SizedBox(width: 8),
-              const _ColorSwatch(color: Color(0xFFB5E2FA), hex: '#B5E2FA'),
-              const SizedBox(width: 8),
-              const _ColorSwatch(color: Color(0xFFF4A8C4), hex: '#F4A8C4'),
-              const SizedBox(width: 8),
-              const _ClearHighlightSwatch(),
+              Container(width: 1, height: 24, color: onBarColor.withValues(alpha: 0.24)),
               const SizedBox(width: 16),
-              Container(width: 1, height: 24, color: Colors.white24),
-              const SizedBox(width: 16),
+              for (final a in actions) ...[a, const SizedBox(width: 12)],
+            ],
+          )
+        : Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 12,
+                runSpacing: 8,
+                children: swatches,
+              ),
+              const SizedBox(height: 8),
+              Divider(height: 1, color: onBarColor.withValues(alpha: 0.24)),
+              const SizedBox(height: 8),
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 8,
+                runSpacing: 4,
+                children: actions,
+              ),
+            ],
+          );
+
+    return Material(
+      elevation: 12.0,
+      color: barColor,
+      borderRadius: BorderRadius.circular(32),
+      clipBehavior: Clip.antiAlias,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.sizeOf(context).width - 32,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+          child: content,
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _buildActions(BuildContext context, WidgetRef ref, Color onBarColor) {
+    return [
               _ActionIcon(
                 icon: Icons.edit_note,
                 label: 'Add Note',
+                color: onBarColor,
                 onTap: () {
                   final selected = ref.read(selectedVersesProvider);
                   showDialog(
@@ -54,10 +100,10 @@ class VerseActionBar extends ConsumerWidget {
                   ref.read(selectedVersesProvider.notifier).clear();
                 },
               ),
-              const SizedBox(width: 12),
               _ActionIcon(
                 icon: Icons.label,
                 label: 'Tag',
+                color: onBarColor,
                 onTap: () {
                   final selected = ref.read(selectedVersesProvider).toList()..sort();
                   if (selected.isEmpty) return;
@@ -77,12 +123,12 @@ class VerseActionBar extends ConsumerWidget {
                 },
               ),
 
-              const SizedBox(width: 12),
               _ActionIcon(
                 icon: Icons.difference,
                 label: 'Compare',
+                color: onBarColor,
                 onTap: () {
-                  if (MediaQuery.sizeOf(context).width > 900) {
+                  if (context.isWideLayout) {
                     ref
                         .read(activeToolProvider.notifier)
                         .setTool(ActiveTool.compare);
@@ -106,10 +152,10 @@ class VerseActionBar extends ConsumerWidget {
                   }
                 },
               ),
-              const SizedBox(width: 12),
               _ActionIcon(
                 icon: Icons.copy,
                 label: 'Copy',
+                color: onBarColor,
                 onTap: () async {
                   final versesMap = ref.read(parallelVersesProvider).value;
                   if (versesMap == null || versesMap.isEmpty) return;
@@ -162,11 +208,46 @@ class VerseActionBar extends ConsumerWidget {
                   ref.read(selectedVersesProvider.notifier).clear();
                 },
               ),
-              const SizedBox(width: 12),
               _ActionIcon(
                 icon: Icons.close,
                 label: 'Deselect',
+                color: onBarColor,
                 onTap: () => ref.read(selectedVersesProvider.notifier).clear(),
+              ),
+    ];
+  }
+}
+
+class _ActionIcon extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _ActionIcon({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: label,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, color: color, size: 20),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: TextStyle(color: color.withValues(alpha: 0.7), fontSize: 10),
               ),
             ],
           ),
@@ -176,60 +257,43 @@ class VerseActionBar extends ConsumerWidget {
   }
 }
 
-class _ActionIcon extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  const _ActionIcon({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: Colors.white, size: 20),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: const TextStyle(color: Colors.white70, fontSize: 10),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _ColorSwatch extends ConsumerWidget {
   final Color color;
   final String hex;
+  final String name;
 
-  const _ColorSwatch({required this.color, required this.hex});
+  const _ColorSwatch({required this.color, required this.hex, required this.name});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return GestureDetector(
-      onTap: () async {
-        final selected = ref.read(selectedVersesProvider);
-        for (final verse in selected) {
-          await ref.read(highlightActionProvider).applyHighlight(verse, hex);
-        }
-        ref.read(selectedVersesProvider.notifier).clear();
-      },
-      child: Container(
-        width: 24,
-        height: 24,
-        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+    return Tooltip(
+      message: '$name highlight',
+      child: Semantics(
+        button: true,
+        label: '$name highlight',
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: () async {
+            HapticFeedback.selectionClick();
+            final selected = ref.read(selectedVersesProvider);
+            for (final verse in selected) {
+              await ref.read(highlightActionProvider).applyHighlight(verse, hex);
+            }
+            ref.read(selectedVersesProvider.notifier).clear();
+          },
+          // 40x40 hit target around the 24px visual swatch.
+          child: SizedBox(
+            width: 40,
+            height: 40,
+            child: Center(
+              child: Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -240,24 +304,38 @@ class _ClearHighlightSwatch extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
     return Tooltip(
-      message: 'Clear Highlight',
-      child: GestureDetector(
-        onTap: () async {
-          final selected = ref.read(selectedVersesProvider);
-          for (final verse in selected) {
-            await ref.read(highlightActionProvider).clearHighlight(verse);
-          }
-          ref.read(selectedVersesProvider.notifier).clear();
-        },
-        child: Container(
-          width: 24,
-          height: 24,
-          decoration: const BoxDecoration(
-            color: Colors.white24,
-            shape: BoxShape.circle,
+      message: 'Clear highlight',
+      child: Semantics(
+        button: true,
+        label: 'Clear highlight',
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: () async {
+            HapticFeedback.selectionClick();
+            final selected = ref.read(selectedVersesProvider);
+            for (final verse in selected) {
+              await ref.read(highlightActionProvider).clearHighlight(verse);
+            }
+            ref.read(selectedVersesProvider.notifier).clear();
+          },
+          child: SizedBox(
+            width: 40,
+            height: 40,
+            child: Center(
+              child: Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.onInverseSurface.withValues(alpha: 0.24),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.format_color_reset,
+                    size: 14, color: theme.colorScheme.onInverseSurface),
+              ),
+            ),
           ),
-          child: const Icon(Icons.format_color_reset, size: 14, color: Colors.white),
         ),
       ),
     );

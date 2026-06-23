@@ -20,6 +20,7 @@ import 'settings/backup_restore_screen.dart';
 import 'reader/reading_plan_panel.dart';
 
 import 'onboarding/onboarding_screen.dart';
+import 'common/breakpoints.dart';
 import '../app/content_providers.dart';
 import '../app/shared_prefs.dart';
 import '../app/version.dart';
@@ -97,7 +98,7 @@ class _MainShellState extends ConsumerState<MainShell> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        if (constraints.maxWidth > 900) {
+        if (constraints.maxWidth > Breakpoints.compact) {
           return const _DesktopLayout();
         } else {
           return const ReaderScreen();
@@ -113,141 +114,130 @@ class _DesktopLayout extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final activeTool = ref.watch(activeToolProvider);
+    final railSide = ref.watch(navRailSideProvider);
+    final theme = Theme.of(context);
+
+    final mainContent = Expanded(
+      child: Row(
+        children: [
+          const Expanded(flex: 5, child: ReaderScreen()),
+          if (activeTool != ActiveTool.none)
+            const VerticalDivider(width: 1, thickness: 1),
+          if (activeTool != ActiveTool.none)
+            Expanded(
+              flex: 4,
+              child: Builder(
+                builder: (context) {
+                  if (activeTool == ActiveTool.compare) {
+                    return const ComparePanel();
+                  }
+                  if (activeTool == ActiveTool.sermons) {
+                    return const SermonsPanel();
+                  }
+                  if (activeTool == ActiveTool.crossReference) {
+                    return const CrossReferencePanel();
+                  }
+                  if (activeTool == ActiveTool.commentaries) {
+                    return const CommentaryPanel();
+                  }
+                  if (activeTool == ActiveTool.notes) {
+                    return const NotesPanel();
+                  }
+                  if (activeTool == ActiveTool.dictionary) {
+                    return const DictionaryPanel();
+                  }
+                  if (activeTool == ActiveTool.search) {
+                    return const SearchPanel();
+                  }
+                  if (activeTool == ActiveTool.history) {
+                    return const HistoryPanel();
+                  }
+                  if (activeTool == ActiveTool.media) {
+                    final book = ref.watch(selectedBookNameProvider);
+                    final chap = ref.watch(selectedChapterProvider);
+                    return MediaPanel(bookName: book, chapter: chap);
+                  }
+                  if (activeTool == ActiveTool.readingPlans) {
+                    return const ReadingPlanPanel();
+                  }
+                  if (activeTool == ActiveTool.devotionals) {
+                    return const DevotionalsPanel();
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
+            ),
+        ],
+      ),
+    );
+
+    final navRail = NavigationRail(
+      backgroundColor: theme.colorScheme.surfaceContainer,
+      labelType: NavigationRailLabelType.all,
+      selectedIconTheme: IconThemeData(color: theme.colorScheme.onSecondaryContainer),
+      unselectedIconTheme: IconThemeData(color: theme.colorScheme.onSurfaceVariant),
+      selectedLabelTextStyle: theme.textTheme.labelSmall?.copyWith(
+        color: theme.colorScheme.onSurface,
+        fontWeight: FontWeight.w600,
+      ),
+      unselectedLabelTextStyle: theme.textTheme.labelSmall?.copyWith(
+        color: theme.colorScheme.onSurfaceVariant,
+      ),
+      indicatorColor: theme.colorScheme.secondaryContainer,
+      destinations: const [
+        NavigationRailDestination(
+          icon: Icon(Icons.compare_arrows),
+          label: Text('Cross-Ref'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.note),
+          label: Text('Notes'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.search),
+          label: Text('Search'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.import_contacts),
+          label: Text('Dictionary'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.menu_book),
+          label: Text('Commentaries'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.history),
+          label: Text('History'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.video_library),
+          label: Text('Media'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.event_note),
+          label: Text('Plans'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.co_present),
+          label: Text('Sermons'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.calendar_today),
+          label: Text('Devotionals'),
+        ),
+      ],
+      selectedIndex: _getSelectedIndex(activeTool),
+      onDestinationSelected: (index) {
+        final tool = _getToolFromIndex(index);
+        ref.read(activeToolProvider.notifier).setTool(tool);
+      },
+    );
 
     return Scaffold(
       body: Row(
-        children: [
-          // Main Content Area
-          Expanded(
-            child: Row(
-              children: [
-                const Expanded(flex: 5, child: ReaderScreen()),
-                if (activeTool != ActiveTool.none)
-                  const VerticalDivider(width: 1, thickness: 1),
-                if (activeTool != ActiveTool.none)
-                  Expanded(
-                    flex: 4,
-                    child: Builder(
-                      builder: (context) {
-                        if (activeTool == ActiveTool.compare) {
-                          return const ComparePanel();
-                        }
-                        if (activeTool == ActiveTool.sermons) {
-                          return const SermonsPanel();
-                        }
-                        if (activeTool == ActiveTool.crossReference) {
-                          return const CrossReferencePanel();
-                        }
-                        if (activeTool == ActiveTool.commentaries) {
-                          return const CommentaryPanel();
-                        }
-                        if (activeTool == ActiveTool.notes) {
-                          return const NotesPanel();
-                        }
-                        if (activeTool == ActiveTool.dictionary) {
-                          return const DictionaryPanel();
-                        }
-                        if (activeTool == ActiveTool.search) {
-                          return const SearchPanel();
-                        }
-                        if (activeTool == ActiveTool.history) {
-                          return const HistoryPanel();
-                        }
-                        if (activeTool == ActiveTool.media) {
-                          final book = ref.watch(selectedBookNameProvider);
-                          final chap = ref.watch(selectedChapterProvider);
-                          return MediaPanel(bookName: book, chapter: chap);
-                        }
-                        if (activeTool == ActiveTool.readingPlans) {
-                          return const ReadingPlanPanel();
-                        }
-                        if (activeTool == ActiveTool.devotionals) {
-                          return const DevotionalsPanel();
-                        }
-                        return const SizedBox.shrink();
-                      },
-                    ),
-                  ),
-              ],
-            ),
-          ),
-
-          // Far right Navigation Rail
-          NavigationRail(
-            backgroundColor: const Color(0xFF2D2B3B),
-            unselectedIconTheme: const IconThemeData(color: Colors.white54),
-            selectedIconTheme: const IconThemeData(color: Colors.white),
-            indicatorColor: Colors.white24,
-            destinations: const [
-              NavigationRailDestination(
-                icon: Tooltip(
-                  message: 'Cross-References',
-                  child: Icon(Icons.compare_arrows),
-                ),
-                label: Text('Cross-Ref'),
-              ),
-              NavigationRailDestination(
-                icon: Tooltip(message: 'Notes', child: Icon(Icons.note)),
-                label: Text('Notes'),
-              ),
-              NavigationRailDestination(
-                icon: Tooltip(message: 'Search', child: Icon(Icons.search)),
-                label: Text('Search'),
-              ),
-              NavigationRailDestination(
-                icon: Tooltip(
-                  message: 'Dictionary',
-                  child: Icon(Icons.import_contacts),
-                ),
-                label: Text('Dictionary'),
-              ),
-              NavigationRailDestination(
-                icon: Tooltip(
-                  message: 'Commentaries',
-                  child: Icon(Icons.menu_book),
-                ),
-                label: Text('Commentaries'),
-              ),
-              NavigationRailDestination(
-                icon: Tooltip(message: 'History', child: Icon(Icons.history)),
-                label: Text('History'),
-              ),
-              NavigationRailDestination(
-                icon: Tooltip(
-                  message: 'Media',
-                  child: Icon(Icons.video_library),
-                ),
-                label: Text('Media'),
-              ),
-              NavigationRailDestination(
-                icon: Tooltip(
-                  message: 'Reading Plans',
-                  child: Icon(Icons.menu_book),
-                ),
-                label: Text('Plans'),
-              ),
-              NavigationRailDestination(
-                icon: Tooltip(
-                  message: 'Sermons',
-                  child: Icon(Icons.co_present),
-                ),
-                label: Text('Sermons'),
-              ),
-              NavigationRailDestination(
-                icon: Tooltip(
-                  message: 'Devotionals',
-                  child: Icon(Icons.calendar_today),
-                ),
-                label: Text('Devotionals'),
-              ),
-            ],
-            selectedIndex: _getSelectedIndex(activeTool),
-            onDestinationSelected: (index) {
-              final tool = _getToolFromIndex(index);
-              ref.read(activeToolProvider.notifier).setTool(tool);
-            },
-          ),
-        ],
+        children: railSide == NavRailSide.left
+            ? [navRail, mainContent]
+            : [mainContent, navRail],
       ),
     );
   }

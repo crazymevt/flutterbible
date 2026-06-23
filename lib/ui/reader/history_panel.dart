@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/user_providers.dart';
 import '../../app/app_state.dart';
 import '../../app/reader_state.dart';
+import '../common/breakpoints.dart';
 
 class HistoryPanel extends ConsumerWidget {
   const HistoryPanel({super.key});
@@ -94,7 +95,7 @@ class HistoryPanel extends ConsumerWidget {
                         }
 
                         ref.read(activeToolProvider.notifier).close();
-                        if (MediaQuery.sizeOf(context).width <= 900) {
+                        if (MediaQuery.sizeOf(context).width <= Breakpoints.compact) {
                           Navigator.of(context).pop();
                         }
                       },

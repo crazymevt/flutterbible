@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/user_store.dart';
 import '../../app/journal_providers.dart';
 import 'journal_editor_panel.dart';
+import '../common/breakpoints.dart';
 
 class SelectedJournalIdNotifier extends Notifier<String?> {
   @override
@@ -40,7 +41,7 @@ class JournalsListPanel extends ConsumerWidget {
     final journalsAsync = ref.watch(journalsProvider);
     final selectedId = ref.watch(selectedJournalIdProvider);
 
-    final isDesktop = MediaQuery.sizeOf(context).width > 900;
+    final isDesktop = MediaQuery.sizeOf(context).width > Breakpoints.compact;
     final selectedDate = ref.watch(selectedJournalDateProvider);
 
     ref.listen<AsyncValue<List<Journal>>>(journalsProvider, (previous, next) {

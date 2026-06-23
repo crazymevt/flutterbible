@@ -50,6 +50,30 @@ enum AppModule {
   backupRestore,
 }
 
+/// Which side of the desktop layout the study-tools navigation rail sits on.
+enum NavRailSide { left, right }
+
+/// Persisted preference for the navigation rail side. Defaults to [right],
+/// matching the original layout.
+class NavRailSideNotifier extends Notifier<NavRailSide> {
+  @override
+  NavRailSide build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getString('navRailSide') == 'left'
+        ? NavRailSide.left
+        : NavRailSide.right;
+  }
+
+  void set(NavRailSide side) {
+    state = side;
+    ref.read(sharedPreferencesProvider).setString('navRailSide', side.name);
+  }
+}
+
+final navRailSideProvider = NotifierProvider<NavRailSideNotifier, NavRailSide>(
+  () => NavRailSideNotifier(),
+);
+
 class ShowDashboardOnStartNotifier extends Notifier<bool> {
   @override
   bool build() {

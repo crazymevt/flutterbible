@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import '../common/breakpoints.dart';
 
 import '../../app/reading_plan_providers.dart';
 import '../../app/content_providers.dart';
@@ -47,7 +48,7 @@ class ReadingPlanPanel extends ConsumerWidget {
                 IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () {
-                    if (MediaQuery.sizeOf(context).width > 900) {
+                    if (MediaQuery.sizeOf(context).width > Breakpoints.compact) {
                       ref.read(activeToolProvider.notifier).close();
                     } else {
                       Navigator.of(context).pop();

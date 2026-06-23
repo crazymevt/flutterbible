@@ -112,7 +112,7 @@ class MobileToolsDrawer extends ConsumerWidget {
             ListTile(
               leading: const Tooltip(
                 message: 'Reading Plans',
-                child: Icon(Icons.menu_book),
+                child: Icon(Icons.event_note),
               ),
               title: const Text('Reading Plans'),
               onTap: () => _openTool(context, const ReadingPlanPanel()),

@@ -6,6 +6,7 @@ import '../../app/reader_state.dart';
 import '../../data/content_store.dart';
 import 'package:drift/drift.dart' hide Column;
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import '../common/breakpoints.dart';
 
 final currentDevotionalEntryProvider = FutureProvider<DevotionalEntry?>((ref) async {
   final id = ref.watch(selectedDevotionalIdProvider);
@@ -54,7 +55,7 @@ class DevotionalsPanel extends ConsumerWidget {
                 IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () {
-                    if (MediaQuery.sizeOf(context).width > 900) {
+                    if (MediaQuery.sizeOf(context).width > Breakpoints.compact) {
                       ref.read(activeToolProvider.notifier).close();
                     } else {
                       Navigator.of(context).pop();
