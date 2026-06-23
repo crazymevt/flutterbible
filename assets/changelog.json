@@ -1,5 +1,17 @@
 [
   {
+    "version": "26.6.23+2",
+    "date": "2026-06-23",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "make verse action bar usable on phones",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.6.23+1",
     "date": "2026-06-23",
     "features": [
