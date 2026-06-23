@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/reader_state.dart';
 import '../../app/app_state.dart';
 import '../../app/content_providers.dart';
+import '../../app/tts_providers.dart';
 import 'chapter_navigation_footer.dart';
 import 'verse_text_builder.dart';
 import 'dictionary_panel.dart';
@@ -54,6 +55,10 @@ class _VerseListViewState extends ConsumerState<VerseListView> {
   final ItemScrollController itemScrollController = ItemScrollController();
   final ItemPositionsListener itemPositionsListener =
       ItemPositionsListener.create();
+
+  // Last verse we auto-scrolled to during read-aloud, so we scroll once per
+  // verse change rather than on every rebuild.
+  int? _lastSpokenScroll;
 
   @override
   void initState() {
@@ -143,6 +148,29 @@ class _VerseListViewState extends ConsumerState<VerseListView> {
 
   @override
   Widget build(BuildContext context) {
+    final spokenVerse = ref.watch(spokenVerseProvider);
+
+    // Follow read-aloud: scroll the active verse into view as it changes.
+    if (spokenVerse != null && spokenVerse != _lastSpokenScroll) {
+      _lastSpokenScroll = spokenVerse;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final controller =
+            widget.externalScrollController ?? itemScrollController;
+        if (!controller.isAttached) return;
+        final idx = widget.verses.indexWhere((v) => v.verse == spokenVerse);
+        if (idx != -1) {
+          final offset = widget.headerWidget != null ? 1 : 0;
+          controller.scrollTo(
+            index: idx + offset,
+            duration: const Duration(milliseconds: 300),
+            alignment: 0.3,
+          );
+        }
+      });
+    } else if (spokenVerse == null) {
+      _lastSpokenScroll = null;
+    }
+
     return ScrollablePositionedList.builder(
       itemScrollController: widget.externalScrollController ?? itemScrollController,
       itemPositionsListener: widget.externalPositionsListener ?? itemPositionsListener,
@@ -165,11 +193,17 @@ class _VerseListViewState extends ConsumerState<VerseListView> {
             ? Color(int.parse(highlightHex.replaceFirst('#', '0xFF')))
             : null;
 
+        final isSpoken = spokenVerse == verse.verse;
         final bgColor = isSelected
             ? Theme.of(
                 context,
               ).colorScheme.primaryContainer.withValues(alpha: 0.5)
-            : highlightColor?.withValues(alpha: 0.2);
+            : isSpoken
+                ? Theme.of(context)
+                    .colorScheme
+                    .tertiaryContainer
+                    .withValues(alpha: 0.6)
+                : highlightColor?.withValues(alpha: 0.2);
 
         final verseSpacing = ref.watch(appVerseSpacingProvider);
         final verseSubheadings = widget.subheadings[verse.verse] ?? [];
