@@ -119,6 +119,24 @@ class TopicReferences extends Table {
   IntColumn get verseEnd => integer().nullable()(); // null = single verse
 }
 
+@DataClassName('Place')
+class Places extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get name => text()();
+  RealColumn get lat => real()();
+  RealColumn get lng => real()();
+}
+
+@DataClassName('PlaceVerse')
+@TableIndex(name: 'idx_place_verse_location', columns: {#bookName, #chapter})
+class PlaceVerses extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get placeId => integer().references(Places, #id)();
+  TextColumn get bookName => text()();
+  IntColumn get chapter => integer()();
+  IntColumn get verse => integer()();
+}
+
 @DataClassName('Devotional')
 class Devotionals extends Table {
   IntColumn get id => integer().autoIncrement()();

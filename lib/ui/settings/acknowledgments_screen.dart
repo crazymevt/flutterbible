@@ -54,7 +54,7 @@ class AcknowledgmentsScreen extends StatelessWidget {
           ),
           _buildCredit(
             title: 'OpenBible.info',
-            subtitle: 'Crowdsourced cross-reference dataset (CC-BY).',
+            subtitle: 'Crowdsourced cross-reference dataset and place geocoding (CC-BY).',
             url: 'https://www.openbible.info/',
           ),
           _buildCredit(

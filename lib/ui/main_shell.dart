@@ -12,6 +12,7 @@ import 'reader/media_panel.dart';
 import 'reader/compare_panel.dart';
 import 'reader/devotionals_panel.dart';
 import 'reader/topics_panel.dart';
+import 'reader/places_panel.dart';
 import '../ui/sermons/sermons_panel.dart';
 import '../app/reader_state.dart';
 import 'journals/journals_prayers_screen.dart';
@@ -167,6 +168,9 @@ class _DesktopLayout extends ConsumerWidget {
                   if (activeTool == ActiveTool.topics) {
                     return const TopicsPanel();
                   }
+                  if (activeTool == ActiveTool.places) {
+                    return const PlacesPanel();
+                  }
                   return const SizedBox.shrink();
                 },
               ),
@@ -175,7 +179,12 @@ class _DesktopLayout extends ConsumerWidget {
       ),
     );
 
-    final navRail = NavigationRail(
+    final navRail = LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: constraints.maxHeight),
+          child: IntrinsicHeight(
+            child: NavigationRail(
       backgroundColor: theme.colorScheme.surfaceContainer,
       labelType: NavigationRailLabelType.all,
       selectedIconTheme: IconThemeData(color: theme.colorScheme.onSecondaryContainer),
@@ -233,12 +242,20 @@ class _DesktopLayout extends ConsumerWidget {
           icon: Icon(Icons.topic),
           label: Text('Topics'),
         ),
+        NavigationRailDestination(
+          icon: Icon(Icons.map),
+          label: Text('Places'),
+        ),
       ],
       selectedIndex: _getSelectedIndex(activeTool),
       onDestinationSelected: (index) {
         final tool = _getToolFromIndex(index);
         ref.read(activeToolProvider.notifier).setTool(tool);
       },
+            ),
+          ),
+        ),
+      ),
     );
 
     return Scaffold(
@@ -274,6 +291,8 @@ class _DesktopLayout extends ConsumerWidget {
         return 9;
       case ActiveTool.topics:
         return 10;
+      case ActiveTool.places:
+        return 11;
       case ActiveTool.none:
       case ActiveTool.compare:
         return null;
@@ -304,6 +323,8 @@ class _DesktopLayout extends ConsumerWidget {
         return ActiveTool.devotionals;
       case 10:
         return ActiveTool.topics;
+      case 11:
+        return ActiveTool.places;
       default:
         return ActiveTool.none;
     }
