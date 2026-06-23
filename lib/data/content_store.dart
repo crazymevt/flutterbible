@@ -25,13 +25,15 @@ part 'content_store.g.dart';
     Topics,
     TopicEntries,
     TopicReferences,
+    Places,
+    PlaceVerses,
   ],
 )
 class ContentStore extends _$ContentStore {
   ContentStore([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 10;
 
   @override
   MigrationStrategy get migration {
@@ -99,6 +101,11 @@ class ContentStore extends _$ContentStore {
           await m.createTable(topicEntries);
           await m.createTable(topicReferences);
           await m.createIndex(idxTopicRefLocation);
+        }
+        if (from < 10) {
+          await m.createTable(places);
+          await m.createTable(placeVerses);
+          await m.createIndex(idxPlaceVerseLocation);
         }
       },
     );

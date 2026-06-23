@@ -5155,6 +5155,641 @@ class TopicReferencesCompanion extends UpdateCompanion<TopicReference> {
   }
 }
 
+class $PlacesTable extends Places with TableInfo<$PlacesTable, Place> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PlacesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _latMeta = const VerificationMeta('lat');
+  @override
+  late final GeneratedColumn<double> lat = GeneratedColumn<double>(
+    'lat',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _lngMeta = const VerificationMeta('lng');
+  @override
+  late final GeneratedColumn<double> lng = GeneratedColumn<double>(
+    'lng',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, name, lat, lng];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'places';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Place> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('lat')) {
+      context.handle(
+        _latMeta,
+        lat.isAcceptableOrUnknown(data['lat']!, _latMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_latMeta);
+    }
+    if (data.containsKey('lng')) {
+      context.handle(
+        _lngMeta,
+        lng.isAcceptableOrUnknown(data['lng']!, _lngMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_lngMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Place map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Place(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      lat: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}lat'],
+      )!,
+      lng: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}lng'],
+      )!,
+    );
+  }
+
+  @override
+  $PlacesTable createAlias(String alias) {
+    return $PlacesTable(attachedDatabase, alias);
+  }
+}
+
+class Place extends DataClass implements Insertable<Place> {
+  final int id;
+  final String name;
+  final double lat;
+  final double lng;
+  const Place({
+    required this.id,
+    required this.name,
+    required this.lat,
+    required this.lng,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    map['lat'] = Variable<double>(lat);
+    map['lng'] = Variable<double>(lng);
+    return map;
+  }
+
+  PlacesCompanion toCompanion(bool nullToAbsent) {
+    return PlacesCompanion(
+      id: Value(id),
+      name: Value(name),
+      lat: Value(lat),
+      lng: Value(lng),
+    );
+  }
+
+  factory Place.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Place(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      lat: serializer.fromJson<double>(json['lat']),
+      lng: serializer.fromJson<double>(json['lng']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'lat': serializer.toJson<double>(lat),
+      'lng': serializer.toJson<double>(lng),
+    };
+  }
+
+  Place copyWith({int? id, String? name, double? lat, double? lng}) => Place(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    lat: lat ?? this.lat,
+    lng: lng ?? this.lng,
+  );
+  Place copyWithCompanion(PlacesCompanion data) {
+    return Place(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      lat: data.lat.present ? data.lat.value : this.lat,
+      lng: data.lng.present ? data.lng.value : this.lng,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Place(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('lat: $lat, ')
+          ..write('lng: $lng')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name, lat, lng);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Place &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.lat == this.lat &&
+          other.lng == this.lng);
+}
+
+class PlacesCompanion extends UpdateCompanion<Place> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<double> lat;
+  final Value<double> lng;
+  const PlacesCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.lat = const Value.absent(),
+    this.lng = const Value.absent(),
+  });
+  PlacesCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    required double lat,
+    required double lng,
+  }) : name = Value(name),
+       lat = Value(lat),
+       lng = Value(lng);
+  static Insertable<Place> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<double>? lat,
+    Expression<double>? lng,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (lat != null) 'lat': lat,
+      if (lng != null) 'lng': lng,
+    });
+  }
+
+  PlacesCompanion copyWith({
+    Value<int>? id,
+    Value<String>? name,
+    Value<double>? lat,
+    Value<double>? lng,
+  }) {
+    return PlacesCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      lat: lat ?? this.lat,
+      lng: lng ?? this.lng,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (lat.present) {
+      map['lat'] = Variable<double>(lat.value);
+    }
+    if (lng.present) {
+      map['lng'] = Variable<double>(lng.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PlacesCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('lat: $lat, ')
+          ..write('lng: $lng')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PlaceVersesTable extends PlaceVerses
+    with TableInfo<$PlaceVersesTable, PlaceVerse> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PlaceVersesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _placeIdMeta = const VerificationMeta(
+    'placeId',
+  );
+  @override
+  late final GeneratedColumn<int> placeId = GeneratedColumn<int>(
+    'place_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES places (id)',
+    ),
+  );
+  static const VerificationMeta _bookNameMeta = const VerificationMeta(
+    'bookName',
+  );
+  @override
+  late final GeneratedColumn<String> bookName = GeneratedColumn<String>(
+    'book_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _chapterMeta = const VerificationMeta(
+    'chapter',
+  );
+  @override
+  late final GeneratedColumn<int> chapter = GeneratedColumn<int>(
+    'chapter',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _verseMeta = const VerificationMeta('verse');
+  @override
+  late final GeneratedColumn<int> verse = GeneratedColumn<int>(
+    'verse',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, placeId, bookName, chapter, verse];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'place_verses';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PlaceVerse> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('place_id')) {
+      context.handle(
+        _placeIdMeta,
+        placeId.isAcceptableOrUnknown(data['place_id']!, _placeIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_placeIdMeta);
+    }
+    if (data.containsKey('book_name')) {
+      context.handle(
+        _bookNameMeta,
+        bookName.isAcceptableOrUnknown(data['book_name']!, _bookNameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_bookNameMeta);
+    }
+    if (data.containsKey('chapter')) {
+      context.handle(
+        _chapterMeta,
+        chapter.isAcceptableOrUnknown(data['chapter']!, _chapterMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_chapterMeta);
+    }
+    if (data.containsKey('verse')) {
+      context.handle(
+        _verseMeta,
+        verse.isAcceptableOrUnknown(data['verse']!, _verseMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_verseMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PlaceVerse map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PlaceVerse(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      placeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}place_id'],
+      )!,
+      bookName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}book_name'],
+      )!,
+      chapter: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}chapter'],
+      )!,
+      verse: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}verse'],
+      )!,
+    );
+  }
+
+  @override
+  $PlaceVersesTable createAlias(String alias) {
+    return $PlaceVersesTable(attachedDatabase, alias);
+  }
+}
+
+class PlaceVerse extends DataClass implements Insertable<PlaceVerse> {
+  final int id;
+  final int placeId;
+  final String bookName;
+  final int chapter;
+  final int verse;
+  const PlaceVerse({
+    required this.id,
+    required this.placeId,
+    required this.bookName,
+    required this.chapter,
+    required this.verse,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['place_id'] = Variable<int>(placeId);
+    map['book_name'] = Variable<String>(bookName);
+    map['chapter'] = Variable<int>(chapter);
+    map['verse'] = Variable<int>(verse);
+    return map;
+  }
+
+  PlaceVersesCompanion toCompanion(bool nullToAbsent) {
+    return PlaceVersesCompanion(
+      id: Value(id),
+      placeId: Value(placeId),
+      bookName: Value(bookName),
+      chapter: Value(chapter),
+      verse: Value(verse),
+    );
+  }
+
+  factory PlaceVerse.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PlaceVerse(
+      id: serializer.fromJson<int>(json['id']),
+      placeId: serializer.fromJson<int>(json['placeId']),
+      bookName: serializer.fromJson<String>(json['bookName']),
+      chapter: serializer.fromJson<int>(json['chapter']),
+      verse: serializer.fromJson<int>(json['verse']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'placeId': serializer.toJson<int>(placeId),
+      'bookName': serializer.toJson<String>(bookName),
+      'chapter': serializer.toJson<int>(chapter),
+      'verse': serializer.toJson<int>(verse),
+    };
+  }
+
+  PlaceVerse copyWith({
+    int? id,
+    int? placeId,
+    String? bookName,
+    int? chapter,
+    int? verse,
+  }) => PlaceVerse(
+    id: id ?? this.id,
+    placeId: placeId ?? this.placeId,
+    bookName: bookName ?? this.bookName,
+    chapter: chapter ?? this.chapter,
+    verse: verse ?? this.verse,
+  );
+  PlaceVerse copyWithCompanion(PlaceVersesCompanion data) {
+    return PlaceVerse(
+      id: data.id.present ? data.id.value : this.id,
+      placeId: data.placeId.present ? data.placeId.value : this.placeId,
+      bookName: data.bookName.present ? data.bookName.value : this.bookName,
+      chapter: data.chapter.present ? data.chapter.value : this.chapter,
+      verse: data.verse.present ? data.verse.value : this.verse,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PlaceVerse(')
+          ..write('id: $id, ')
+          ..write('placeId: $placeId, ')
+          ..write('bookName: $bookName, ')
+          ..write('chapter: $chapter, ')
+          ..write('verse: $verse')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, placeId, bookName, chapter, verse);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PlaceVerse &&
+          other.id == this.id &&
+          other.placeId == this.placeId &&
+          other.bookName == this.bookName &&
+          other.chapter == this.chapter &&
+          other.verse == this.verse);
+}
+
+class PlaceVersesCompanion extends UpdateCompanion<PlaceVerse> {
+  final Value<int> id;
+  final Value<int> placeId;
+  final Value<String> bookName;
+  final Value<int> chapter;
+  final Value<int> verse;
+  const PlaceVersesCompanion({
+    this.id = const Value.absent(),
+    this.placeId = const Value.absent(),
+    this.bookName = const Value.absent(),
+    this.chapter = const Value.absent(),
+    this.verse = const Value.absent(),
+  });
+  PlaceVersesCompanion.insert({
+    this.id = const Value.absent(),
+    required int placeId,
+    required String bookName,
+    required int chapter,
+    required int verse,
+  }) : placeId = Value(placeId),
+       bookName = Value(bookName),
+       chapter = Value(chapter),
+       verse = Value(verse);
+  static Insertable<PlaceVerse> custom({
+    Expression<int>? id,
+    Expression<int>? placeId,
+    Expression<String>? bookName,
+    Expression<int>? chapter,
+    Expression<int>? verse,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (placeId != null) 'place_id': placeId,
+      if (bookName != null) 'book_name': bookName,
+      if (chapter != null) 'chapter': chapter,
+      if (verse != null) 'verse': verse,
+    });
+  }
+
+  PlaceVersesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? placeId,
+    Value<String>? bookName,
+    Value<int>? chapter,
+    Value<int>? verse,
+  }) {
+    return PlaceVersesCompanion(
+      id: id ?? this.id,
+      placeId: placeId ?? this.placeId,
+      bookName: bookName ?? this.bookName,
+      chapter: chapter ?? this.chapter,
+      verse: verse ?? this.verse,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (placeId.present) {
+      map['place_id'] = Variable<int>(placeId.value);
+    }
+    if (bookName.present) {
+      map['book_name'] = Variable<String>(bookName.value);
+    }
+    if (chapter.present) {
+      map['chapter'] = Variable<int>(chapter.value);
+    }
+    if (verse.present) {
+      map['verse'] = Variable<int>(verse.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PlaceVersesCompanion(')
+          ..write('id: $id, ')
+          ..write('placeId: $placeId, ')
+          ..write('bookName: $bookName, ')
+          ..write('chapter: $chapter, ')
+          ..write('verse: $verse')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$ContentStore extends GeneratedDatabase {
   _$ContentStore(QueryExecutor e) : super(e);
   $ContentStoreManager get managers => $ContentStoreManager(this);
@@ -5179,9 +5814,15 @@ abstract class _$ContentStore extends GeneratedDatabase {
   late final $TopicReferencesTable topicReferences = $TopicReferencesTable(
     this,
   );
+  late final $PlacesTable places = $PlacesTable(this);
+  late final $PlaceVersesTable placeVerses = $PlaceVersesTable(this);
   late final Index idxTopicRefLocation = Index(
     'idx_topic_ref_location',
     'CREATE INDEX idx_topic_ref_location ON topic_references (book_name, chapter)',
+  );
+  late final Index idxPlaceVerseLocation = Index(
+    'idx_place_verse_location',
+    'CREATE INDEX idx_place_verse_location ON place_verses (book_name, chapter)',
   );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
@@ -5202,7 +5843,10 @@ abstract class _$ContentStore extends GeneratedDatabase {
     topics,
     topicEntries,
     topicReferences,
+    places,
+    placeVerses,
     idxTopicRefLocation,
+    idxPlaceVerseLocation,
   ];
 }
 
@@ -9999,6 +10643,581 @@ typedef $$TopicReferencesTableProcessedTableManager =
       TopicReference,
       PrefetchHooks Function({bool topicId, bool entryId})
     >;
+typedef $$PlacesTableCreateCompanionBuilder =
+    PlacesCompanion Function({
+      Value<int> id,
+      required String name,
+      required double lat,
+      required double lng,
+    });
+typedef $$PlacesTableUpdateCompanionBuilder =
+    PlacesCompanion Function({
+      Value<int> id,
+      Value<String> name,
+      Value<double> lat,
+      Value<double> lng,
+    });
+
+final class $$PlacesTableReferences
+    extends BaseReferences<_$ContentStore, $PlacesTable, Place> {
+  $$PlacesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$PlaceVersesTable, List<PlaceVerse>>
+  _placeVersesRefsTable(_$ContentStore db) => MultiTypedResultKey.fromTable(
+    db.placeVerses,
+    aliasName: 'places__id__place_verses__place_id',
+  );
+
+  $$PlaceVersesTableProcessedTableManager get placeVersesRefs {
+    final manager = $$PlaceVersesTableTableManager(
+      $_db,
+      $_db.placeVerses,
+    ).filter((f) => f.placeId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_placeVersesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$PlacesTableFilterComposer
+    extends Composer<_$ContentStore, $PlacesTable> {
+  $$PlacesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get lat => $composableBuilder(
+    column: $table.lat,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get lng => $composableBuilder(
+    column: $table.lng,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> placeVersesRefs(
+    Expression<bool> Function($$PlaceVersesTableFilterComposer f) f,
+  ) {
+    final $$PlaceVersesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.placeVerses,
+      getReferencedColumn: (t) => t.placeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlaceVersesTableFilterComposer(
+            $db: $db,
+            $table: $db.placeVerses,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$PlacesTableOrderingComposer
+    extends Composer<_$ContentStore, $PlacesTable> {
+  $$PlacesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get lat => $composableBuilder(
+    column: $table.lat,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get lng => $composableBuilder(
+    column: $table.lng,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PlacesTableAnnotationComposer
+    extends Composer<_$ContentStore, $PlacesTable> {
+  $$PlacesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<double> get lat =>
+      $composableBuilder(column: $table.lat, builder: (column) => column);
+
+  GeneratedColumn<double> get lng =>
+      $composableBuilder(column: $table.lng, builder: (column) => column);
+
+  Expression<T> placeVersesRefs<T extends Object>(
+    Expression<T> Function($$PlaceVersesTableAnnotationComposer a) f,
+  ) {
+    final $$PlaceVersesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.placeVerses,
+      getReferencedColumn: (t) => t.placeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlaceVersesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.placeVerses,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$PlacesTableTableManager
+    extends
+        RootTableManager<
+          _$ContentStore,
+          $PlacesTable,
+          Place,
+          $$PlacesTableFilterComposer,
+          $$PlacesTableOrderingComposer,
+          $$PlacesTableAnnotationComposer,
+          $$PlacesTableCreateCompanionBuilder,
+          $$PlacesTableUpdateCompanionBuilder,
+          (Place, $$PlacesTableReferences),
+          Place,
+          PrefetchHooks Function({bool placeVersesRefs})
+        > {
+  $$PlacesTableTableManager(_$ContentStore db, $PlacesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PlacesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PlacesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PlacesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<double> lat = const Value.absent(),
+                Value<double> lng = const Value.absent(),
+              }) => PlacesCompanion(id: id, name: name, lat: lat, lng: lng),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String name,
+                required double lat,
+                required double lng,
+              }) => PlacesCompanion.insert(
+                id: id,
+                name: name,
+                lat: lat,
+                lng: lng,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) =>
+                    (e.readTable(table), $$PlacesTableReferences(db, table, e)),
+              )
+              .toList(),
+          prefetchHooksCallback: ({placeVersesRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [if (placeVersesRefs) db.placeVerses],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (placeVersesRefs)
+                    await $_getPrefetchedData<Place, $PlacesTable, PlaceVerse>(
+                      currentTable: table,
+                      referencedTable: $$PlacesTableReferences
+                          ._placeVersesRefsTable(db),
+                      managerFromTypedResult: (p0) => $$PlacesTableReferences(
+                        db,
+                        table,
+                        p0,
+                      ).placeVersesRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where((e) => e.placeId == item.id),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$PlacesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ContentStore,
+      $PlacesTable,
+      Place,
+      $$PlacesTableFilterComposer,
+      $$PlacesTableOrderingComposer,
+      $$PlacesTableAnnotationComposer,
+      $$PlacesTableCreateCompanionBuilder,
+      $$PlacesTableUpdateCompanionBuilder,
+      (Place, $$PlacesTableReferences),
+      Place,
+      PrefetchHooks Function({bool placeVersesRefs})
+    >;
+typedef $$PlaceVersesTableCreateCompanionBuilder =
+    PlaceVersesCompanion Function({
+      Value<int> id,
+      required int placeId,
+      required String bookName,
+      required int chapter,
+      required int verse,
+    });
+typedef $$PlaceVersesTableUpdateCompanionBuilder =
+    PlaceVersesCompanion Function({
+      Value<int> id,
+      Value<int> placeId,
+      Value<String> bookName,
+      Value<int> chapter,
+      Value<int> verse,
+    });
+
+final class $$PlaceVersesTableReferences
+    extends BaseReferences<_$ContentStore, $PlaceVersesTable, PlaceVerse> {
+  $$PlaceVersesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $PlacesTable _placeIdTable(_$ContentStore db) =>
+      db.places.createAlias('place_verses__place_id__places__id');
+
+  $$PlacesTableProcessedTableManager get placeId {
+    final $_column = $_itemColumn<int>('place_id')!;
+
+    final manager = $$PlacesTableTableManager(
+      $_db,
+      $_db.places,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_placeIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$PlaceVersesTableFilterComposer
+    extends Composer<_$ContentStore, $PlaceVersesTable> {
+  $$PlaceVersesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bookName => $composableBuilder(
+    column: $table.bookName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get chapter => $composableBuilder(
+    column: $table.chapter,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get verse => $composableBuilder(
+    column: $table.verse,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$PlacesTableFilterComposer get placeId {
+    final $$PlacesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.placeId,
+      referencedTable: $db.places,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlacesTableFilterComposer(
+            $db: $db,
+            $table: $db.places,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PlaceVersesTableOrderingComposer
+    extends Composer<_$ContentStore, $PlaceVersesTable> {
+  $$PlaceVersesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bookName => $composableBuilder(
+    column: $table.bookName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get chapter => $composableBuilder(
+    column: $table.chapter,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get verse => $composableBuilder(
+    column: $table.verse,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$PlacesTableOrderingComposer get placeId {
+    final $$PlacesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.placeId,
+      referencedTable: $db.places,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlacesTableOrderingComposer(
+            $db: $db,
+            $table: $db.places,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PlaceVersesTableAnnotationComposer
+    extends Composer<_$ContentStore, $PlaceVersesTable> {
+  $$PlaceVersesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get bookName =>
+      $composableBuilder(column: $table.bookName, builder: (column) => column);
+
+  GeneratedColumn<int> get chapter =>
+      $composableBuilder(column: $table.chapter, builder: (column) => column);
+
+  GeneratedColumn<int> get verse =>
+      $composableBuilder(column: $table.verse, builder: (column) => column);
+
+  $$PlacesTableAnnotationComposer get placeId {
+    final $$PlacesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.placeId,
+      referencedTable: $db.places,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlacesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.places,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PlaceVersesTableTableManager
+    extends
+        RootTableManager<
+          _$ContentStore,
+          $PlaceVersesTable,
+          PlaceVerse,
+          $$PlaceVersesTableFilterComposer,
+          $$PlaceVersesTableOrderingComposer,
+          $$PlaceVersesTableAnnotationComposer,
+          $$PlaceVersesTableCreateCompanionBuilder,
+          $$PlaceVersesTableUpdateCompanionBuilder,
+          (PlaceVerse, $$PlaceVersesTableReferences),
+          PlaceVerse,
+          PrefetchHooks Function({bool placeId})
+        > {
+  $$PlaceVersesTableTableManager(_$ContentStore db, $PlaceVersesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PlaceVersesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PlaceVersesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PlaceVersesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> placeId = const Value.absent(),
+                Value<String> bookName = const Value.absent(),
+                Value<int> chapter = const Value.absent(),
+                Value<int> verse = const Value.absent(),
+              }) => PlaceVersesCompanion(
+                id: id,
+                placeId: placeId,
+                bookName: bookName,
+                chapter: chapter,
+                verse: verse,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int placeId,
+                required String bookName,
+                required int chapter,
+                required int verse,
+              }) => PlaceVersesCompanion.insert(
+                id: id,
+                placeId: placeId,
+                bookName: bookName,
+                chapter: chapter,
+                verse: verse,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$PlaceVersesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({placeId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (placeId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.placeId,
+                                referencedTable: $$PlaceVersesTableReferences
+                                    ._placeIdTable(db),
+                                referencedColumn: $$PlaceVersesTableReferences
+                                    ._placeIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$PlaceVersesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ContentStore,
+      $PlaceVersesTable,
+      PlaceVerse,
+      $$PlaceVersesTableFilterComposer,
+      $$PlaceVersesTableOrderingComposer,
+      $$PlaceVersesTableAnnotationComposer,
+      $$PlaceVersesTableCreateCompanionBuilder,
+      $$PlaceVersesTableUpdateCompanionBuilder,
+      (PlaceVerse, $$PlaceVersesTableReferences),
+      PlaceVerse,
+      PrefetchHooks Function({bool placeId})
+    >;
 
 class $ContentStoreManager {
   final _$ContentStore _db;
@@ -10031,4 +11250,8 @@ class $ContentStoreManager {
       $$TopicEntriesTableTableManager(_db, _db.topicEntries);
   $$TopicReferencesTableTableManager get topicReferences =>
       $$TopicReferencesTableTableManager(_db, _db.topicReferences);
+  $$PlacesTableTableManager get places =>
+      $$PlacesTableTableManager(_db, _db.places);
+  $$PlaceVersesTableTableManager get placeVerses =>
+      $$PlaceVersesTableTableManager(_db, _db.placeVerses);
 }
