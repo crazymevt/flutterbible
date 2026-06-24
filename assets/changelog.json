@@ -1,5 +1,89 @@
 [
   {
+    "version": "26.6.24+1",
+    "date": "2026-06-24",
+    "features": [
+      {
+        "category": "New Features",
+        "title": "book-scoped search + dismissible scope chip",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "ot:/nt: testament-scoped verse search",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "strip verse markup in rebuildSearchIndex too",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "restrict verse search to the active translation",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "import milestone-form OSIS verses",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "index cleaned verse text for MyBible search",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "track multi-pass Bible reading so re-reads count",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "drop no-op ternary in note search title",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "checkpoint WAL before backup so recent writes are captured",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "start read-aloud from the selected verse",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "exact-match dictionary lookup for tapped words",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Updates",
+        "title": "own verse recognizers per row in the lazy reader views",
+        "description": "",
+        "icon": "update"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "dispose per-word tap recognizers in the reader",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.6.23+6",
     "date": "2026-06-23",
     "features": [
