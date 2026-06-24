@@ -49,9 +49,44 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
     super.dispose();
   }
 
+  /// Removes the active search scope and re-runs the query against everything,
+  /// syncing the text field to the now-unscoped terms.
+  void _clearScope(String bareTerms) {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _controller.text = bareTerms;
+    _controller.selection = TextSelection.collapsed(offset: bareTerms.length);
+    ref.read(globalSearchQueryProvider.notifier).setQuery(bareTerms);
+  }
+
+  /// A dismissible chip showing the active scope (a testament or a book). The
+  /// delete (✕) clears the scope and searches the whole library.
+  Widget _buildScopeChip(BuildContext context, SearchScope scope) {
+    final theme = Theme.of(context);
+    return Container(
+      width: double.infinity,
+      color: theme.colorScheme.surfaceContainerHighest,
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: InputChip(
+          avatar: Icon(
+            Icons.filter_alt,
+            size: 18,
+            color: theme.colorScheme.primary,
+          ),
+          label: Text('In ${scope.label}'),
+          onDeleted: () => _clearScope(scope.bareTerms),
+          deleteIcon: const Icon(Icons.close, size: 18),
+          tooltip: 'Search the whole library instead',
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final resultsAsync = ref.watch(globalSearchResultsProvider);
+    final scope = resultsAsync.asData?.value.scope;
 
     return Material(
       color: Theme.of(context).colorScheme.surface,
@@ -126,11 +161,13 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
               ],
             ),
           ),
+          if (scope != null) _buildScopeChip(context, scope),
           Expanded(
             child: TabBarView(
               children: [
                 resultsAsync.when(
-              data: (results) {
+              data: (output) {
+                final results = output.results;
                 if (results.isEmpty && _controller.text.isNotEmpty) {
                   return const Center(child: Text('No results found.'));
                 } else if (results.isEmpty) {

@@ -33,6 +33,23 @@ class SearchResult {
   });
 }
 
+/// An active search scope (from an `ot:`/`nt:` or `BookName:` prefix), shown as
+/// a dismissible chip. [bareTerms] is the query with the scope removed, used by
+/// the chip's "search everywhere" action.
+class SearchScope {
+  final String label;
+  final String bareTerms;
+  const SearchScope({required this.label, required this.bareTerms});
+}
+
+/// Result of a global search: the [results] plus the [scope] that was applied
+/// (null when the query had no scope prefix).
+class GlobalSearchResults {
+  final List<SearchResult> results;
+  final SearchScope? scope;
+  const GlobalSearchResults(this.results, {this.scope});
+}
+
 class SearchQueryNotifier extends Notifier<String> {
   @override
   String build() => '';
@@ -80,35 +97,75 @@ final autocompleteWordsProvider = FutureProvider<List<String>>((ref) async {
   }
 });
 
-final globalSearchResultsProvider = FutureProvider<List<SearchResult>>((
+final globalSearchResultsProvider = FutureProvider<GlobalSearchResults>((
   ref,
 ) async {
   final contentStore = ref.watch(contentStoreProvider);
   final userStore = ref.watch(userStoreProvider);
   final query = ref.watch(globalSearchQueryProvider);
 
-  if (query.trim().isEmpty) return [];
+  if (query.trim().isEmpty) return const GlobalSearchResults([]);
 
-  // An optional `ot:` / `nt:` prefix scopes the search to a single testament
-  // (verses only). Strip it off and search the remaining terms.
-  final scope = parseTestamentScope(query);
-  if (scope.terms.isEmpty) return [];
+  final activeVersions = ref.watch(activeVersionsProvider);
+
+  // --- Determine the search scope ---
+  // A query may be scoped to a testament (`ot:`/`nt:`) or to a single book
+  // (`BookName: terms`). Both restrict to verses and suppress the reference
+  // shortcut and the user-content/tag sections. A scope with no terms after it
+  // is meaningless, so it falls through to a plain search (e.g. a bare
+  // `Daniel:` just searches for the word).
+  String? testament;
+  String? bookName; // canonical book name for a book scope
+  SearchScope? scope;
+  String terms = query.trim();
+
+  final ts = parseTestamentScope(query);
+  if (ts.testament != null && ts.terms.isNotEmpty) {
+    testament = ts.testament;
+    terms = ts.terms;
+    scope = SearchScope(
+      label: testament == 'OT' ? 'Old Testament' : 'New Testament',
+      bareTerms: terms,
+    );
+  } else if (activeVersions.isNotEmpty) {
+    // Book scope: split on the first colon. The left side must resolve to a
+    // bare book — reference forms like "John 3:16" leave a chapter number on
+    // the left, don't resolve, and so fall through to the nav shortcut below.
+    final colon = query.indexOf(':');
+    if (colon > 0) {
+      final left = query.substring(0, colon).trim();
+      final right = query.substring(colon + 1).trim();
+      if (right.isNotEmpty) {
+        final books = await ref.watch(
+          booksForVersionProvider(activeVersions.first).future,
+        );
+        final book = ReferenceParser.findBook(left.toLowerCase(), books);
+        if (book != null) {
+          bookName = book.name;
+          terms = right;
+          scope = SearchScope(label: book.name, bareTerms: terms);
+        }
+      }
+    }
+  }
+
+  final scoped = testament != null || bookName != null;
+  if (terms.isEmpty) return const GlobalSearchResults([]);
 
   // Sanitize the query for FTS5 to prevent syntax errors with punctuation
-  final cleanQuery = scope.terms.replaceAll('"', '""');
+  final cleanQuery = terms.replaceAll('"', '""');
   final searchPattern = '"$cleanQuery"*'; // Match prefix as phrase
 
   final List<SearchResult> results = [];
 
-  // Check if query is a reference for quick navigation. A testament-scoped
-  // search is a word search, so skip the reference shortcut there.
-  final activeVersions = ref.watch(activeVersionsProvider);
-  if (scope.testament == null && activeVersions.isNotEmpty) {
+  // Check if query is a reference for quick navigation. A scoped search is a
+  // word search, so skip the reference shortcut there.
+  if (!scoped && activeVersions.isNotEmpty) {
     try {
       final books = await ref.watch(
         booksForVersionProvider(activeVersions.first).future,
       );
-      final parsed = ReferenceParser.parse(scope.terms, books);
+      final parsed = ReferenceParser.parse(terms, books);
       if (parsed != null) {
         String titleStr = parsed.book.name;
         if (parsed.chapter > 0) titleStr += ' ${parsed.chapter}';
@@ -146,10 +203,15 @@ final globalSearchResultsProvider = FutureProvider<List<SearchResult>>((
     verseFilters.write("\n    AND (f.type != 'verse' OR b.version_id = ?)");
     verseFilterVars.add(Variable.withString(primaryVersion));
   }
-  if (scope.testament != null) {
+  if (testament != null) {
     // Testament scope: restrict to verses in the requested testament.
     verseFilters.write("\n    AND f.type = 'verse' AND b.testament = ?");
-    verseFilterVars.add(Variable.withString(scope.testament!));
+    verseFilterVars.add(Variable.withString(testament));
+  }
+  if (bookName != null) {
+    // Book scope: restrict to verses in the requested book.
+    verseFilters.write("\n    AND f.type = 'verse' AND b.name = ?");
+    verseFilterVars.add(Variable.withString(bookName));
   }
 
   final contentQuery =
@@ -257,7 +319,7 @@ final globalSearchResultsProvider = FutureProvider<List<SearchResult>>((
 
   // User content (notes/sermons/journals/prayers) and tags aren't scripture,
   // so a testament-scoped search skips both sections.
-  if (scope.testament == null) {
+  if (!scoped) {
     // 2. Query User Database
     final userQuery = '''
     SELECT 
@@ -545,7 +607,7 @@ final globalSearchResultsProvider = FutureProvider<List<SearchResult>>((
     return (a.verse ?? 0).compareTo(b.verse ?? 0);
   });
 
-  return [...uniqueVerses, ...others];
+  return GlobalSearchResults([...uniqueVerses, ...others], scope: scope);
 });
 
 /// Nave's topic names are stored upper-cased; display them in title case.
