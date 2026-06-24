@@ -38,6 +38,10 @@ Running list of known issues and follow-ups.
     (`scripts/update_version.dart`); the dialog lives near the app's
     "What's New" / version display.
 
+- [ ] **Auto check for updates.** Automatically check for updates and display
+  a message indicating that a new version is available, along with a link to the
+  latest releases page.
+
 ## Research
 
 - [ ] **Investigate importing SWORD modules.** SWORD is the CrossWire module
