@@ -105,9 +105,39 @@ Running list of known issues and follow-ups.
     in the macOS app. Phase-1 caveat fixed along the way: SWORD reserves two
     leading index slots (module + testament heading), so book offsets start at
     2 — an off-by-one that shifted every verse.
-  - **Remaining (phases 2–3):** `RawText` (uncompressed), BZIP2/LZSS/XZ
-    compression, GBF/ThML source filters, non-KJV versifications (Synodal,
-    LXX, …), commentaries (`zCom`), dictionaries (`zLD`).
+  - **Roadmap for the remaining phases** (planned order: 2 → 4 → 3 → 5):
+    - **Phase 2 — broaden format coverage** (cheap, high payoff; unlocks much
+      more of the catalog): `RawText`/`RawText4` (uncompressed; flat `ot` +
+      `ot.vss` index, no block layer — new reader); **BZIP2** (tiny add —
+      `package:archive` already has `BZip2Decoder`); `GBF` and `ThML` per-verse
+      source filters alongside `parseOsisFragment` (ThML can lean on
+      `package:html`). LZSS (~100-line port) and XZ stay rejected with a clear
+      message until needed.
+    - **Phase 4 — CrossWire download manager** (decided: build it,
+      license-aware). New "CrossWire Catalog" tab beside ph4.org/OSIS: fetch
+      [`masterRepoList.conf`](https://crosswire.org/ftpmirror/pub/sword/masterRepoList.conf)
+      → repos; fetch each repo's `mods.d.tar.gz` → parse confs into a catalog
+      (Description + license); download `packages/rawzip/<NAME>.zip` → existing
+      SWORD importer. **Gate the list** to supported + freely-distributable +
+      **unlocked** modules (skip any conf with a `CipherKey`); grey out the
+      rest with the reason. Keep the manual `.zip` import as the fallback.
+      - **Legality (researched 2026-06-24):** permissible and the intended use
+        — CrossWire publishes only modules it may distribute in the public
+        `…/sword/raw` repo, and SWORD frontends (And Bible, Xiphos, PocketSword)
+        consume these repos. Conditions: fetch only from the official repos
+        (don't re-host/mirror); skip `CipherKey`-locked modules; **preserve and
+        display** each module's `DistributionLicense`/`Copyright`/
+        `ShortCopyright` (store in `versions.about`); be a good network citizen
+        (HTTPS, real User-Agent, cache the index). Not legal advice.
+    - **Phase 3 — more versifications** (data-heavy, mechanical): Synodal,
+      German, Vulgate, LXX, NRSV(A), Catholic/Catholic2, … Same
+      `SwordVersification` shape, validated against aggregate totals as KJV was.
+      Needed for most non-English and Catholic modules.
+    - **Phase 5 — other content types:** commentaries (`zCom`/`RawCom` →
+      `Commentaries`/`CommentaryEntries`; same `zVerse` index math — reuse the
+      reader, new importer); dictionaries/lexicons (`zLD`/`RawLD` →
+      `Dictionaries`/`DictionaryEntries`; different key-based `.dat/.idx/.zdt/
+      .zdx` index — new reader).
 
 ## Issues
 
