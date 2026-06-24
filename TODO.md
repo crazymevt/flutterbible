@@ -173,6 +173,9 @@ Running list of known issues and follow-ups.
         `HtmlWidget`). The CrossWire catalog now installs Bible, commentary, and
         dictionary modules; book/chapter intro ("verse 0") commentary entries
         are not yet mapped.
+      - **Verified in the macOS app**: a commentary and a dictionary downloaded
+        from the CrossWire catalog install and render correctly in the
+        commentary/dictionary panels (formatted HTML, no raw markup).
 
 ## Issues
 
