@@ -245,12 +245,7 @@ class MyBibleImporter {
 
       final indexRows = <(int, String)>[];
       for (final v in insertedVerses) {
-        final clean = MyBibleVerseParser()
-            .parseVerse(v.textContent)
-            .map((s) => s.text)
-            .join('')
-            .replaceAll(RegExp(r'\s+'), ' ')
-            .trim();
+        final clean = mybibleVersePlainText(v.textContent);
         if (clean.isNotEmpty) indexRows.add((v.id, clean));
       }
 
