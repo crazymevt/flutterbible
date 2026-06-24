@@ -21,7 +21,11 @@ class ActiveVersionsNotifier extends Notifier<List<String>> {
       final pruned = state.where(ids.contains).toList();
       final fixed = pruned.isEmpty ? [installed.first.id] : pruned;
       if (!const ListEquality<String>().equals(fixed, state)) {
-        set(fixed);
+        // Defer the write out of the listener's synchronous notification
+        // flush; calling set() inline mutates this state mid-build and throws
+        // "markNeedsBuild() called during build". See
+        // test/reader_self_heal_test.dart.
+        Future.microtask(() => set(fixed));
       }
     });
 
