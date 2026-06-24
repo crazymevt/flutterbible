@@ -35,13 +35,16 @@ class ReferenceParser {
       if (verse != null && verse <= 0) verse = null;
     }
 
-    final book = _findBook(bookInput, availableBooks);
+    final book = findBook(bookInput, availableBooks);
     if (book == null) return null;
 
     return ParsedReference(book: book, chapter: chapter, verse: verse);
   }
 
-  static Book? _findBook(String input, List<Book> books) {
+  /// Resolves a bare book name (e.g. "John", "1 Jn", "Ps", "Song of Solomon")
+  /// to a [Book], by exact, space-normalized, then prefix match. Returns null
+  /// when nothing matches. Used both by [parse] and by book-scoped search.
+  static Book? findBook(String input, List<Book> books) {
     // 1. Exact match (case insensitive)
     var exact = books.firstWhereOrNull((b) => b.name.toLowerCase() == input);
     if (exact != null) return exact;
