@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:drift/drift.dart';
 import '../data/importer/mybible_verse_parser.dart';
 import '../domain/search/reference_parser.dart';
+import '../domain/search/testament_scope.dart';
 import 'content_providers.dart';
 import 'user_providers.dart';
 import 'reader_state.dart';
@@ -45,8 +46,6 @@ final globalSearchQueryProvider = NotifierProvider<SearchQueryNotifier, String>(
   () => SearchQueryNotifier(),
 );
 
-
-
 final autocompleteWordsProvider = FutureProvider<List<String>>((ref) async {
   final query = ref.watch(globalSearchQueryProvider).trim();
   if (query.isEmpty) return [];
@@ -54,7 +53,7 @@ final autocompleteWordsProvider = FutureProvider<List<String>>((ref) async {
   // Get the last word the user is typing
   final words = query.split(RegExp(r'\s+'));
   final lastWord = words.last.toLowerCase();
-  
+
   // Only suggest if at least 2 characters are typed
   if (lastWord.length < 2) return [];
 
@@ -65,12 +64,14 @@ final autocompleteWordsProvider = FutureProvider<List<String>>((ref) async {
     final safeWord = lastWord.replaceAll("'", "''");
     // Restrict to alphabetic, sane-length terms: the FTS index includes raw
     // commentary HTML, so the vocab contains markup and junk tokens.
-    final rows = await contentStore.customSelect(
-      "SELECT term FROM content_vocab WHERE term LIKE ? "
-      "AND term NOT GLOB '*[^a-z]*' AND length(term) BETWEEN 2 AND 18 "
-      "ORDER BY cnt DESC LIMIT 15",
-      variables: [Variable.withString('$safeWord%')],
-    ).get();
+    final rows = await contentStore
+        .customSelect(
+          "SELECT term FROM content_vocab WHERE term LIKE ? "
+          "AND term NOT GLOB '*[^a-z]*' AND length(term) BETWEEN 2 AND 18 "
+          "ORDER BY cnt DESC LIMIT 15",
+          variables: [Variable.withString('$safeWord%')],
+        )
+        .get();
 
     return rows.map((row) => row.read<String>('term')).toList();
   } catch (e) {
@@ -88,18 +89,26 @@ final globalSearchResultsProvider = FutureProvider<List<SearchResult>>((
 
   if (query.trim().isEmpty) return [];
 
+  // An optional `ot:` / `nt:` prefix scopes the search to a single testament
+  // (verses only). Strip it off and search the remaining terms.
+  final scope = parseTestamentScope(query);
+  if (scope.terms.isEmpty) return [];
+
   // Sanitize the query for FTS5 to prevent syntax errors with punctuation
-  final cleanQuery = query.trim().replaceAll('"', '""');
+  final cleanQuery = scope.terms.replaceAll('"', '""');
   final searchPattern = '"$cleanQuery"*'; // Match prefix as phrase
 
   final List<SearchResult> results = [];
 
-  // Check if query is a reference for quick navigation
+  // Check if query is a reference for quick navigation. A testament-scoped
+  // search is a word search, so skip the reference shortcut there.
   final activeVersions = ref.watch(activeVersionsProvider);
-  if (activeVersions.isNotEmpty) {
+  if (scope.testament == null && activeVersions.isNotEmpty) {
     try {
-      final books = await ref.watch(booksForVersionProvider(activeVersions.first).future);
-      final parsed = ReferenceParser.parse(query, books);
+      final books = await ref.watch(
+        booksForVersionProvider(activeVersions.first).future,
+      );
+      final parsed = ReferenceParser.parse(scope.terms, books);
       if (parsed != null) {
         String titleStr = parsed.book.name;
         if (parsed.chapter > 0) titleStr += ' ${parsed.chapter}';
@@ -128,12 +137,23 @@ final globalSearchResultsProvider = FutureProvider<List<SearchResult>>((
   // than the one being read — and tapping the result opens the active version,
   // mismatching the preview. Restrict verse matches to the primary active
   // version. Non-verse rows (commentary/dictionary/topic) are unaffected.
-  final primaryVersion =
-      activeVersions.isNotEmpty ? activeVersions.first : null;
-  final verseVersionFilter =
-      primaryVersion != null ? "AND (f.type != 'verse' OR b.version_id = ?)" : '';
+  final primaryVersion = activeVersions.isNotEmpty
+      ? activeVersions.first
+      : null;
+  final verseFilters = StringBuffer();
+  final verseFilterVars = <Variable>[];
+  if (primaryVersion != null) {
+    verseFilters.write("\n    AND (f.type != 'verse' OR b.version_id = ?)");
+    verseFilterVars.add(Variable.withString(primaryVersion));
+  }
+  if (scope.testament != null) {
+    // Testament scope: restrict to verses in the requested testament.
+    verseFilters.write("\n    AND f.type = 'verse' AND b.testament = ?");
+    verseFilterVars.add(Variable.withString(scope.testament!));
+  }
 
-  final contentQuery = '''
+  final contentQuery =
+      '''
     SELECT
       f.type,
       f.reference_id,
@@ -150,8 +170,7 @@ final globalSearchResultsProvider = FutureProvider<List<SearchResult>>((
     LEFT JOIN dictionary_entries de ON f.type = 'dictionary' AND f.reference_id = de.id
     LEFT JOIN dictionaries d ON de.dictionary_id = d.id
     LEFT JOIN topics tp ON f.type = 'topic' AND f.reference_id = tp.id
-    WHERE content_search MATCH ?
-    $verseVersionFilter
+    WHERE content_search MATCH ?$verseFilters
     ORDER BY rank
     LIMIT 100
   ''';
@@ -159,10 +178,7 @@ final globalSearchResultsProvider = FutureProvider<List<SearchResult>>((
   final contentRows = await contentStore
       .customSelect(
         contentQuery,
-        variables: [
-          Variable.withString(searchPattern),
-          if (primaryVersion != null) Variable.withString(primaryVersion),
-        ],
+        variables: [Variable.withString(searchPattern), ...verseFilterVars],
       )
       .get();
   for (final row in contentRows) {
@@ -175,7 +191,7 @@ final globalSearchResultsProvider = FutureProvider<List<SearchResult>>((
       final cNum = row.readNullable<int>('verse_chapter') ?? 1;
       final vNum = row.readNullable<int>('verse_num') ?? 1;
       final bOrder = row.readNullable<int>('verse_book_order') ?? 0;
-      
+
       final cleanText = MyBibleVerseParser()
           .parseVerse(text)
           .map((s) => s.text)
@@ -239,8 +255,11 @@ final globalSearchResultsProvider = FutureProvider<List<SearchResult>>((
     }
   }
 
-  // 2. Query User Database
-  final userQuery = '''
+  // User content (notes/sermons/journals/prayers) and tags aren't scripture,
+  // so a testament-scoped search skips both sections.
+  if (scope.testament == null) {
+    // 2. Query User Database
+    final userQuery = '''
     SELECT 
       f.type, 
       f.reference_id, 
@@ -259,115 +278,121 @@ final globalSearchResultsProvider = FutureProvider<List<SearchResult>>((
     LIMIT 100
   ''';
 
-  try {
-    final userRows = await userStore
-        .customSelect(
-          userQuery,
-          variables: [Variable.withString(searchPattern)],
-        )
-        .get();
-    for (final row in userRows) {
-      final type = row.readNullable<String>('type');
-      if (type == null) continue;
-      final refId = row.readNullable<String>('reference_id') ?? '';
-      final text = row.readNullable<String>('text_content') ?? '';
-
-      if (type == 'verse') {
+    try {
+      final userRows = await userStore
+          .customSelect(
+            userQuery,
+            variables: [Variable.withString(searchPattern)],
+          )
+          .get();
+      for (final row in userRows) {
+        final type = row.readNullable<String>('type');
+        if (type == null) continue;
         final refId = row.readNullable<String>('reference_id') ?? '';
-        final parts = refId.split(':');
-        if (parts.length > 1) {
-          final data = parts[1].split('|');
-          if (data.length >= 3) {
-            final book = data[0];
-            final chapter = int.tryParse(data[1]);
-            final verse = int.tryParse(data[2]);
-            
-            results.add(SearchResult(
+        final text = row.readNullable<String>('text_content') ?? '';
+
+        if (type == 'verse') {
+          final refId = row.readNullable<String>('reference_id') ?? '';
+          final parts = refId.split(':');
+          if (parts.length > 1) {
+            final data = parts[1].split('|');
+            if (data.length >= 3) {
+              final book = data[0];
+              final chapter = int.tryParse(data[1]);
+              final verse = int.tryParse(data[2]);
+
+              results.add(
+                SearchResult(
+                  type: type,
+                  referenceId: refId,
+                  textContent: text,
+                  title: '$book $chapter:$verse',
+                  book: book,
+                  chapter: chapter,
+                  verse: verse,
+                ),
+              );
+            }
+          }
+        } else if (type == 'journal') {
+          final isDeleted = row.readNullable<bool>('journal_deleted') ?? false;
+          if (isDeleted) continue;
+          final jTitle = row.readNullable<String>('journal_title') ?? 'Journal';
+          results.add(
+            SearchResult(
               type: type,
               referenceId: refId,
               textContent: text,
-              title: '$book $chapter:$verse',
-              book: book,
-              chapter: chapter,
-              verse: verse,
-            ));
-          }
-        }
-      } else if (type == 'journal') {
-        final isDeleted = row.readNullable<bool>('journal_deleted') ?? false;
-        if (isDeleted) continue;
-        final jTitle = row.readNullable<String>('journal_title') ?? 'Journal';
-        results.add(SearchResult(
-          type: type,
-          referenceId: refId,
-          textContent: text,
-          title: 'Journal: $jTitle',
-        ));
-      } else if (type == 'prayer') {
-        final isDeleted = row.readNullable<bool>('prayer_deleted') ?? false;
-        if (isDeleted) continue;
-        final pName = row.readNullable<String>('prayer_name') ?? 'Prayer';
-        results.add(SearchResult(
-          type: type,
-          referenceId: refId,
-          textContent: text,
-          title: 'Prayer: $pName',
-        ));
-      } else if (type == 'note') {
-        final isDeleted = row.readNullable<bool>('note_deleted') ?? false;
-        if (isDeleted) continue;
-        final bName = row.readNullable<String>('note_book') ?? 'Unknown Book';
-        final cNum = row.readNullable<int>('note_chapter') ?? 1;
-        final vNum = row.readNullable<int>('note_verse');
-        final sVerses = row.readNullable<String>('note_selected_verses');
-        
-        String targetStr = '$bName $cNum';
-        if (sVerses != null) {
+              title: 'Journal: $jTitle',
+            ),
+          );
+        } else if (type == 'prayer') {
+          final isDeleted = row.readNullable<bool>('prayer_deleted') ?? false;
+          if (isDeleted) continue;
+          final pName = row.readNullable<String>('prayer_name') ?? 'Prayer';
+          results.add(
+            SearchResult(
+              type: type,
+              referenceId: refId,
+              textContent: text,
+              title: 'Prayer: $pName',
+            ),
+          );
+        } else if (type == 'note') {
+          final isDeleted = row.readNullable<bool>('note_deleted') ?? false;
+          if (isDeleted) continue;
+          final bName = row.readNullable<String>('note_book') ?? 'Unknown Book';
+          final cNum = row.readNullable<int>('note_chapter') ?? 1;
+          final vNum = row.readNullable<int>('note_verse');
+          final sVerses = row.readNullable<String>('note_selected_verses');
+
+          String targetStr = '$bName $cNum';
+          if (sVerses != null) {
             targetStr += ':$sVerses';
-        } else if (vNum != null) {
+          } else if (vNum != null) {
             targetStr += ':$vNum';
+          }
+
+          results.add(
+            SearchResult(
+              type: type,
+              referenceId: refId,
+              textContent: text,
+              title: 'Note: $targetStr',
+              book: bName,
+              chapter: cNum,
+              verse: vNum,
+              selectedVerses: sVerses,
+            ),
+          );
+        } else if (type == 'sermon') {
+          final isDeleted = row.readNullable<bool>('sermon_deleted') ?? false;
+          if (isDeleted) continue;
+          final sTitle = row.readNullable<String>('sermon_title') ?? 'Sermon';
+          final sSeries = row.readNullable<String>('sermon_series');
+          final displayTitle = sSeries != null ? '$sTitle ($sSeries)' : sTitle;
+
+          // user_search now indexes plain text for sermons, so the snippet is
+          // already clean — no Delta JSON to strip.
+          results.add(
+            SearchResult(
+              type: type,
+              referenceId: refId,
+              textContent: text.trim(),
+              title: 'Sermon: $displayTitle',
+            ),
+          );
         }
-
-        results.add(
-          SearchResult(
-            type: type,
-            referenceId: refId,
-            textContent: text,
-            title: 'Note: $targetStr',
-            book: bName,
-            chapter: cNum,
-            verse: vNum,
-            selectedVerses: sVerses,
-          ),
-        );
-      } else if (type == 'sermon') {
-        final isDeleted = row.readNullable<bool>('sermon_deleted') ?? false;
-        if (isDeleted) continue;
-        final sTitle = row.readNullable<String>('sermon_title') ?? 'Sermon';
-        final sSeries = row.readNullable<String>('sermon_series');
-        final displayTitle = sSeries != null ? '$sTitle ($sSeries)' : sTitle;
-
-        // user_search now indexes plain text for sermons, so the snippet is
-        // already clean — no Delta JSON to strip.
-        results.add(
-          SearchResult(
-            type: type,
-            referenceId: refId,
-            textContent: text.trim(),
-            title: 'Sermon: $displayTitle',
-          ),
-        );
       }
+    } catch (e) {
+      // If user_search table doesn't exist yet (before hot restart), ignore
     }
-  } catch (e) {
-    // If user_search table doesn't exist yet (before hot restart), ignore
-  }
 
-  // 3. Direct tag search — don't rely on FTS triggers for tags
-  try {
-    final tagSearchPattern = query.trim().replaceAll(RegExp(r'^#'), '');
-    if (tagSearchPattern.isNotEmpty) {
-      final tagQuery = '''
+    // 3. Direct tag search — don't rely on FTS triggers for tags
+    try {
+      final tagSearchPattern = query.trim().replaceAll(RegExp(r'^#'), '');
+      if (tagSearchPattern.isNotEmpty) {
+        final tagQuery = '''
         SELECT et.entity_id, et.entity_type, t.name as tag_name,
           n.book_name as note_book, n.chapter as note_chapter, n.verse as note_verse, n.selected_verses as note_selected_verses, n.content as note_content, n.deleted as note_deleted,
           s.title as sermon_title, s.series as sermon_series, s.deleted as sermon_deleted,
@@ -383,102 +408,123 @@ final globalSearchResultsProvider = FutureProvider<List<SearchResult>>((
         LIMIT 100
       ''';
 
-      final tagRows = await userStore
-          .customSelect(
-            tagQuery,
-            variables: [Variable.withString('%${tagSearchPattern.toLowerCase()}%')],
-          )
-          .get();
+        final tagRows = await userStore
+            .customSelect(
+              tagQuery,
+              variables: [
+                Variable.withString('%${tagSearchPattern.toLowerCase()}%'),
+              ],
+            )
+            .get();
 
-      // Collect existing result keys to avoid duplicates
-      final existingKeys = results.map((r) => '${r.type}:${r.referenceId}').toSet();
+        // Collect existing result keys to avoid duplicates
+        final existingKeys = results
+            .map((r) => '${r.type}:${r.referenceId}')
+            .toSet();
 
-      for (final row in tagRows) {
-        final entityType = row.readNullable<String>('entity_type') ?? '';
-        final entityId = row.readNullable<String>('entity_id') ?? '';
-        final tagName = row.readNullable<String>('tag_name') ?? '';
-        final key = '$entityType:$entityId';
-        if (existingKeys.contains(key)) continue;
-        existingKeys.add(key);
+        for (final row in tagRows) {
+          final entityType = row.readNullable<String>('entity_type') ?? '';
+          final entityId = row.readNullable<String>('entity_id') ?? '';
+          final tagName = row.readNullable<String>('tag_name') ?? '';
+          final key = '$entityType:$entityId';
+          if (existingKeys.contains(key)) continue;
+          existingKeys.add(key);
 
-        if (entityType == 'verse') {
-          final parts = entityId.split(':');
-          if (parts.length > 1) {
-            final data = parts[1].split('|');
-            if (data.length >= 3) {
-              results.add(SearchResult(
-                type: 'verse',
+          if (entityType == 'verse') {
+            final parts = entityId.split(':');
+            if (parts.length > 1) {
+              final data = parts[1].split('|');
+              if (data.length >= 3) {
+                results.add(
+                  SearchResult(
+                    type: 'verse',
+                    referenceId: entityId,
+                    textContent: '#$tagName',
+                    title: '${data[0]} ${data[1]}:${data[2]}',
+                    book: data[0],
+                    chapter: int.tryParse(data[1]),
+                    verse: int.tryParse(data[2]),
+                  ),
+                );
+              }
+            }
+          } else if (entityType == 'note') {
+            final isDeleted = row.readNullable<bool>('note_deleted') ?? false;
+            if (isDeleted) continue;
+            final bName =
+                row.readNullable<String>('note_book') ?? 'Unknown Book';
+            final cNum = row.readNullable<int>('note_chapter') ?? 1;
+            final vNum = row.readNullable<int>('note_verse');
+            final sVerses = row.readNullable<String>('note_selected_verses');
+            final noteContent =
+                row.readNullable<String>('note_content') ?? '#$tagName';
+            String targetStr = '$bName $cNum';
+            if (sVerses != null) {
+              targetStr += ':$sVerses';
+            } else if (vNum != null) {
+              targetStr += ':$vNum';
+            }
+            results.add(
+              SearchResult(
+                type: 'note',
+                referenceId: entityId,
+                textContent: noteContent,
+                title: 'Note: $targetStr',
+                book: bName,
+                chapter: cNum,
+                verse: vNum,
+                selectedVerses: sVerses,
+              ),
+            );
+          } else if (entityType == 'sermon') {
+            final isDeleted = row.readNullable<bool>('sermon_deleted') ?? false;
+            if (isDeleted) continue;
+            final sTitle = row.readNullable<String>('sermon_title') ?? 'Sermon';
+            final sSeries = row.readNullable<String>('sermon_series');
+            final displayTitle = sSeries != null
+                ? '$sTitle ($sSeries)'
+                : sTitle;
+            results.add(
+              SearchResult(
+                type: 'sermon',
                 referenceId: entityId,
                 textContent: '#$tagName',
-                title: '${data[0]} ${data[1]}:${data[2]}',
-                book: data[0],
-                chapter: int.tryParse(data[1]),
-                verse: int.tryParse(data[2]),
-              ));
-            }
+                title: 'Sermon: $displayTitle',
+              ),
+            );
+          } else if (entityType == 'journal') {
+            final isDeleted =
+                row.readNullable<bool>('journal_deleted') ?? false;
+            if (isDeleted) continue;
+            final jTitle =
+                row.readNullable<String>('journal_title') ?? 'Journal';
+            results.add(
+              SearchResult(
+                type: 'journal',
+                referenceId: entityId,
+                textContent: '#$tagName',
+                title: 'Journal: $jTitle',
+              ),
+            );
+          } else if (entityType == 'prayer') {
+            final isDeleted = row.readNullable<bool>('prayer_deleted') ?? false;
+            if (isDeleted) continue;
+            final pName = row.readNullable<String>('prayer_name') ?? 'Prayer';
+            results.add(
+              SearchResult(
+                type: 'prayer',
+                referenceId: entityId,
+                textContent: '#$tagName',
+                title: 'Prayer: $pName',
+              ),
+            );
           }
-        } else if (entityType == 'note') {
-          final isDeleted = row.readNullable<bool>('note_deleted') ?? false;
-          if (isDeleted) continue;
-          final bName = row.readNullable<String>('note_book') ?? 'Unknown Book';
-          final cNum = row.readNullable<int>('note_chapter') ?? 1;
-          final vNum = row.readNullable<int>('note_verse');
-          final sVerses = row.readNullable<String>('note_selected_verses');
-          final noteContent = row.readNullable<String>('note_content') ?? '#$tagName';
-          String targetStr = '$bName $cNum';
-          if (sVerses != null) {
-            targetStr += ':$sVerses';
-          } else if (vNum != null) {
-            targetStr += ':$vNum';
-          }
-          results.add(SearchResult(
-            type: 'note',
-            referenceId: entityId,
-            textContent: noteContent,
-            title: 'Note: $targetStr',
-            book: bName,
-            chapter: cNum,
-            verse: vNum,
-            selectedVerses: sVerses,
-          ));
-        } else if (entityType == 'sermon') {
-          final isDeleted = row.readNullable<bool>('sermon_deleted') ?? false;
-          if (isDeleted) continue;
-          final sTitle = row.readNullable<String>('sermon_title') ?? 'Sermon';
-          final sSeries = row.readNullable<String>('sermon_series');
-          final displayTitle = sSeries != null ? '$sTitle ($sSeries)' : sTitle;
-          results.add(SearchResult(
-            type: 'sermon',
-            referenceId: entityId,
-            textContent: '#$tagName',
-            title: 'Sermon: $displayTitle',
-          ));
-        } else if (entityType == 'journal') {
-          final isDeleted = row.readNullable<bool>('journal_deleted') ?? false;
-          if (isDeleted) continue;
-          final jTitle = row.readNullable<String>('journal_title') ?? 'Journal';
-          results.add(SearchResult(
-            type: 'journal',
-            referenceId: entityId,
-            textContent: '#$tagName',
-            title: 'Journal: $jTitle',
-          ));
-        } else if (entityType == 'prayer') {
-          final isDeleted = row.readNullable<bool>('prayer_deleted') ?? false;
-          if (isDeleted) continue;
-          final pName = row.readNullable<String>('prayer_name') ?? 'Prayer';
-          results.add(SearchResult(
-            type: 'prayer',
-            referenceId: entityId,
-            textContent: '#$tagName',
-            title: 'Prayer: $pName',
-          ));
         }
       }
+    } catch (e) {
+      // Tag search failed, ignore
     }
-  } catch (e) {
-    // Tag search failed, ignore
-  }
+  } // end: unscoped-only (user content + tags)
 
   // Deduplicate and sort verses by canonical order
   final verses = results.where((r) => r.type == 'verse').toList();
