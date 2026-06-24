@@ -36,7 +36,7 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     // Rebuild so the search field's hint reflects the active tab.
     _tabController.addListener(_onTabChanged);
   }
@@ -127,6 +127,8 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
         return 'Filter ph4.org catalog…';
       case 2:
         return 'Filter OSIS languages…';
+      case 3:
+        return 'Filter CrossWire catalog…';
       default:
         return 'Filter installed content…';
     }
@@ -191,13 +193,14 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
             Tab(text: 'Installed'),
             Tab(text: 'ph4.org Catalog'),
             Tab(text: 'OSIS Catalog'),
+            Tab(text: 'CrossWire Catalog'),
           ],
         ),
       ),
       drawer: const AppDrawer(),
       body: TabBarView(
         controller: _tabController,
-        children: [_buildInstalledTab(), _buildPh4Tab(), _buildOsisTab()],
+        children: [_buildInstalledTab(), _buildPh4Tab(), _buildOsisTab(), _buildCrosswireTab()],
       ),
     );
   }
@@ -447,10 +450,24 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
                   Widget downloadWidget;
                   final isInstalled = installedIds.contains(m.abbr.toUpperCase());
 
-                  if (dlState != null) {
-                    if (dlState.status == 'Done') {
-                      downloadWidget = const Icon(Icons.check, color: Colors.green);
-                    } else if (dlState.status.startsWith('Error')) {
+                  if (isInstalled) {
+                    downloadWidget = Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.check_circle, color: Colors.green),
+                        IconButton(
+                          icon: const Icon(Icons.refresh),
+                          tooltip: 'Redownload',
+                          onPressed: () {
+                            ref
+                                .read(contentManagerControllerProvider.notifier)
+                                .downloadAndImportPh4(m);
+                          },
+                        ),
+                      ],
+                    );
+                  } else if (dlState != null && dlState.status != 'Done') {
+                    if (dlState.status.startsWith('Error')) {
                       downloadWidget = IconButton(
                         icon: const Icon(Icons.error, color: Colors.red),
                         tooltip: dlState.status,
@@ -472,22 +489,6 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
                         ),
                       );
                     }
-                  } else if (isInstalled) {
-                    downloadWidget = Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.check_circle, color: Colors.green),
-                        IconButton(
-                          icon: const Icon(Icons.refresh),
-                          tooltip: 'Redownload',
-                          onPressed: () {
-                            ref
-                                .read(contentManagerControllerProvider.notifier)
-                                .downloadAndImportPh4(m);
-                          },
-                        ),
-                      ],
-                    );
                   } else {
                     downloadWidget = IconButton(
                       icon: const Icon(Icons.download),
@@ -619,15 +620,27 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
                                     Widget downloadWidget;
                                     final isInstalled = installedIds.contains(t.basename.toUpperCase());
 
-                                    if (dlState != null) {
-                                      if (dlState.status == 'Done') {
-                                        downloadWidget = const Icon(
-                                          Icons.check,
-                                          color: Colors.green,
-                                        );
-                                      } else if (dlState.status.startsWith(
-                                        'Error',
-                                      )) {
+                                    if (isInstalled) {
+                                      downloadWidget = Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(Icons.check_circle, color: Colors.green),
+                                          IconButton(
+                                            icon: const Icon(Icons.refresh),
+                                            tooltip: 'Redownload',
+                                            onPressed: () {
+                                              ref
+                                                  .read(
+                                                    contentManagerControllerProvider
+                                                        .notifier,
+                                                  )
+                                                  .downloadAndImportOsis(t, l.code);
+                                            },
+                                          ),
+                                        ],
+                                      );
+                                    } else if (dlState != null && dlState.status != 'Done') {
+                                      if (dlState.status.startsWith('Error')) {
                                         downloadWidget = IconButton(
                                           icon: const Icon(
                                             Icons.error,
@@ -657,25 +670,6 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
                                           ),
                                         );
                                       }
-                                    } else if (isInstalled) {
-                                      downloadWidget = Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const Icon(Icons.check_circle, color: Colors.green),
-                                          IconButton(
-                                            icon: const Icon(Icons.refresh),
-                                            tooltip: 'Redownload',
-                                            onPressed: () {
-                                              ref
-                                                  .read(
-                                                    contentManagerControllerProvider
-                                                        .notifier,
-                                                  )
-                                                  .downloadAndImportOsis(t, l.code);
-                                            },
-                                          ),
-                                        ],
-                                      );
                                     } else {
                                       downloadWidget = IconButton(
                                         icon: const Icon(Icons.download),
@@ -728,5 +722,145 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
               );
             },
           );
+  }
+
+  Widget _buildCrosswireTab() {
+    final catalogAsync = ref.watch(crosswireCatalogProvider);
+    final downloadStates = ref.watch(contentManagerControllerProvider);
+    final installedIdsAsync = ref.watch(installedModuleIdsProvider);
+    final installedIds = installedIdsAsync.value ?? {};
+
+    return catalogAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (err, _) => Center(child: Text('Error: $err')),
+      data: (modules) {
+        final filtered = modules.where((m) {
+          final desc = m.config.description?.toLowerCase() ?? '';
+          final name = m.config.name.toLowerCase();
+          return desc.contains(_filterQuery) || name.contains(_filterQuery);
+        }).toList();
+
+        if (filtered.isEmpty) {
+          return Center(
+            child: Text(_filterQuery.isEmpty
+                ? 'No modules available.'
+                : 'No modules match "${_searchController.text}".'),
+          );
+        }
+
+        return ListView.builder(
+          itemCount: filtered.length,
+          itemBuilder: (context, index) {
+            final m = filtered[index];
+            final stateKey = 'cw_${m.config.name}';
+            final dlState = downloadStates[stateKey];
+
+            Widget downloadWidget;
+            final isInstalled = installedIds.contains(m.config.name.toUpperCase());
+            final isSupported = m.config.modDrv.isBible;
+
+            if (isInstalled) {
+              downloadWidget = Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.check_circle, color: Colors.green),
+                  IconButton(
+                    icon: const Icon(Icons.refresh),
+                    tooltip: 'Redownload',
+                    onPressed: isSupported ? () {
+                      ref
+                          .read(contentManagerControllerProvider.notifier)
+                          .downloadAndImportCrosswire(m);
+                    } : null,
+                  ),
+                ],
+              );
+            } else if (dlState != null && dlState.status != 'Done') {
+              if (dlState.status.startsWith('Error')) {
+                downloadWidget = IconButton(
+                  icon: const Icon(Icons.error, color: Colors.red),
+                  tooltip: dlState.status,
+                  onPressed: () {},
+                );
+              } else {
+                downloadWidget = SizedBox(
+                  width: 100,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      LinearProgressIndicator(value: dlState.percent),
+                      const SizedBox(height: 4),
+                      Text(dlState.status, style: const TextStyle(fontSize: 10)),
+                    ],
+                  ),
+                );
+              }
+            } else {
+              downloadWidget = IconButton(
+                icon: const Icon(Icons.download),
+                tooltip: isSupported ? 'Download' : 'Only Bible modules are currently supported',
+                onPressed: isSupported ? () {
+                  ref
+                      .read(contentManagerControllerProvider.notifier)
+                      .downloadAndImportCrosswire(m);
+                } : null,
+              );
+            }
+
+            final aboutText = m.config.about;
+            final license = m.config.value('DistributionLicense');
+            final shortCopyright = m.config.value('ShortCopyright');
+
+            Widget trailing = Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (aboutText != null || license != null || shortCopyright != null)
+                  IconButton(
+                    icon: const Icon(Icons.info_outline),
+                    tooltip: 'Info',
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Text(m.config.description ?? m.config.name),
+                          content: SingleChildScrollView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (license != null) ...[
+                                  Text('License: $license', style: const TextStyle(fontWeight: FontWeight.bold)),
+                                  const SizedBox(height: 8),
+                                ],
+                                if (shortCopyright != null) ...[
+                                  Text('Copyright: $shortCopyright', style: const TextStyle(fontWeight: FontWeight.bold)),
+                                  const SizedBox(height: 8),
+                                ],
+                                if (aboutText != null) Text(aboutText),
+                              ],
+                            ),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('Close'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                downloadWidget,
+              ],
+            );
+
+            return ListTile(
+              title: Text(m.config.description ?? m.config.name),
+              subtitle: Text('${m.config.name} • ${m.config.value('ModDrv') ?? 'Unknown'} • ${m.config.lang ?? 'Unknown'}'),
+              trailing: trailing,
+            );
+          },
+        );
+      },
+    );
   }
 }

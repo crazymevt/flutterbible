@@ -19,6 +19,10 @@ final ph4CatalogProvider = FutureProvider<List<Ph4Module>>((ref) async {
   return ref.read(contentManagerApiProvider).fetchPh4Modules();
 });
 
+final crosswireCatalogProvider = FutureProvider<List<CrosswireModule>>((ref) async {
+  return ref.read(contentManagerApiProvider).fetchCrosswireModules();
+});
+
 final osisLanguagesProvider = FutureProvider<List<OsisLanguage>>((ref) async {
   return ref.read(contentManagerApiProvider).fetchOsisLanguages();
 });
@@ -183,6 +187,74 @@ class ContentManagerController extends Notifier<Map<String, DownloadProgress>> {
       ref.invalidate(installedModuleIdsProvider);
     } catch (e, stack) {
       logError(e, stack, context: 'ContentManager.downloadAndImportOsis');
+      state = {...state, stateKey: DownloadProgress(0, 'Error: $e')};
+    }
+  }
+
+  Future<void> downloadAndImportCrosswire(CrosswireModule module) async {
+    final stateKey = 'cw_${module.config.name}';
+    state = {...state, stateKey: DownloadProgress(0, 'Downloading...')};
+
+    try {
+      final api = ref.read(contentManagerApiProvider);
+      final tempDir = await getTemporaryDirectory();
+      await tempDir.create(recursive: true);
+
+      final dlFile = File(p.join(tempDir.path, '${module.config.name}.zip'));
+
+      // Construct the URL. Usually packages/rawzip/<NAME>.zip
+      // If repoPath ends with /raw, we typically replace it with /packages/rawzip for CrossWire.
+      String zipPath = module.repoPath.endsWith('/raw')
+          ? module.repoPath.replaceAll(RegExp(r'/raw$'), '/packages/rawzip')
+          : '${module.repoPath}/packages/rawzip';
+      
+      String dlUrl = 'https://${module.repoDomain}$zipPath/${module.config.name}.zip';
+
+      try {
+        await api.downloadFile(
+          dlUrl,
+          dlFile.path,
+          onReceiveProgress: (received, total) {
+            if (total != -1) {
+              state = {
+                ...state,
+                stateKey: DownloadProgress(received / total, 'Downloading...'),
+              };
+            }
+          },
+        );
+      } catch (e) {
+        // Fallback: try without the /packages/rawzip replacement if it failed
+        if (module.repoPath.endsWith('/raw')) {
+          dlUrl = 'https://${module.repoDomain}${module.repoPath}/packages/rawzip/${module.config.name}.zip';
+          await api.downloadFile(
+            dlUrl,
+            dlFile.path,
+            onReceiveProgress: (received, total) {
+              if (total != -1) {
+                state = {
+                  ...state,
+                  stateKey: DownloadProgress(received / total, 'Downloading...'),
+                };
+              }
+            },
+          );
+        } else {
+          rethrow;
+        }
+      }
+
+      state = {...state, stateKey: DownloadProgress(1.0, 'Importing...')};
+
+      // Reuse the existing local zip importer
+      await importSwordModuleFile(dlFile);
+      
+      // Cleanup
+      await dlFile.delete();
+
+      state = {...state, stateKey: DownloadProgress(1.0, 'Done')};
+    } catch (e, stack) {
+      logError(e, stack, context: 'ContentManager.downloadAndImportCrosswire');
       state = {...state, stateKey: DownloadProgress(0, 'Error: $e')};
     }
   }
