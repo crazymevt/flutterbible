@@ -38,9 +38,15 @@ Running list of known issues and follow-ups.
     (`scripts/update_version.dart`); the dialog lives near the app's
     "What's New" / version display.
 
-- [ ] **Auto check for updates.** Automatically check for updates and display
+- [x] **Auto check for updates.** Automatically check for updates and display
   a message indicating that a new version is available, along with a link to the
   latest releases page.
+  - Done: `updateCheckerProvider` (`lib/app/update_checker.dart`) queries the
+    GitHub releases API on desktop only, comparing the latest tag against
+    `appVersion`. The dashboard shows a dismissible `MaterialBanner` with a
+    "View Release" link when a newer version exists. Result is cached for the
+    session (`ref.keepAlive()`); dismissal is keyed to the version so a later
+    release re-shows the banner.
 
 ## Research
 
@@ -57,7 +63,18 @@ Running list of known issues and follow-ups.
 ## Issues
 
 - [x] **Investigate ScriptureParser.** `ScriptureParser` currently does not support parsing references with multi-word book names, but it also appears to be unused outside of its own tests (the app uses `ReferenceParser`). Investigate if this is dead code that can be safely removed.
-- [ ] **Outdated dependencies.** `flutter pub get` reports that 24 packages have newer versions incompatible with current dependency constraints. Need to review `flutter pub outdated` and update constraints in `pubspec.yaml`.
+- [x] **Outdated dependencies.** `flutter pub get` reports that 24 packages have newer versions incompatible with current dependency constraints. Need to review `flutter pub outdated` and update constraints in `pubspec.yaml`.
+  - Investigated (2026-06-24): the only freely-resolvable bump was
+    `path_provider_linux` 2.2.1 → 2.2.2 — applied via `flutter pub upgrade`.
+  - The other 24 are all major-version bumps blocked at the resolver level:
+    even `flutter pub upgrade --major-versions` reports "No changes would be
+    made." Their newer majors (analyzer 14, win32 6, package_info_plus 10,
+    vector_math 2.4, `latlong2` 0.10 via flutter_map, `share_plus` 13, etc.)
+    depend on transitive packages pinned by the Flutter SDK.
+  - We're already on the latest stable **Flutter 3.44.3** (2026-06-18), so the
+    tree is as current as the SDK allows. These will become reachable only when
+    a future Flutter release bumps its pins — nothing actionable until then.
+    Tests green after the bump.
 - [ ] **Investigate silent failures on network and IO operations.** Many `catch` blocks (e.g. cross-reference import in `content_providers.dart`, audio loading in `audio_player_widget.dart`, and network calls in `content_manager_api.dart`) swallow exceptions with a simple `debugPrint` and return empty states. In release builds, this means features fail completely silently without logging to a crash reporter or showing a UI error to the user.
 - [ ] **FutureBuilder inside build method.** `WhatsNewDialog` creates its future (`_loadChangelog()`) directly inside its `build` method. This causes the app to re-read and re-parse the JSON asset on every single widget rebuild, which is a common Flutter anti-pattern that can lead to flickering or performance hits. It should be converted to a `StatefulWidget` and initialized in `initState`.
 - [ ] **TextEditingController memory leaks.** Several dialogs create `TextEditingController` instances but fail to dispose them. For example, `_NoteEditorDialogState` (in `note_editor.dart`) lacks a `dispose()` method entirely, while methods like `_showNewSermonDialog` (in `sermons_panel.dart`) and `_showOutlineGeneratorDialog` (in `sermon_editor_screen.dart`) instantiate controllers before calling `showDialog` but never call `.dispose()` after the dialog completes. This causes compounding memory leaks as users open and close dialogs.
