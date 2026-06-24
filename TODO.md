@@ -52,13 +52,130 @@ Running list of known issues and follow-ups.
 
 - [ ] **Investigate importing SWORD modules.** SWORD is the CrossWire module
   format used by many open Bible apps — a large library of translations,
-  commentaries, and dictionaries. Scope out what it would take to import them:
-  the on-disk module layout (conf + compressed `ztext`/`zld`/`zcom` data),
-  the compression/encoding (LZSS/zlib, versification), and how it maps onto our
-  existing `verses`/`commentary`/`dictionary` tables. We already import OSIS
-  XML, and many SWORD modules are OSIS-encoded internally, so the existing
-  `OsisImporter` (now milestone-aware) may be reusable for the text once a
-  module is unpacked.
+  commentaries, and dictionaries.
+  - **Researched (2026-06-24).** A module is a `.conf` metadata file (`mods.d/`)
+    plus binary data files (`modules/…/`). The `.conf` is INI-like and drives
+    everything: `ModDrv` (`zText`/`RawText` Bibles, `zCom`/`RawCom`
+    commentaries, `zLD`/`RawLD` dictionaries, `RawGenBook` trees); `SourceType`
+    (the per-verse markup: `OSIS`/`GBF`/`ThML`/`TEI`/plain); `CompressType`
+    (`ZIP`=zlib, `BZIP2`, `LZSS`, `XZ`); `Versification`; plus `Encoding`,
+    `Lang`, `Description`, `About`.
+  - **`zText` layout** (compressed Bibles, common case): per testament
+    (`ot`/`nt`) three files — `.bzz` (concatenated compressed text blocks),
+    `.bzs` (block index: `[fileOffset(4), compSize(4), uncompSize(4)]`), `.bzv`
+    (verse index, one record **per verse slot in the versification**:
+    `[blockNum(4), offsetInBlock(4), length(2)]`). Read a verse = `.bzv` lookup
+    by positional index → block#/offset/length → `.bzs` → seek/decompress
+    `.bzz` block → slice. `RawText` has no block layer (`ot` + `ot.vss`).
+  - **Schema fit is clean, no migrations needed:** `zText`/`RawText` →
+    `Versions`/`Books`/`Verses` (+ `content_search` FTS); `zCom` →
+    `Commentaries`/`CommentaryEntries`; `zLD` →
+    `Dictionaries`/`DictionaryEntries`. SWORD inline markup maps onto our
+    `VerseSegment`/footnote model.
+  - **Reusable:** `extractOsisBookVerses` ([osis_importer.dart](lib/data/importer/osis_importer.dart),
+    already milestone-aware) for OSIS modules — but SWORD stores an OSIS
+    *fragment per verse*, not a whole document, so it needs adapting to
+    per-verse fragments. Decompression: `package:archive` (already a dep) has
+    `ZLibDecoder` + `BZip2Decoder`, and `dart:io` has zlib built in, so ZIP and
+    BZIP2 are free. The download→extract→pick-driver→import→invalidate flow in
+    [content_manager_providers.dart](lib/app/content_manager_providers.dart)
+    drops straight in.
+  - **Hard part = versification.** The `.bzv` index is *positional*: entry N is
+    the Nth verse slot in the module's v11n, uninterpretable without the full
+    ordered canon (per-chapter verse counts + testament/book intro "verse 0"
+    slots). SWORD hardcodes ~20 of these in C++ (`canon_*.h`); we'd port **KJV**
+    first, then Synodal/LXX/etc. as needed. An off-by-one shifts every verse —
+    this is the line item to budget for, *not* the compression.
+  - **Other new work:** `.conf` parser (INI-ish, has continuation lines +
+    repeated keys like `GlobalOptionFilter`); GBF/ThML filters for older
+    non-OSIS modules; LZSS decoder (SWORD's own variant, ~100 lines to port, no
+    Dart package); `zLD` dictionary index (`.dat/.idx/.zdt/.zdx`). XZ + LZSS
+    can be rejected with a clear message initially.
+  - **Phased plan:** (1) `.conf` parser + `zText`/`RawText` with ZIP + OSIS +
+    KJV versification only — covers KJV/ASV/WEB and proves the binary-index +
+    versification machinery end-to-end. (2) BZIP2, then GBF/ThML, then more
+    versifications. (3) commentaries (`zCom`) and dictionaries (`zLD`).
+  - **Phase 1 DONE** (branch `feat/sword-import`, `lib/data/importer/sword/`):
+    `.conf` parser, KJV versification + index math, `zText` ZIP reader,
+    per-verse OSIS fragment parser, and `SwordBibleImporter` →
+    `versions`/`books`/`verses`, all unit-tested. Wired into the Content
+    Manager via a local-file "Import SWORD module (.zip)" action.
+    **Verified end-to-end** against the real CrossWire KJV module (all 31,102
+    verses, correct text + Strong's + footnotes + FTS) and confirmed working
+    in the macOS app. Phase-1 caveat fixed along the way: SWORD reserves two
+    leading index slots (module + testament heading), so book offsets start at
+    2 — an off-by-one that shifted every verse.
+  - **Roadmap for the remaining phases** (planned order: 2 → 4 → 3 → 5):
+    - **Phase 2 DONE — broaden format coverage** (2026-06-24).
+      `RawText`/`RawText4` uncompressed Bibles via a new `SwordRawTextReader`
+      (flat `ot`/`nt` text + `ot.vss`/`nt.vss` positional index, no block
+      layer); both readers now share a `SwordVerseReader` interface so
+      `SwordBibleImporter` walks the versification reader-agnostically and
+      accepts any Bible driver. **BZIP2** decompression added to
+      `SwordZTextReader` via `package:archive`'s `BZip2Decoder`. Per-verse
+      source filters `parseGbfFragment` (token-based GBF) and `parseThmlFragment`
+      (XML via `package:xml`) join `parseOsisFragment`, dispatched by
+      `SourceType`; both share a `VerseSegmentBuilder` that attaches the
+      trailing Strong's codes GBF/ThML emit *after* each word, captures
+      footnotes out of the search text, and marks italic/Jesus words. The shared
+      parse result is now `ParsedVerseEntry` (renamed from `ParsedOsisEntry`).
+      LZSS and XZ compression, and `TEI` source, still throw a clear
+      unsupported-format error. All unit-tested (readers, both filters,
+      end-to-end RawText import), and **verified in the macOS app** against real
+      CrossWire **GBF** and **ThML** modules — download → install → text and
+      footnotes rendering correctly in the reader. Not yet exercised against a
+      real module: **BZIP2** (none in the CrossWire repo) and GBF/ThML
+      **Strong's** attachment (no available GBF/ThML Bible ships Strong's) —
+      both remain synthetic-tested only.
+    - **Phase 4 DONE — CrossWire download manager** (2026-06-24).
+      New "CrossWire Catalog" tab beside ph4.org/OSIS: fetches
+      [`masterRepoList.conf`](https://crosswire.org/ftpmirror/pub/sword/masterRepoList.conf)
+      to locate the **primary CrossWire repo**, fetches that repo's
+      `mods.d.tar.gz` → parses confs into a catalog (Description + license);
+      downloads `packages/rawzip/<NAME>.zip` → existing SWORD importer.
+      (Enumerating the *other* repos in the master list is deferred — see the
+      Phase-1 note's "single primary repo" caveat; revisit when broader coverage
+      is wanted.) **Unlocked** only — confs with a `CipherKey` are skipped
+      outright. Remaining modules stay visible but are **greyed out with the
+      reason** unless they are both supported (a Bible driver — `zText`/`RawText`)
+      and **freely distributable** (`SwordConfig.isFreelyDistributable` accepts
+      only `DistributionLicense` values that explicitly grant redistribution —
+      public domain, Creative Commons, the GNU licenses, and the "Free …/
+      Permission … to distribute" grants — and fails closed on a bare
+      `Copyrighted`/absent license). The info dialog preserves and displays each
+      module's `DistributionLicense`, full `Copyright`, and `ShortCopyright`.
+      Sets a proper `User-Agent` (incl. app version) and uses HTTPS throughout.
+    - **Phase 3 — more versifications** (data-heavy, mechanical): Synodal,
+      German, Vulgate, LXX, NRSV(A), Catholic/Catholic2, … Same
+      `SwordVersification` shape, validated against aggregate totals as KJV was.
+      Needed for most non-English and Catholic modules.
+    - **Phase 5 DONE — other content types** (2026-06-24).
+      - **Commentaries** (`zCom`/`zCom4`/`RawCom`/`RawCom4` →
+        `commentaries`/`commentary_entries`). A commentary uses the same
+        verse-keyed `zVerse`/`RawVerse` backend as a Bible, so
+        `SwordCommentaryImporter` reuses the existing verse readers and walks
+        the versification just like the Bible importer. Verified against the
+        real CrossWire **MHCC** module (28,718 entries).
+      - **Dictionaries/lexicons** (`zLD`/`RawLD`/`RawLD4` →
+        `dictionaries`/`dictionary_entries`) via a new key-based
+        `SwordLdReader`. The on-disk format was reverse-engineered and verified:
+        `.idx` (`offset` + `size`; **8-byte for zLD/RawLD4, 6-byte for RawLD**,
+        auto-detected by bounds-checking) → `.dat`, whose record is
+        `KEY\r\n<body>` (RawLD) or `KEY\r\n` + `blockNum(u32)` +
+        `entryInBlock(u32)` (zLD). For zLD the body lives in a `.zdt` zlib block
+        located via `.zdx` (`offset` + `compSize`); each decompressed block is
+        `count(u32)` + `count×(offset,size)` directory + bodies. Verified against
+        real CrossWire **Easton** (zLD/TEI, 3,963 entries) and **AmTract**
+        (RawLD/ThML, 2,286).
+      - Added a **TEI** per-source filter (`parseTeiFragment`) — most lexicons
+        are TEI — and a shared `parseSwordSource` dispatcher + `segmentsToHtml`
+        serialiser feeding both new importers (their panels render with
+        `HtmlWidget`). The CrossWire catalog now installs Bible, commentary, and
+        dictionary modules; book/chapter intro ("verse 0") commentary entries
+        are not yet mapped.
+      - **Verified in the macOS app**: a commentary and a dictionary downloaded
+        from the CrossWire catalog install and render correctly in the
+        commentary/dictionary panels (formatted HTML, no raw markup).
 
 ## Issues
 

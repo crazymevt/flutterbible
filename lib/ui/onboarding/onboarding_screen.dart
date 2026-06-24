@@ -9,11 +9,11 @@ class OnboardingScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final catalogAsync = ref.watch(ph4CatalogProvider);
+    final catalogAsync = ref.watch(crosswireCatalogProvider);
     final downloadStates = ref.watch(contentManagerControllerProvider);
     
-    // We target KJV_plus_
-    final kjvProgress = downloadStates['KJV_plus_'];
+    // We target KJV from CrossWire
+    final kjvProgress = downloadStates['cw_KJV'];
     final isDownloading = kjvProgress != null && kjvProgress.percent < 1.0 && kjvProgress.status != 'Done';
 
     return Scaffold(
@@ -77,7 +77,7 @@ class OnboardingScreen extends ConsumerWidget {
                   ] else ...[
                     catalogAsync.when(
                       data: (modules) {
-                        final kjvModule = modules.where((m) => m.abbr == 'KJV_plus_').firstOrNull;
+                        final kjvModule = modules.where((m) => m.config.name == 'KJV').firstOrNull;
                         
                         return SizedBox(
                           width: double.infinity,
@@ -92,7 +92,7 @@ class OnboardingScreen extends ConsumerWidget {
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                             ),
                             onPressed: kjvModule == null ? null : () {
-                              ref.read(contentManagerControllerProvider.notifier).downloadAndImportPh4(kjvModule);
+                              ref.read(contentManagerControllerProvider.notifier).downloadAndImportCrosswire(kjvModule);
                             },
                           ),
                         );

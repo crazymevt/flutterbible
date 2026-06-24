@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'package:archive/archive.dart';
 import 'package:dio/dio.dart';
 import 'package:html/parser.dart' as html_parser;
+import '../app/version.dart';
 import 'logging.dart';
+import 'importer/sword/sword_config.dart';
 
 enum ModuleType { bible, commentary, dictionary, subheadings, devotional }
 
@@ -50,10 +53,22 @@ class OsisTranslation {
   });
 }
 
+class CrosswireModule {
+  final SwordConfig config;
+  final String repoDomain;
+  final String repoPath;
+
+  CrosswireModule({
+    required this.config,
+    required this.repoDomain,
+    required this.repoPath,
+  });
+}
+
 class ContentManagerApi {
   final Dio _dio = Dio(
     BaseOptions(
-      headers: {'User-Agent': 'Mozilla/5.0 (StudyBible Flutter)'},
+      headers: {'User-Agent': 'Mozilla/5.0 (StudyBible Flutter/$appVersion)'},
       responseType: ResponseType.plain,
     ),
   );
@@ -244,12 +259,70 @@ class ContentManagerApi {
     void Function(int, int)? onReceiveProgress,
   }) async {
     final dioDownload = Dio(
-      BaseOptions(headers: {'User-Agent': 'Mozilla/5.0 (StudyBible Flutter)'}),
+      BaseOptions(headers: {'User-Agent': 'Mozilla/5.0 (StudyBible Flutter/$appVersion)'}),
     );
     await dioDownload.download(
       url,
       targetPath,
       onReceiveProgress: onReceiveProgress,
     );
+  }
+
+  /// Fetch CrossWire modules from the main repository
+  Future<List<CrosswireModule>> fetchCrosswireModules() async {
+    try {
+      final response = await _dio.get('https://crosswire.org/ftpmirror/pub/sword/masterRepoList.conf');
+      final lines = response.data.toString().split('\n');
+      
+      String repoDomain = 'crosswire.org';
+      String repoPath = '/ftpmirror/pub/sword/raw';
+
+      // Parse the primary CrossWire repo
+      for (final line in lines) {
+        if (line.contains('HTTPSPackagePreference=CrossWire|')) {
+          final parts = line.split('=')[2].split('|');
+          if (parts.length >= 3) {
+            repoDomain = parts[1];
+            repoPath = parts[2];
+            break;
+          }
+        }
+      }
+
+      final modsUrl = 'https://$repoDomain$repoPath/mods.d.tar.gz';
+      final modsResponse = await _dio.get(
+        modsUrl,
+        options: Options(responseType: ResponseType.bytes),
+      );
+
+      final bytes = modsResponse.data as List<int>;
+      final archive = TarDecoder().decodeBytes(GZipDecoder().decodeBytes(bytes));
+
+      final List<CrosswireModule> modules = [];
+
+      for (final file in archive) {
+        if (file.isFile && file.name.toLowerCase().endsWith('.conf')) {
+          final content = utf8.decode(file.content as List<int>, allowMalformed: true);
+          final config = SwordConfig.parse(content);
+
+          // Skip if locked
+          if (config.value('CipherKey') != null) {
+            continue;
+          }
+
+          modules.add(CrosswireModule(
+            config: config,
+            repoDomain: repoDomain,
+            repoPath: repoPath,
+          ));
+        }
+      }
+
+      modules.sort((a, b) => a.config.name.compareTo(b.config.name));
+      return modules;
+    } catch (e, stack) {
+      logError(e, stack, context: 'ContentManagerApi.fetchCrosswireModules');
+      rethrow;
+    }
   }
 }
