@@ -1,5 +1,17 @@
 [
   {
+    "version": "26.6.25+2",
+    "date": "2026-06-25",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "Recover from interrupted content-DB creation instead of wedging",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.6.25+1",
     "date": "2026-06-25",
     "features": [
