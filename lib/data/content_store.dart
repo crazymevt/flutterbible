@@ -40,7 +40,17 @@ class ContentStore extends _$ContentStore {
   MigrationStrategy get migration {
     return MigrationStrategy(
       onCreate: (Migrator m) async {
-        await m.createAll();
+        // Create each entity only if it isn't already present, so a partial or
+        // interrupted onCreate can be re-run safely. Drift only bumps the
+        // stored schema version once the whole strategy completes; if onCreate
+        // fails midway, some tables stay committed with the version still at 0,
+        // and the next open re-runs onCreate. A plain m.createAll() would then
+        // throw "table already exists" and wedge every future open — leaving
+        // the user with no content DB and unable to install one. See
+        // [_createIfNotExists].
+        for (final entity in allSchemaEntities) {
+          await _createIfNotExists(m, entity);
+        }
         await customStatement('''
           CREATE VIRTUAL TABLE IF NOT EXISTS content_search USING fts5(type UNINDEXED, reference_id UNINDEXED, text_content);
         ''');
@@ -98,17 +108,17 @@ class ContentStore extends _$ContentStore {
           await m.addColumn(devotionals, devotionals.about);
         }
         if (from < 9) {
-          await _createTableIfNotExists(m, topics);
-          await _createTableIfNotExists(m, topicEntries);
-          await _createTableIfNotExists(m, topicReferences);
+          await _createIfNotExists(m, topics);
+          await _createIfNotExists(m, topicEntries);
+          await _createIfNotExists(m, topicReferences);
           await customStatement(
             'CREATE INDEX IF NOT EXISTS idx_topic_ref_location '
             'ON topic_references (book_name, chapter)',
           );
         }
         if (from < 10) {
-          await _createTableIfNotExists(m, places);
-          await _createTableIfNotExists(m, placeVerses);
+          await _createIfNotExists(m, places);
+          await _createIfNotExists(m, placeVerses);
           await customStatement(
             'CREATE INDEX IF NOT EXISTS idx_place_verse_location '
             'ON place_verses (book_name, chapter)',
@@ -118,22 +128,24 @@ class ContentStore extends _$ContentStore {
     );
   }
 
-  /// Creates [table] only if it isn't already present.
+  /// Creates [entity] (a table, index, view, …) only if it isn't already
+  /// present.
   ///
-  /// A migration block can be re-entered after a partial or interrupted run —
-  /// drift only bumps the stored schema version once the whole strategy
-  /// completes, so a failure midway leaves some statements applied and the
-  /// version unchanged. On the next open the same block runs again; a plain
-  /// [Migrator.createTable] would then throw "table already exists" and wedge
-  /// every future open (the content DB never finishes opening, so the reader
-  /// hangs). Skipping tables that already exist makes the block idempotent.
-  Future<void> _createTableIfNotExists(Migrator m, TableInfo table) async {
+  /// Both onCreate and onUpgrade can be re-entered after a partial or
+  /// interrupted run — drift only bumps the stored schema version once the
+  /// whole strategy completes, so a failure midway leaves some statements
+  /// applied and the version unchanged. On the next open the same block runs
+  /// again; a plain [Migrator.create] would then throw "already exists" and
+  /// wedge every future open (the content DB never finishes opening, so the
+  /// reader hangs). Skipping entities that already exist makes the block
+  /// idempotent.
+  Future<void> _createIfNotExists(Migrator m, DatabaseSchemaEntity entity) async {
     final existing = await customSelect(
-      "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?",
-      variables: [Variable<String>(table.actualTableName)],
+      "SELECT 1 FROM sqlite_master WHERE name = ?",
+      variables: [Variable<String>(entity.entityName)],
     ).get();
     if (existing.isEmpty) {
-      await m.createTable(table);
+      await m.create(entity);
     }
   }
 
