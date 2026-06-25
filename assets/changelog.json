@@ -1,5 +1,17 @@
 [
   {
+    "version": "26.6.25+3",
+    "date": "2026-06-25",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "Keep audio playing when the player drawer is closed",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.6.25+2",
     "date": "2026-06-25",
     "features": [
