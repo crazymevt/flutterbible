@@ -114,6 +114,9 @@ class _GlobalSearchBarState extends ConsumerState<GlobalSearchBar> {
                 ref.read(selectedVersesProvider.notifier).clear();
                 ref.read(selectedVersesProvider.notifier).toggle(parsed.verse!);
               }
+              ref
+                  .read(navigationControllerProvider)
+                  .recordHistory(verse: parsed.verse);
               ref.read(appModuleProvider.notifier).setModule(AppModule.reader);
               _controller.clear();
               return;

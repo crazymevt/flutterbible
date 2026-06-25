@@ -13,6 +13,7 @@ import 'book_chooser_sheet.dart';
 import '../common/breakpoints.dart';
 
 import 'mobile_tools_drawer.dart';
+import 'history_panel.dart';
 import 'audio_player_widget.dart';
 import 'tts_player_widget.dart';
 import '../../app/tts_providers.dart';
@@ -361,6 +362,24 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
           centerTitle: true,
           title: const SearchTitleBar(),
           actions: [
+            IconButton(
+              icon: const Icon(Icons.history),
+              tooltip: 'History',
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  useSafeArea: true,
+                  builder: (context) => DraggableScrollableSheet(
+                    initialChildSize: 0.9,
+                    minChildSize: 0.5,
+                    maxChildSize: 1.0,
+                    expand: false,
+                    builder: (_, _) => const HistoryPanel(),
+                  ),
+                );
+              },
+            ),
             if (audioData != null)
               IconButton(
                 icon: const Icon(Icons.headphones),
