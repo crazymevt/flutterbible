@@ -1,14 +1,12 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
-import '../../app/app_state.dart';
 import '../../app/audio_providers.dart';
-import '../../app/content_providers.dart';
-import '../../app/dashboard_providers.dart';
 import '../../app/reader_state.dart';
-import '../../data/logging.dart';
 
+/// Bottom-sheet view onto the long-lived [AudioPlayerController]. The player
+/// itself lives in the controller (a kept-alive provider), so dismissing this
+/// sheet does not stop playback.
 class AudioPlayerWidget extends ConsumerStatefulWidget {
   const AudioPlayerWidget({super.key});
 
@@ -17,95 +15,9 @@ class AudioPlayerWidget extends ConsumerStatefulWidget {
 }
 
 class _AudioPlayerWidgetState extends ConsumerState<AudioPlayerWidget> {
-  final AudioPlayer _player = AudioPlayer();
-  String? _currentUrl;
-  bool _shouldAutoPlay = false;
-  bool _loadFailed = false;
-  double _playbackSpeed = 1.0;
-  double? _dragValue; // non-null while the user is scrubbing the slider
-  Timer? _sleepTimer;
-  int? _sleepMinutes; // active sleep-timer duration, null when off
-  StreamSubscription? _playerStateSubscription;
-
-  static const List<double> _speedOptions = [0.75, 1.0, 1.25, 1.5, 2.0];
-  static const List<int> _sleepOptions = [15, 30, 45, 60];
-
-  @override
-  void initState() {
-    super.initState();
-    _playerStateSubscription = _player.playerStateStream.listen((state) {
-      if (state.processingState == ProcessingState.completed) {
-        _onChapterComplete();
-      }
-    });
-  }
-
-  Future<void> _onChapterComplete() async {
-    _shouldAutoPlay = true;
-
-    final book = ref.read(selectedBookNameProvider);
-    final chapter = ref.read(selectedChapterProvider);
-
-    // Mark the just-finished chapter read on completion, if enabled. This
-    // runs before nextChapter() and independently of whether navigation
-    // actually advances, so the final chapter of the Bible (which has no
-    // next chapter to move to) is still credited.
-    // Fire-and-forget, but guard the unawaited future so a DB/device-id
-    // failure doesn't surface as an unhandled async error.
-    if (ref.read(audioAdvanceMarksReadProvider)) {
-      ref
-          .read(dashboardActionProvider)
-          .markChapterRead(book, chapter)
-          .catchError((Object e) => debugPrint('Failed to mark read: $e'));
-    }
-
-    await ref.read(navigationControllerProvider).nextChapter();
-
-    // If nothing advanced (e.g. the final chapter of the Bible), clear the
-    // pending auto-play so it doesn't linger and surprise the next load.
-    if (!mounted) return;
-    if (ref.read(selectedBookNameProvider) == book &&
-        ref.read(selectedChapterProvider) == chapter) {
-      _shouldAutoPlay = false;
-    }
-  }
-
-  @override
-  void dispose() {
-    _playerStateSubscription?.cancel();
-    _sleepTimer?.cancel();
-    _player.dispose();
-    super.dispose();
-  }
-
-  /// Move to an adjacent chapter from the player, preserving playback: if audio
-  /// is currently playing, the next chapter auto-plays once loaded.
-  void _skipChapter({required bool forward}) {
-    _shouldAutoPlay = _player.playing;
-    final nav = ref.read(navigationControllerProvider);
-    if (forward) {
-      nav.nextChapter();
-    } else {
-      nav.previousChapter();
-    }
-  }
-
-  void _cycleSpeed() {
-    final i = _speedOptions.indexOf(_playbackSpeed);
-    final next = _speedOptions[(i + 1) % _speedOptions.length];
-    setState(() => _playbackSpeed = next);
-    _player.setSpeed(next);
-  }
-
-  void _setSleepTimer(int? minutes) {
-    _sleepTimer?.cancel();
-    setState(() => _sleepMinutes = minutes);
-    if (minutes == null) return;
-    _sleepTimer = Timer(Duration(minutes: minutes), () {
-      _player.pause();
-      if (mounted) setState(() => _sleepMinutes = null);
-    });
-  }
+  // The only state that belongs to the sheet itself: the in-progress scrub
+  // position. Non-null while the user is dragging the slider.
+  double? _dragValue;
 
   // Shared pill container for the secondary controls.
   Widget _chip(BuildContext context, {required Widget child, bool active = false}) {
@@ -122,15 +34,16 @@ class _AudioPlayerWidgetState extends ConsumerState<AudioPlayerWidget> {
     );
   }
 
-  Widget _buildSpeedChip(BuildContext context) {
+  Widget _buildSpeedChip(BuildContext context, double playbackSpeed) {
     final scheme = Theme.of(context).colorScheme;
-    final label = _playbackSpeed == _playbackSpeed.roundToDouble()
-        ? '${_playbackSpeed.toStringAsFixed(0)}×'
-        : '$_playbackSpeed×';
-    final active = _playbackSpeed != 1.0;
+    final label = playbackSpeed == playbackSpeed.roundToDouble()
+        ? '${playbackSpeed.toStringAsFixed(0)}×'
+        : '$playbackSpeed×';
+    final active = playbackSpeed != 1.0;
     return InkWell(
       borderRadius: BorderRadius.circular(16),
-      onTap: _cycleSpeed,
+      onTap: () =>
+          ref.read(audioPlayerControllerProvider.notifier).cycleSpeed(),
       child: _chip(
         context,
         active: active,
@@ -189,15 +102,16 @@ class _AudioPlayerWidgetState extends ConsumerState<AudioPlayerWidget> {
     );
   }
 
-  Widget _buildSleepChip(BuildContext context) {
+  Widget _buildSleepChip(BuildContext context, int? sleepMinutes) {
     final scheme = Theme.of(context).colorScheme;
-    final active = _sleepMinutes != null;
+    final active = sleepMinutes != null;
     return PopupMenuButton<int?>(
       tooltip: 'Sleep timer',
-      onSelected: _setSleepTimer,
+      onSelected: (m) =>
+          ref.read(audioPlayerControllerProvider.notifier).setSleepTimer(m),
       itemBuilder: (context) => [
         const PopupMenuItem<int?>(value: null, child: Text('Off')),
-        ..._sleepOptions.map(
+        ...AudioPlayerController.sleepOptions.map(
           (m) => PopupMenuItem<int?>(value: m, child: Text('$m minutes')),
         ),
       ],
@@ -210,7 +124,7 @@ class _AudioPlayerWidgetState extends ConsumerState<AudioPlayerWidget> {
             Icon(Icons.bedtime, size: 16, color: scheme.onSurfaceVariant),
             const SizedBox(width: 6),
             Text(
-              active ? '$_sleepMinutes min' : 'Sleep',
+              active ? '$sleepMinutes min' : 'Sleep',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: scheme.onSurfaceVariant,
@@ -222,49 +136,17 @@ class _AudioPlayerWidgetState extends ConsumerState<AudioPlayerWidget> {
     );
   }
 
-  Future<void> _loadAudio(String url) async {
-    if (_currentUrl == url) return;
-    _currentUrl = url;
-    // Note: this method is invoked from build(); all setState() calls below
-    // run only after the first await, never synchronously during build.
-    try {
-      await _player.setUrl(url);
-      await _player.setSpeed(_playbackSpeed);
-      if (_shouldAutoPlay) {
-        _shouldAutoPlay = false;
-        _player.play();
-      }
-      if (_loadFailed && mounted) setState(() => _loadFailed = false);
-    } catch (e, stack) {
-      logError(e, stack, context: 'AudioPlayerWidget._loadAudio');
-      _shouldAutoPlay = false;
-      if (mounted) setState(() => _loadFailed = true);
-    }
-  }
-
-  Future<void> _retryLoad() async {
-    final url = _currentUrl;
-    if (url == null) return;
-    _currentUrl = null; // force _loadAudio to re-attempt the same url
-    _shouldAutoPlay = true;
-    await _loadAudio(url);
-  }
-
   @override
   Widget build(BuildContext context) {
     final audioData = ref.watch(chapterAudioProvider);
 
     if (audioData == null) {
-      _player.stop();
-      _currentUrl = null;
-      // Plain assignment (not setState): we're in build and returning an empty
-      // widget anyway; this just avoids a stale error flashing when audio
-      // becomes available again.
-      _loadFailed = false;
       return const SizedBox.shrink();
     }
 
-    _loadAudio(audioData.url);
+    final uiState = ref.watch(audioPlayerControllerProvider);
+    final controller = ref.read(audioPlayerControllerProvider.notifier);
+    final player = controller.player;
 
     return SafeArea(
       child: Padding(
@@ -285,7 +167,7 @@ class _AudioPlayerWidgetState extends ConsumerState<AudioPlayerWidget> {
               ),
             ),
             const SizedBox(height: 24),
-            
+
             // Title
             Text(
               'Now Playing',
@@ -302,7 +184,7 @@ class _AudioPlayerWidgetState extends ConsumerState<AudioPlayerWidget> {
                     fontWeight: FontWeight.bold,
                   ),
             ),
-            if (_loadFailed) ...[
+            if (uiState.loadFailed) ...[
               const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -323,7 +205,7 @@ class _AudioPlayerWidgetState extends ConsumerState<AudioPlayerWidget> {
                   ),
                   const SizedBox(width: 8),
                   TextButton(
-                    onPressed: _retryLoad,
+                    onPressed: controller.retryLoad,
                     child: const Text('Retry'),
                   ),
                 ],
@@ -333,10 +215,10 @@ class _AudioPlayerWidgetState extends ConsumerState<AudioPlayerWidget> {
 
             // Slider
             StreamBuilder<Duration>(
-              stream: _player.positionStream,
+              stream: player.positionStream,
               builder: (context, snapshot) {
                 final position = snapshot.data ?? Duration.zero;
-                final duration = _player.duration ?? Duration.zero;
+                final duration = player.duration ?? Duration.zero;
                 final maxMs = duration.inMilliseconds.toDouble() > 0
                     ? duration.inMilliseconds.toDouble()
                     : 1.0;
@@ -371,7 +253,7 @@ class _AudioPlayerWidgetState extends ConsumerState<AudioPlayerWidget> {
                           setState(() => _dragValue = value);
                         },
                         onChangeEnd: (value) {
-                          _player.seek(Duration(milliseconds: value.round()));
+                          player.seek(Duration(milliseconds: value.round()));
                           setState(() => _dragValue = null);
                         },
                       ),
@@ -390,9 +272,9 @@ class _AudioPlayerWidgetState extends ConsumerState<AudioPlayerWidget> {
                 );
               },
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // Controls — FittedBox keeps the 5-button row from overflowing on
             // very narrow screens by scaling it down.
             FittedBox(
@@ -404,7 +286,7 @@ class _AudioPlayerWidgetState extends ConsumerState<AudioPlayerWidget> {
                   icon: const Icon(Icons.skip_previous),
                   iconSize: 32.0,
                   tooltip: 'Previous chapter',
-                  onPressed: () => _skipChapter(forward: false),
+                  onPressed: () => controller.skipChapter(forward: false),
                 ),
                 const SizedBox(width: 8),
                 IconButton(
@@ -412,13 +294,13 @@ class _AudioPlayerWidgetState extends ConsumerState<AudioPlayerWidget> {
                   iconSize: 28.0,
                   tooltip: 'Back 10 seconds',
                   onPressed: () {
-                    final newPos = _player.position - const Duration(seconds: 10);
-                    _player.seek(newPos < Duration.zero ? Duration.zero : newPos);
+                    final newPos = player.position - const Duration(seconds: 10);
+                    player.seek(newPos < Duration.zero ? Duration.zero : newPos);
                   },
                 ),
                 const SizedBox(width: 12),
                 StreamBuilder<PlayerState>(
-                  stream: _player.playerStateStream,
+                  stream: player.playerStateStream,
                   builder: (context, snapshot) {
                     final playerState = snapshot.data;
                     final processingState = playerState?.processingState;
@@ -447,11 +329,11 @@ class _AudioPlayerWidgetState extends ConsumerState<AudioPlayerWidget> {
                       color: Theme.of(context).colorScheme.primary,
                       onPressed: () {
                         if (playing != true) {
-                          _player.play();
+                          player.play();
                         } else if (processingState != ProcessingState.completed) {
-                          _player.pause();
+                          player.pause();
                         } else {
-                          _player.seek(Duration.zero);
+                          player.seek(Duration.zero);
                         }
                       },
                     );
@@ -463,9 +345,9 @@ class _AudioPlayerWidgetState extends ConsumerState<AudioPlayerWidget> {
                   iconSize: 28.0,
                   tooltip: 'Forward 10 seconds',
                   onPressed: () {
-                    final newPos = _player.position + const Duration(seconds: 10);
-                    final dur = _player.duration ?? Duration.zero;
-                    _player.seek(newPos > dur ? dur : newPos);
+                    final newPos = player.position + const Duration(seconds: 10);
+                    final dur = player.duration ?? Duration.zero;
+                    player.seek(newPos > dur ? dur : newPos);
                   },
                 ),
                 const SizedBox(width: 8),
@@ -473,14 +355,14 @@ class _AudioPlayerWidgetState extends ConsumerState<AudioPlayerWidget> {
                   icon: const Icon(Icons.skip_next),
                   iconSize: 32.0,
                   tooltip: 'Next chapter',
-                  onPressed: () => _skipChapter(forward: true),
+                  onPressed: () => controller.skipChapter(forward: true),
                 ),
               ],
               ),
             ),
 
             const SizedBox(height: 32),
-            
+
             // Secondary controls: speed, voice actor, sleep timer
             Wrap(
               alignment: WrapAlignment.center,
@@ -488,9 +370,9 @@ class _AudioPlayerWidgetState extends ConsumerState<AudioPlayerWidget> {
               spacing: 12,
               runSpacing: 8,
               children: [
-                _buildSpeedChip(context),
+                _buildSpeedChip(context, uiState.playbackSpeed),
                 _buildVoiceChip(context, audioData),
-                _buildSleepChip(context),
+                _buildSleepChip(context, uiState.sleepMinutes),
               ],
             ),
             const SizedBox(height: 16),
