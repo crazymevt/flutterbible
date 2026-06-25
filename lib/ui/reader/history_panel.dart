@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/user_providers.dart';
 import '../../app/app_state.dart';
+import '../../app/content_providers.dart';
 import '../../app/reader_state.dart';
-import '../common/breakpoints.dart';
 
 class HistoryPanel extends ConsumerWidget {
   const HistoryPanel({super.key});
@@ -94,8 +94,14 @@ class HistoryPanel extends ConsumerWidget {
                               .toggle(item.verse!);
                         }
 
+                        // Re-record the visit so the tapped entry is deduped
+                        // and re-inserted at the top of the history list.
+                        ref
+                            .read(navigationControllerProvider)
+                            .recordHistory(verse: item.verse);
+
                         ref.read(activeToolProvider.notifier).close();
-                        if (MediaQuery.sizeOf(context).width <= Breakpoints.compact) {
+                        if (Navigator.of(context).canPop()) {
                           Navigator.of(context).pop();
                         }
                       },

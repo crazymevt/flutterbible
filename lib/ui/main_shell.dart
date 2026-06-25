@@ -7,7 +7,6 @@ import 'reader/commentary_panel.dart';
 import 'reader/notes_panel.dart';
 import 'reader/dictionary_panel.dart';
 import 'reader/search_panel.dart';
-import 'reader/history_panel.dart';
 import 'reader/media_panel.dart';
 import 'reader/compare_panel.dart';
 import 'reader/devotionals_panel.dart';
@@ -158,9 +157,6 @@ class _DesktopLayout extends ConsumerWidget {
                   if (activeTool == ActiveTool.search) {
                     return const SearchPanel();
                   }
-                  if (activeTool == ActiveTool.history) {
-                    return const HistoryPanel();
-                  }
                   if (activeTool == ActiveTool.media) {
                     final book = ref.watch(selectedBookNameProvider);
                     final chap = ref.watch(selectedChapterProvider);
@@ -223,10 +219,6 @@ class _DesktopLayout extends ConsumerWidget {
           label: Text('Commentaries'),
         ),
         NavigationRailDestination(
-          icon: Icon(Icons.history),
-          label: Text('History'),
-        ),
-        NavigationRailDestination(
           icon: Icon(Icons.video_library),
           label: Text('Media'),
         ),
@@ -280,20 +272,19 @@ class _DesktopLayout extends ConsumerWidget {
         return 3;
       case ActiveTool.commentaries:
         return 4;
-      case ActiveTool.history:
-        return 5;
       case ActiveTool.media:
-        return 6;
+        return 5;
       case ActiveTool.readingPlans:
-        return 7;
+        return 6;
       case ActiveTool.sermons:
-        return 8;
+        return 7;
       case ActiveTool.devotionals:
-        return 9;
+        return 8;
       case ActiveTool.topics:
-        return 10;
+        return 9;
       case ActiveTool.places:
-        return 11;
+        return 10;
+      case ActiveTool.history:
       case ActiveTool.none:
       case ActiveTool.compare:
         return null;
@@ -313,18 +304,16 @@ class _DesktopLayout extends ConsumerWidget {
       case 4:
         return ActiveTool.commentaries;
       case 5:
-        return ActiveTool.history;
-      case 6:
         return ActiveTool.media;
-      case 7:
+      case 6:
         return ActiveTool.readingPlans;
-      case 8:
+      case 7:
         return ActiveTool.sermons;
-      case 9:
+      case 8:
         return ActiveTool.devotionals;
-      case 10:
+      case 9:
         return ActiveTool.topics;
-      case 11:
+      case 10:
         return ActiveTool.places;
       default:
         return ActiveTool.none;

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import '../../app/content_providers.dart';
 import '../../app/app_state.dart';
+import '../common/bible_link_handler.dart';
 
 class DictionaryPanel extends ConsumerStatefulWidget {
   const DictionaryPanel({super.key});
@@ -127,6 +128,8 @@ class _DictionaryPanelState extends ConsumerState<DictionaryPanel> {
                           textStyle: Theme.of(context).textTheme.bodyMedium,
                           onErrorBuilder: (context, element, error) => const SizedBox.shrink(),
                           onLoadingBuilder: (context, element, progress) => const SizedBox.shrink(),
+                          onTapUrl: (url) =>
+                              handleBibleRefTap(ref, context, url),
                         ),
                       ],
                     );

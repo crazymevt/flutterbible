@@ -7,7 +7,6 @@ import 'notes_panel.dart';
 import 'search_panel.dart';
 import 'dictionary_panel.dart';
 import 'commentary_panel.dart';
-import 'history_panel.dart';
 import 'media_panel.dart';
 import 'reading_plan_panel.dart';
 import '../sermons/sermons_panel.dart';
@@ -87,14 +86,6 @@ class MobileToolsDrawer extends ConsumerWidget {
               ),
               title: const Text('Commentaries'),
               onTap: () => _openTool(context, const CommentaryPanel()),
-            ),
-            ListTile(
-              leading: const Tooltip(
-                message: 'History',
-                child: Icon(Icons.history),
-              ),
-              title: const Text('History'),
-              onTap: () => _openTool(context, const HistoryPanel()),
             ),
             ListTile(
               leading: const Tooltip(
