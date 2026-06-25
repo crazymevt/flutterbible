@@ -21,7 +21,7 @@ void main() {
       // next open treats the database as fresh and runs onCreate again.
       final raw = sqlite.sqlite3.open(file.path);
       raw.execute('PRAGMA user_version = 0');
-      raw.dispose();
+      raw.close();
 
       // The re-run must be idempotent — a plain createAll() would throw
       // "table already exists" here and wedge every future open.
