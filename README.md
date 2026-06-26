@@ -34,7 +34,7 @@ _Click any image to view it full size._
 - **Integrated commentaries & dictionaries** — verse-ref lookup, parallel view, multi-dictionary search, tap-a-word lookup.
 - **Study tools** — journals, prayer tracker, sermon builder, plan generator, custom notes, and bookmarks.
 - **Progress dashboard** — reading coverage + per-book drill-down, reading pace, achievements/badges, time tracker & analytics.
-- **Content manager** — install bibles/commentaries/dictionaries from ph4.org; OSIS + MyBible import.
+- **Content manager** — install bibles/commentaries/dictionaries from ph4.org and SWORD repositories; OSIS, MyBible, and SWORD module import.
 - **Rich media** — local audio/video, YouTube overlay, image lightbox.
 - **Cross-device sync** — highlights, notes, bookmarks, journals, prayers, reading progress, and settings synced across devices (using zero-cost file-based sync like Syncthing or cloud folders).
 
@@ -65,6 +65,7 @@ This project strictly follows a **clean layered architecture**:
 This project is made possible thanks to several upstream resources and formats:
 - **[ph4.org](https://ph4.org/)**: For providing the extensive catalog of Bible modules, commentaries, and dictionaries.
 - **[MyBible](https://mybible.zone/)**: For their excellent SQLite-based module format which this app imports and utilizes.
+- **[The SWORD Project](https://crosswire.org/sword/)**: For the extensive library of Bible modules and the SWORD module format.
 - **OSIS (Open Scriptural Information Standard)**: For the standard XML schema used in representing scriptural texts.
 - **[BibleProject](https://bibleproject.com/)**: Incredible animated videos and resources for exploring the Bible.
 - **[Lumo Project](https://lumoproject.com/)**: Visual translations of the four Gospels.
