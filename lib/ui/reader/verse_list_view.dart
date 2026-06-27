@@ -139,6 +139,28 @@ class _VerseListViewState extends ConsumerState<VerseListView> {
   Widget build(BuildContext context) {
     final spokenVerse = ref.watch(spokenVerseProvider);
 
+    ref.listen<ActiveTool>(activeToolProvider, (previous, next) {
+      if (previous == ActiveTool.none && next != ActiveTool.none) {
+        if (widget.selectedVerses.isNotEmpty) {
+          final targetVerse = widget.selectedVerses.first;
+          final targetIndex = widget.verses.indexWhere((v) => v.verse == targetVerse);
+          if (targetIndex != -1) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              final controller = widget.externalScrollController ?? itemScrollController;
+              if (controller.isAttached) {
+                final offset = widget.headerWidget != null ? 1 : 0;
+                controller.scrollTo(
+                  index: targetIndex + offset,
+                  duration: const Duration(milliseconds: 300),
+                  alignment: 0.3,
+                );
+              }
+            });
+          }
+        }
+      }
+    });
+
     // Follow read-aloud: scroll the active verse into view as it changes.
     if (spokenVerse != null && spokenVerse != _lastSpokenScroll) {
       _lastSpokenScroll = spokenVerse;

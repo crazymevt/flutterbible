@@ -168,6 +168,24 @@ class _FlowingParagraphViewState extends ConsumerState<FlowingParagraphView> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<ActiveTool>(activeToolProvider, (previous, next) {
+      if (previous == ActiveTool.none && next != ActiveTool.none) {
+        if (widget.selectedVerses.isNotEmpty) {
+          final targetVerse = widget.selectedVerses.first;
+          final key = _verseKeys[targetVerse];
+          if (key != null && key.currentContext != null) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Scrollable.ensureVisible(
+                key.currentContext!,
+                duration: const Duration(milliseconds: 300),
+                alignment: 0.2,
+              );
+            });
+          }
+        }
+      }
+    });
+
     // Dispose the previous frame's per-span recognizers before building fresh
     // ones; otherwise every rebuild (selection, scroll target, theme) leaks a
     // recognizer for every word on screen.

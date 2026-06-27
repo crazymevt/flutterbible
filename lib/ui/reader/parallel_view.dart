@@ -157,6 +157,33 @@ class _ParallelViewState extends ConsumerState<ParallelView> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<ActiveTool>(activeToolProvider, (previous, next) {
+      if (previous == ActiveTool.none && next != ActiveTool.none) {
+        if (widget.selectedVerses.isNotEmpty) {
+          final targetVerse = widget.selectedVerses.first;
+          final Set<int> allVerseNumbers = {};
+          for (final verses in widget.versesMap.values) {
+            allVerseNumbers.addAll(verses.map((v) => v.verse));
+          }
+          final verseNumbers = allVerseNumbers.toList()..sort();
+          final targetIndex = verseNumbers.indexOf(targetVerse);
+          if (targetIndex != -1) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              final controller = widget.externalScrollController ?? itemScrollController;
+              if (controller.isAttached) {
+                final offset = widget.headerWidget != null ? 1 : 0;
+                controller.scrollTo(
+                  index: targetIndex + offset,
+                  duration: const Duration(milliseconds: 300),
+                  alignment: 0.3,
+                );
+              }
+            });
+          }
+        }
+      }
+    });
+
     if (widget.versesMap.isEmpty) {
       return const Center(child: Text('No active versions.'));
     }
