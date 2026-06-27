@@ -19,6 +19,16 @@ Flathub distribution is planned (see [flatpak/README.md](flatpak/README.md)).
 
 > iOS is supported in the codebase but isn't distributed as a signed build yet — build it from source (see [Getting Started](#getting-started)).
 
+### Windows SmartScreen
+
+Because this is an unsigned application, Windows SmartScreen may block the installation or execution. To bypass this:
+1. When the "Windows protected your PC" dialog appears, click **More info**.
+2. Click the **Run anyway** button that appears at the bottom.
+
+Alternatively, you can unblock the file directly:
+1. Right-click the downloaded file and select **Properties**.
+2. At the bottom of the **General** tab, check the **Unblock** box (if present) and click **OK**.
+
 ## Screenshots
 
 _Click any image to view it full size._
