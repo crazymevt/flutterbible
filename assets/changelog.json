@@ -1,5 +1,29 @@
 [
   {
+    "version": "26.6.27+2",
+    "date": "2026-06-27",
+    "features": [
+      {
+        "category": "New Features",
+        "title": "enhance FTS5 NEAR chaining, sync SearchPanel query, and update search help example",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "add FTS5 NEAR operator for search using ~N syntax",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "scroll selected verse into view when sidepanel opens",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.6.27+1",
     "date": "2026-06-27",
     "features": [
