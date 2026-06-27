@@ -1,5 +1,29 @@
 [
   {
+    "version": "26.6.27+3",
+    "date": "2026-06-27",
+    "features": [
+      {
+        "category": "Updates",
+        "title": "build: switch Windows release artifact to Inno Setup installer",
+        "description": "",
+        "icon": "update"
+      },
+      {
+        "category": "Updates",
+        "title": "ci: add push trigger to kick off workflow",
+        "description": "",
+        "icon": "update"
+      },
+      {
+        "category": "Updates",
+        "title": "ci: add manual workflow to build Windows installer and auto updater config",
+        "description": "",
+        "icon": "update"
+      }
+    ]
+  },
+  {
     "version": "26.6.27+2",
     "date": "2026-06-27",
     "features": [
