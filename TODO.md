@@ -6,7 +6,7 @@ Running list of known issues and follow-ups.
 
 ## Enhancements
 
-- [ ] **Support FTS5 NEAR operator.** Update the search system to allow proximity searches (e.g. `NEAR`) instead of forcing exact phrase matches for everything.
+- [x] **Support FTS5 NEAR operator.** Update the search system to allow proximity searches (e.g. `NEAR`) instead of forcing exact phrase matches for everything.
 
 - [x] **Delete Notes.**
 
