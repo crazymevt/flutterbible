@@ -81,6 +81,7 @@ dependencies:
   latlong2: ^0.9.1
   just_audio_windows: ^0.2.3
   flutter_markdown_plus: ^1.0.7
+  auto_updater: ^1.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

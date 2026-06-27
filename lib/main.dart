@@ -13,6 +13,7 @@ import 'app/app_state.dart';
 import 'data/logging.dart';
 import 'theme/app_themes.dart';
 import 'dart:ui';
+import 'package:auto_updater/auto_updater.dart';
 
 class AppScrollBehavior extends MaterialScrollBehavior {
   @override
@@ -68,6 +69,13 @@ void main() {
         await windowManager.show();
         await windowManager.focus();
       });
+    }
+
+    if (!kIsWeb && Platform.isWindows) {
+      String feedURL = 'https://crazymevt.github.io/StudyBible/appcast.xml';
+      await autoUpdater.setFeedURL(feedURL);
+      await autoUpdater.checkForUpdates(inBackground: true);
+      await autoUpdater.setScheduledCheckInterval(3600);
     }
 
     runApp(
