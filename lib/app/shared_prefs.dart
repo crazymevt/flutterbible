@@ -21,3 +21,23 @@ const int kSearchIndexGeneration = 1;
 /// re-fires for each future generation but never nags after a rebuild. See
 /// [WhatsNewDialog] and `MainShell._checkWhatsNew`.
 const String kSearchIndexRebuiltGenKey = 'searchIndexRebuiltGeneration';
+
+const String kHasSeenTutorialKey = 'hasSeenTutorial';
+
+class HasSeenTutorialNotifier extends Notifier<bool> {
+  @override
+  bool build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getBool(kHasSeenTutorialKey) ?? false;
+  }
+
+  Future<void> setSeen(bool seen) async {
+    final prefs = ref.read(sharedPreferencesProvider);
+    await prefs.setBool(kHasSeenTutorialKey, seen);
+    state = seen;
+  }
+}
+
+final hasSeenTutorialProvider = NotifierProvider<HasSeenTutorialNotifier, bool>(() {
+  return HasSeenTutorialNotifier();
+});

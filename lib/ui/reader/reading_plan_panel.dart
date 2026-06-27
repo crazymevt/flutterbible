@@ -189,7 +189,7 @@ class _ActivePlanView extends ConsumerWidget {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
+                  icon: const Icon(Icons.delete_outline, color: Colors.red),
                   tooltip: 'Delete Plan',
                   onPressed: () => _confirmDelete(context, ref, selectedPlanId),
                 ),
@@ -215,7 +215,7 @@ class _ActivePlanView extends ConsumerWidget {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
+                  icon: const Icon(Icons.delete_outline, color: Colors.red),
                   tooltip: 'Delete Plan',
                   onPressed: () => _confirmDelete(context, ref, selectedPlanId),
                 ),

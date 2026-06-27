@@ -155,7 +155,7 @@ class PrayerTrackerPanel extends ConsumerWidget {
                           ),
                           TextButton.icon(
                             icon: const Icon(
-                              Icons.delete,
+                              Icons.delete_outline,
                               size: 18,
                               color: Colors.red,
                             ),

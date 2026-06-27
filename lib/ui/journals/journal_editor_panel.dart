@@ -69,8 +69,7 @@ class _JournalEditorPanelState extends ConsumerState<JournalEditorPanel> {
         setState(() {
           _currentId = id;
         });
-        // We do NOT update selectedJournalIdProvider here to avoid losing focus if it rebuilds too much,
-        // but normally we'd want to set it so the list highlights it.
+        ref.read(selectedJournalIdProvider.notifier).setId(id);
       }
     });
   }
@@ -78,8 +77,24 @@ class _JournalEditorPanelState extends ConsumerState<JournalEditorPanel> {
   @override
   Widget build(BuildContext context) {
     ref.listen<String?>(selectedJournalIdProvider, (previous, next) {
-      _currentId = next;
-      _loadCurrentJournal();
+      if (_currentId != next) {
+        setState(() {
+          _currentId = next;
+        });
+        _loadCurrentJournal();
+      }
+    });
+
+    ref.listen<DateTime>(selectedJournalDateProvider, (previous, next) {
+      if (previous != next) {
+        final targetId = ref.read(selectedJournalIdProvider);
+        if (targetId == null) {
+          setState(() {
+            _currentId = null;
+          });
+          _loadCurrentJournal();
+        }
+      }
     });
 
     return Column(
@@ -114,7 +129,7 @@ class _JournalEditorPanelState extends ConsumerState<JournalEditorPanel> {
                     },
                   ),
                   IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
+                  icon: const Icon(Icons.delete_outline, color: Colors.red),
                   onPressed: () async {
                     final targetId = _currentId;
                     if (targetId == null) return;

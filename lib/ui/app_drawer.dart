@@ -5,6 +5,7 @@ import '../app/version.dart';
 import 'whats_new_dialog.dart';
 
 import 'settings/settings_screen.dart';
+import 'help/help_screen.dart';
 
 class AppDrawer extends ConsumerWidget {
   const AppDrawer({super.key});
@@ -123,6 +124,16 @@ class AppDrawer extends ConsumerWidget {
                   .read(appModuleProvider.notifier)
                   .setModule(AppModule.backupRestore);
               Navigator.of(context).pop();
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.help_outline),
+            title: const Text('Help Center'),
+            onTap: () {
+              Navigator.of(context).pop(); // close drawer
+              Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (_) => const HelpScreen()));
             },
           ),
           ListTile(

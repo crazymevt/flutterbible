@@ -182,7 +182,7 @@ class JournalsListPanel extends ConsumerWidget {
                       ).toLocal().toString().split(' ')[0],
                     ),
                     trailing: IconButton(
-                      icon: const Icon(Icons.delete, size: 20),
+                      icon: const Icon(Icons.delete_outline, size: 20),
                       onPressed: () async {
                         final confirm = await showDialog<bool>(
                           context: context,

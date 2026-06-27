@@ -89,8 +89,30 @@ class SermonsPanel extends ConsumerWidget {
                       title: Text(sermon.title.isEmpty ? 'Untitled Sermon' : sermon.title),
                       subtitle: Text(sermon.series ?? 'No Series'),
                       trailing: IconButton(
-                        icon: const Icon(Icons.delete, size: 20),
-                        onPressed: () => ref.read(sermonActionProvider).deleteSermon(sermon.id),
+                        icon: const Icon(Icons.delete_outline, size: 20),
+                        tooltip: 'Delete Sermon',
+                        onPressed: () async {
+                          final confirm = await showDialog<bool>(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Delete Sermon'),
+                              content: const Text('Are you sure you want to delete this sermon?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(false),
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(true),
+                                  child: const Text('Delete'),
+                                ),
+                              ],
+                            ),
+                          );
+                          if (confirm == true) {
+                            ref.read(sermonActionProvider).deleteSermon(sermon.id);
+                          }
+                        },
                       ),
                       onTap: () {
                         if (MediaQuery.sizeOf(context).width > Breakpoints.compact) {

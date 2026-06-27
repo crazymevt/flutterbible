@@ -95,18 +95,49 @@ class NotesPanel extends ConsumerWidget {
                           Navigator.of(context).pop();
                         }
                       },
-                      trailing: IconButton(
-                        icon: const Icon(Icons.label_outline),
-                        tooltip: 'Manage Tags',
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (_) => TagEditorDialog(
-                              entityId: note.id,
-                              entityType: 'note',
-                            ),
-                          );
-                        },
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.delete_outline),
+                            tooltip: 'Delete Note',
+                            onPressed: () async {
+                              final confirm = await showDialog<bool>(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text('Delete Note'),
+                                  content: const Text('Are you sure you want to delete this note?'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.of(context).pop(false),
+                                      child: const Text('Cancel'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () => Navigator.of(context).pop(true),
+                                      child: const Text('Delete'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                              if (confirm == true) {
+                                ref.read(noteActionProvider).deleteNote(note.id);
+                              }
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.label_outline),
+                            tooltip: 'Manage Tags',
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (_) => TagEditorDialog(
+                                  entityId: note.id,
+                                  entityType: 'note',
+                                ),
+                              );
+                            },
+                          ),
+                        ],
                       ),
                     );
                   },

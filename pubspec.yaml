@@ -80,6 +80,7 @@ dependencies:
   flutter_map: ^8.3.0
   latlong2: ^0.9.1
   just_audio_windows: ^0.2.3
+  flutter_markdown_plus: ^1.0.7
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -127,6 +128,7 @@ flutter:
 
   assets:
     - assets/
+    - assets/help/
     - assets/reading_plans/
     - assets/media/
     - assets/data/

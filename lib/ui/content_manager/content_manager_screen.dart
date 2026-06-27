@@ -309,7 +309,7 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
               },
             ),
           IconButton(
-            icon: const Icon(Icons.delete, color: Colors.red),
+            icon: const Icon(Icons.delete_outline, color: Colors.red),
             tooltip: 'Delete $name',
             onPressed: onDelete,
           ),

@@ -21,6 +21,7 @@ import 'settings/backup_restore_screen.dart';
 import 'reader/reading_plan_panel.dart';
 
 import 'onboarding/onboarding_screen.dart';
+import 'onboarding/tutorial_screen.dart';
 import 'common/breakpoints.dart';
 import '../app/content_providers.dart';
 import '../app/shared_prefs.dart';
@@ -96,6 +97,11 @@ class _MainShellState extends ConsumerState<MainShell> {
 
     if (hasNoBibles) {
       return const OnboardingScreen();
+    }
+
+    final hasSeenTutorial = ref.watch(hasSeenTutorialProvider);
+    if (!hasSeenTutorial) {
+      return const TutorialScreen();
     }
 
     if (currentModule == AppModule.journalsPrayers) {

@@ -48,4 +48,4 @@ final class UpdateCheckerProvider
   }
 }
 
-String _$updateCheckerHash() => r'ab2be6627a7b5c5f38b083b88edd64bc5bd5d1b1';
+String _$updateCheckerHash() => r'90f3165cb04aefe7fe24a1c256d63a7bca748d3c';
