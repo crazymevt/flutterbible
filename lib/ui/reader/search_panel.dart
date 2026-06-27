@@ -34,6 +34,9 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
   @override
   void initState() {
     super.initState();
+    final currentQuery = ref.read(globalSearchQueryProvider);
+    _controller.text = currentQuery;
+    
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         _focusNode.requestFocus();
@@ -85,6 +88,13 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(globalSearchQueryProvider, (previous, next) {
+      if (next != _controller.text) {
+        _controller.text = next;
+        _controller.selection = TextSelection.collapsed(offset: next.length);
+      }
+    });
+
     final resultsAsync = ref.watch(globalSearchResultsProvider);
     final scope = resultsAsync.asData?.value.scope;
 

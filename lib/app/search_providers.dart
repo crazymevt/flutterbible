@@ -158,10 +158,13 @@ final globalSearchResultsProvider = FutureProvider<GlobalSearchResults>((
 
   // Sanitize the query for FTS5 to prevent syntax errors with punctuation
   String searchPattern;
-  final nearMatch = RegExp(r'~([0-9]+)').firstMatch(terms);
-  if (nearMatch != null) {
-    // It's a NEAR search. Extract the distance.
-    final distance = int.parse(nearMatch.group(1)!);
+  final nearMatches = RegExp(r'~([0-9]+)').allMatches(terms);
+  if (nearMatches.isNotEmpty) {
+    // It's a NEAR search. Extract the total distance.
+    int distance = 0;
+    for (final m in nearMatches) {
+      distance += int.parse(m.group(1)!);
+    }
     
     // Split the terms by the ~N pattern
     final parts = terms.split(RegExp(r'\s*~[0-9]+\s*'))
