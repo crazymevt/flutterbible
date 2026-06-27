@@ -39,7 +39,7 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
       const _TutorialPage(
         icon: Icons.search,
         title: 'Powerful Search',
-        description: 'Search across all your downloaded Bibles, journals, and sermons in milliseconds. Use `ot:` or `nt:` to filter by testament. You can also enter a book reference like "John 3:16" to quickly navigate there!',
+        description: 'Search across all your Bibles and journals in milliseconds. Use `ot:` or `nt:` to filter by testament. Use `~10` between words to find them near each other (e.g. `faith ~10 works`).',
       ),
       const _TutorialPage(
         icon: Icons.edit_document,

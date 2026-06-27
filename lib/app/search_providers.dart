@@ -157,8 +157,29 @@ final globalSearchResultsProvider = FutureProvider<GlobalSearchResults>((
   if (terms.isEmpty) return const GlobalSearchResults([]);
 
   // Sanitize the query for FTS5 to prevent syntax errors with punctuation
-  final cleanQuery = terms.replaceAll('"', '""');
-  final searchPattern = '"$cleanQuery"*'; // Match prefix as phrase
+  String searchPattern;
+  final nearMatch = RegExp(r'~([0-9]+)').firstMatch(terms);
+  if (nearMatch != null) {
+    // It's a NEAR search. Extract the distance.
+    final distance = int.parse(nearMatch.group(1)!);
+    
+    // Split the terms by the ~N pattern
+    final parts = terms.split(RegExp(r'\s*~[0-9]+\s*'))
+        .map((p) => p.trim())
+        .where((p) => p.isNotEmpty)
+        .toList();
+        
+    if (parts.length >= 2) {
+      final safeParts = parts.map((p) => '"${p.replaceAll('"', '""')}"').join(' ');
+      searchPattern = 'NEAR($safeParts, $distance)';
+    } else {
+      final cleanQuery = terms.replaceAll('"', '""');
+      searchPattern = '"$cleanQuery"*';
+    }
+  } else {
+    final cleanQuery = terms.replaceAll('"', '""');
+    searchPattern = '"$cleanQuery"*'; // Match prefix as phrase
+  }
 
   final List<SearchResult> results = [];
 
