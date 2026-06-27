@@ -104,6 +104,10 @@ final globalSearchResultsProvider = FutureProvider<GlobalSearchResults>((
   final userStore = ref.watch(userStoreProvider);
   final query = ref.watch(globalSearchQueryProvider);
 
+  // Invalidate this provider whenever relevant user data changes
+  final sub = userStore.tableUpdates().listen((_) => ref.invalidateSelf());
+  ref.onDispose(() => sub.cancel());
+
   if (query.trim().isEmpty) return const GlobalSearchResults([]);
 
   final activeVersions = ref.watch(activeVersionsProvider);

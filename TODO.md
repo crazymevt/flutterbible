@@ -8,7 +8,7 @@ Running list of known issues and follow-ups.
 
 - [ ] **Support FTS5 NEAR operator.** Update the search system to allow proximity searches (e.g. `NEAR`) instead of forcing exact phrase matches for everything.
 
-- [ ] **Delete Notes.**
+- [x] **Delete Notes.**
 
 - [ ] **Gesture navigation using PageView.** Implement swipe navigation in the Reader to change chapters by wrapping the content in a `PageView`. This will require refactoring the state to eagerly load adjacent chapters to support smooth swipe animations.
 
