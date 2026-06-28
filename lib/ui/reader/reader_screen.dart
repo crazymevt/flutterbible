@@ -53,6 +53,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
   Timer? _searchDebounce;
   final FocusNode _searchFocusNode = FocusNode();
   final FocusNode _mainFocusNode = FocusNode();
+  final TextEditingController _searchController = TextEditingController();
 
   /// Returns the sorted list of verse numbers whose text contains [query]
   /// (case-insensitive) across all displayed versions. Single source of truth
@@ -143,6 +144,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     _searchDebounce?.cancel();
     _searchFocusNode.dispose();
     _mainFocusNode.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -300,6 +302,40 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     });
     ref.listen<int>(selectedChapterProvider, (prev, next) {
       _updateChapterTracking(ref.read(selectedBookNameProvider), next);
+    });
+
+    ref.listen<String?>(findInPageQueryProvider, (prev, next) {
+      if (next != null) {
+        setState(() {
+          _showSearchBox = true;
+          _searchQuery = next;
+          _currentMatchIndex = -1;
+          _searchController.text = next;
+        });
+        
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            _searchFocusNode.requestFocus();
+          }
+        });
+
+        _searchDebounce?.cancel();
+        _searchDebounce = Timer(
+          const Duration(milliseconds: 100),
+          () {
+            if (!mounted || !parallelVersesAsync.hasValue) return;
+            final newMatchVerses = _computeMatchVerses(
+              parallelVersesAsync.value!,
+              next,
+            );
+            if (newMatchVerses.isNotEmpty) {
+              ref
+                  .read(targetVerseToScrollProvider.notifier)
+                  .set(newMatchVerses.first);
+            }
+          },
+        );
+      }
     });
 
     // Trigger initial tracking if not already tracking
@@ -494,6 +530,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: TextField(
+                      controller: _searchController,
                       focusNode: _searchFocusNode,
                       decoration: const InputDecoration(
                         hintText: 'Find in page...',
@@ -563,7 +600,9 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                         _showSearchBox = false;
                         _searchQuery = '';
                         _currentMatchIndex = -1;
+                        _searchController.clear();
                       });
+                      ref.read(findInPageQueryProvider.notifier).set(null);
                       _mainFocusNode.requestFocus();
                     },
                     tooltip: 'Close search',

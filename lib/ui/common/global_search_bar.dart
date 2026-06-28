@@ -51,12 +51,16 @@ class _GlobalSearchBarState extends ConsumerState<GlobalSearchBar> {
       focusNode: _focusNode,
       optionsBuilder: (TextEditingValue textEditingValue) async {
         final text = textEditingValue.text;
-        if (text.isEmpty) {
+        if (text.trim().isEmpty) {
           return const Iterable<String>.empty();
         }
         
         final contentStore = ref.read(contentStoreProvider);
         final List<String> results = [];
+        final currentModule = ref.read(appModuleProvider);
+        if (currentModule == AppModule.reader && text.isNotEmpty) {
+          results.add('Find on page: $text');
+        }
 
         try {
           final activeVersions = ref.read(activeVersionsProvider);
@@ -99,6 +103,14 @@ class _GlobalSearchBarState extends ConsumerState<GlobalSearchBar> {
         return results;
       },
       onSelected: (String selection) async {
+        if (selection.startsWith('Find on page: ')) {
+          final query = selection.replaceFirst('Find on page: ', '');
+          ref.read(findInPageQueryProvider.notifier).set(query);
+          _focusNode.unfocus();
+          _controller.clear();
+          return;
+        }
+
         if (selection.startsWith('Go to: ')) {
           final refStr = selection.replaceFirst('Go to: ', '');
           final activeVersions = ref.read(activeVersionsProvider);
@@ -118,6 +130,7 @@ class _GlobalSearchBarState extends ConsumerState<GlobalSearchBar> {
                   .read(navigationControllerProvider)
                   .recordHistory(verse: parsed.verse);
               ref.read(appModuleProvider.notifier).setModule(AppModule.reader);
+              _focusNode.unfocus();
               _controller.clear();
               return;
             }
@@ -176,17 +189,18 @@ class _GlobalSearchBarState extends ConsumerState<GlobalSearchBar> {
                 itemBuilder: (BuildContext context, int index) {
                   final String option = options.elementAt(index);
                   final isGoto = option.startsWith('Go to: ');
+                  final isFind = option.startsWith('Find on page: ');
                   return ListTile(
                     dense: true,
                     leading: Icon(
-                      isGoto ? Icons.menu_book : Icons.search,
+                      isGoto ? Icons.menu_book : (isFind ? Icons.find_in_page : Icons.search),
                       size: 16,
                       color: Theme.of(context).colorScheme.primary,
                     ),
                     title: Text(
                       option,
                       style: TextStyle(
-                        fontWeight: isGoto ? FontWeight.bold : FontWeight.normal,
+                        fontWeight: (isGoto || isFind) ? FontWeight.bold : FontWeight.normal,
                       ),
                     ),
                     onTap: () {

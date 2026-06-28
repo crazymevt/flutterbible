@@ -198,3 +198,13 @@ class SelectedDevotionalDayNotifier extends Notifier<int> {
 final selectedDevotionalDayProvider = NotifierProvider<SelectedDevotionalDayNotifier, int>(
   () => SelectedDevotionalDayNotifier(),
 );
+
+class FindInPageQueryNotifier extends Notifier<String?> {
+  @override
+  String? build() => null;
+  void set(String? query) => state = query;
+}
+
+final findInPageQueryProvider = NotifierProvider<FindInPageQueryNotifier, String?>(
+  () => FindInPageQueryNotifier(),
+);
