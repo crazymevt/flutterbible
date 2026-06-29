@@ -1,5 +1,53 @@
 [
   {
+    "version": "26.6.29+1",
+    "date": "2026-06-29",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "embed a Unicode font so PDFs can draw bullets and non-Latin text",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "print notes and journals, and render sermon formatting in PDF",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "print sermons via the system print dialog",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "generated sermon outline was not saved",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "crash when creating a new sermon",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "stop the tutorial overlay from crashing the reader on first run",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "redesign tutorial as an interactive guided tour",
+        "description": "",
+        "icon": "star"
+      }
+    ]
+  },
+  {
     "version": "26.6.28+2",
     "date": "2026-06-28",
     "features": [

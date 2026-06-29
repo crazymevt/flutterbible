@@ -1,5 +1,5 @@
 // This file is the global version tracker.
 // It can be easily parsed or updated by build scripts.
 
-const String appVersion = '26.6.28';
-const int buildNumber = 2;
+const String appVersion = '26.6.29';
+const int buildNumber = 1;
