@@ -222,6 +222,38 @@ final audioAdvanceMarksReadProvider =
       () => AudioAdvanceMarksReadNotifier(),
     );
 
+/// The day the "this week" window starts on for the dashboard's reading-time
+/// and chapters-this-week stats. Stored as a [DateTime.weekday] value
+/// (1 = Monday … 7 = Sunday); defaults to Monday, matching the original
+/// hard-coded behaviour.
+class WeekStartDayNotifier extends Notifier<int> {
+  @override
+  int build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    final stored = prefs.getInt('weekStartDay');
+    if (stored != null && stored >= DateTime.monday && stored <= DateTime.sunday) {
+      return stored;
+    }
+    return DateTime.monday;
+  }
+
+  void set(int weekday) {
+    state = weekday;
+    ref.read(sharedPreferencesProvider).setInt('weekStartDay', weekday);
+  }
+}
+
+final weekStartDayProvider = NotifierProvider<WeekStartDayNotifier, int>(
+  () => WeekStartDayNotifier(),
+);
+
+/// Number of days to subtract from [day] to reach the most recent occurrence of
+/// [firstWeekday] (inclusive), using the [DateTime.weekday] convention.
+DateTime startOfWeekFor(DateTime day, int firstWeekday) {
+  final offset = (day.weekday - firstWeekday) % 7;
+  return day.subtract(Duration(days: offset));
+}
+
 class AppModuleNotifier extends Notifier<AppModule> {
   @override
   AppModule build() {

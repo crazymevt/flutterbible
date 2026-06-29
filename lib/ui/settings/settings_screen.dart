@@ -638,6 +638,32 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             },
           ),
           ListTile(
+            title: const Text('Week starts on'),
+            subtitle: const Text(
+              'First day of the week for the dashboard\'s "This Week" stats',
+            ),
+            trailing: DropdownButton<int>(
+              value: ref.watch(weekStartDayProvider),
+              onChanged: (int? value) {
+                if (value != null) {
+                  ref.read(weekStartDayProvider.notifier).set(value);
+                }
+              },
+              items: const [
+                DropdownMenuItem(value: DateTime.sunday, child: Text('Sunday')),
+                DropdownMenuItem(value: DateTime.monday, child: Text('Monday')),
+                DropdownMenuItem(value: DateTime.tuesday, child: Text('Tuesday')),
+                DropdownMenuItem(
+                    value: DateTime.wednesday, child: Text('Wednesday')),
+                DropdownMenuItem(
+                    value: DateTime.thursday, child: Text('Thursday')),
+                DropdownMenuItem(value: DateTime.friday, child: Text('Friday')),
+                DropdownMenuItem(
+                    value: DateTime.saturday, child: Text('Saturday')),
+              ],
+            ),
+          ),
+          ListTile(
             title: const Text('Subheadings Source'),
             subtitle: const Text('Select which module to use for inline subheadings'),
             trailing: ref.watch(subheadingSourcesProvider).when(

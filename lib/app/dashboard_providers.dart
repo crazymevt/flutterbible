@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import 'package:drift/drift.dart' hide Column;
 import '../data/user_store.dart';
+import 'app_state.dart';
 import 'user_providers.dart';
 import 'sync_service.dart';
 import 'achievement_service.dart';
@@ -67,7 +68,7 @@ final timeAnalyticsProvider = Provider<Map<String, int>>((ref) {
   final trackers = ref.watch(timeTrackerProvider).value ?? [];
   final now = DateTime.now();
   final today = DateTime(now.year, now.month, now.day);
-  final startOfWeek = today.subtract(Duration(days: today.weekday - 1));
+  final startOfWeek = startOfWeekFor(today, ref.watch(weekStartDayProvider));
   final startOfLastWeek = startOfWeek.subtract(const Duration(days: 7));
   final startOfYearAgo = today.subtract(const Duration(days: 365));
 
@@ -162,7 +163,7 @@ final readingPaceProvider = Provider<Map<String, int>>((ref) {
     }
   }
 
-  final startOfWeek = todayDate.subtract(Duration(days: today.weekday - 1));
+  final startOfWeek = startOfWeekFor(todayDate, ref.watch(weekStartDayProvider));
   int chaptersThisWeek = 0;
   for (final p in progress) {
     final d = DateTime.fromMillisecondsSinceEpoch(p.readAt).toLocal();
