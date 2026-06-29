@@ -1,5 +1,71 @@
 [
   {
+    "version": "26.6.29+5",
+    "date": "2026-06-29",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "close footnote sheet after navigating to avoid setState-during-build",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "make cross-reference footnotes tappable to navigate",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "make module (re)import atomic so a failure can't corrupt the old copy",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "show redownload progress and errors for installed modules",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "resolve MyBible cross-reference footnotes from companion module",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "collapse long footnotes to tappable markers and drop empty ones",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "flag online-only features in the Help Center",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "show onboarding KJV button without waiting on full catalog",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "migrate Windows app data after EXE rename",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "replace com.example scaffold defaults in Windows EXE metadata",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.6.29+4",
     "date": "2026-06-29",
     "features": [
