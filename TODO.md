@@ -58,6 +58,12 @@ Running list of known issues and follow-ups.
   `StudyBible.exe` filename (matching `BINARY_NAME`). Repo-wide sweep confirmed
   no other `com.example` app refs; Android/macOS already use
   `io.github.crazymevt.studybible`.
+  - **Caveat handled:** on Windows `path_provider` derives the app-data dir from
+    the EXE's `CompanyName`/`ProductName`, so this rename moves it from
+    `%APPDATA%\com.example\study_bible` to `%APPDATA%\StudyBible Team\Study Bible`.
+    `appDataDir()` now copies the old tree across on first run
+    (`_migrateWindowsAppDataRelocation`) so existing Windows users keep their
+    data. macOS is unaffected (keys off the bundle id).
 
 ## Archive
 
