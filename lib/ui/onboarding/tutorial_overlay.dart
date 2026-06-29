@@ -110,14 +110,6 @@ class _TutorialOverlayState extends ConsumerState<TutorialOverlay>
       duration: const Duration(milliseconds: 360),
       value: 1,
     );
-    // The spotlight targets live in the reader; switch there so the user is in
-    // the right place to see them (and lands in the reader when done).
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      if (ref.read(appModuleProvider) != AppModule.reader) {
-        ref.read(appModuleProvider.notifier).setModule(AppModule.reader);
-      }
-    });
   }
 
   @override
@@ -180,6 +172,13 @@ class _TutorialOverlayState extends ConsumerState<TutorialOverlay>
   }
 
   void _finish() {
+    // While the tour is up, the reader is forced behind the overlay
+    // (main_shell) without changing the module. Land the user there for real
+    // now that it's done; by now the verse providers have settled, so the
+    // switch is safe.
+    if (ref.read(appModuleProvider) != AppModule.reader) {
+      ref.read(appModuleProvider.notifier).setModule(AppModule.reader);
+    }
     ref.read(hasSeenTutorialProvider.notifier).setSeen(true);
   }
 

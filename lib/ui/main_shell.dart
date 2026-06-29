@@ -100,23 +100,6 @@ class _MainShellState extends ConsumerState<MainShell> {
       return const OnboardingScreen();
     }
 
-    final Widget shell;
-    if (currentModule == AppModule.journalsPrayers) {
-      shell = const JournalsPrayersScreen();
-    } else if (currentModule == AppModule.dashboard) {
-      shell = const DashboardScreen();
-    } else {
-      shell = LayoutBuilder(
-        builder: (context, constraints) {
-          if (constraints.maxWidth > Breakpoints.compact) {
-            return const _DesktopLayout();
-          } else {
-            return const ReaderScreen();
-          }
-        },
-      );
-    }
-
     // The interactive tutorial spotlights real shell elements, so it renders
     // over the live shell rather than replacing it. Marking it seen rebuilds
     // here and drops the overlay. Only show it once a Bible is positively
@@ -128,7 +111,36 @@ class _MainShellState extends ConsumerState<MainShell> {
       orElse: () => false,
     );
     final hasSeenTutorial = ref.watch(hasSeenTutorialProvider);
-    if (!hasSeenTutorial && hasBibles) {
+    final showTutorial = !hasSeenTutorial && hasBibles;
+
+    final readerLayout = LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth > Breakpoints.compact) {
+          return const _DesktopLayout();
+        } else {
+          return const ReaderScreen();
+        }
+      },
+    );
+
+    final Widget shell;
+    if (showTutorial) {
+      // Render the reader behind the tour so its spotlight targets exist,
+      // *without* mutating the module. Switching the module mid-tour would swap
+      // the shell (e.g. dashboard→reader), reparenting the GlobalKey'd search
+      // bar while its label animation is dirty and crashing with "wrong build
+      // scope". The module is set to reader when the tour finishes instead, so
+      // the user simply stays on the reader (see TutorialOverlay._finish).
+      shell = readerLayout;
+    } else if (currentModule == AppModule.journalsPrayers) {
+      shell = const JournalsPrayersScreen();
+    } else if (currentModule == AppModule.dashboard) {
+      shell = const DashboardScreen();
+    } else {
+      shell = readerLayout;
+    }
+
+    if (showTutorial) {
       return Stack(
         fit: StackFit.expand,
         children: [shell, const TutorialOverlay()],
