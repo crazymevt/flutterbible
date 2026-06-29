@@ -1,5 +1,29 @@
 [
   {
+    "version": "26.6.28+2",
+    "date": "2026-06-28",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "smooth swipe settle and guard reader views against unmount",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "swipe navigation between chapters via PageView",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "actually apply FTS soft-delete trigger rewrite via ordered migration",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.6.28+1",
     "date": "2026-06-28",
     "features": [
