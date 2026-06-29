@@ -42,7 +42,7 @@ Create credentials → OAuth client ID**):
 | Linux/Windows/macOS | **Desktop app** | Used by the loopback browser flow. Has an id **and** a secret. |
 | Android             | **Android**   | Package name `io.github.crazymevt.studybible` + your signing SHA-1. |
 | iOS / macOS (mobile)| **iOS**       | Bundle id `io.github.crazymevt.studybible`. |
-| Web                 | **Web application** | Add your origin(s) to *Authorized JavaScript origins*. |
+| Web application     | **Web application** | **Required for Android** — its id is passed as `serverClientId` to Credential Manager (the Android client alone is not enough). No redirect URIs needed for that use. Also used for the actual web build (add your origin(s) to *Authorized JavaScript origins*). |
 
 > The "secret" of a Desktop client is **not** a true secret — it's expected to
 > ship inside the installed app and is protected by the user-consent flow, not by
@@ -66,9 +66,12 @@ For reproducible builds, put these in a `--dart-define-from-file=oauth.json`
 
 ### Platform extras
 
-- **Android:** no client id is passed in code — the Android OAuth client is
-  matched by package name + SHA-1. Just make sure those match your keystore(s)
-  (debug and release have different SHA-1s).
+- **Android:** the Android OAuth client is matched by package name + SHA-1
+  (make sure those match your keystore(s) — debug and release have different
+  SHA-1s). In addition, the **web** client id **must** be supplied as
+  `GOOGLE_OAUTH_WEB_CLIENT_ID`; Android's Credential Manager uses it as the
+  `serverClientId`, and sign-in fails with "CredentialManager requires a
+  serverClientId" without it.
 - **iOS:** add the **reversed** iOS client id as a URL scheme in
   `ios/Runner/Info.plist` (`CFBundleURLTypes`), per the `google_sign_in`
   README.
