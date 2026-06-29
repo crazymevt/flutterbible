@@ -155,6 +155,15 @@ class _MobileGoogleDriveAuth implements GoogleDriveAuth {
 
   Future<void> _ensureInit() async {
     if (_initialized) return;
+    // Android's Credential Manager flow requires a serverClientId, which must be
+    // the *web* OAuth client id. Surface a clear message instead of the plugin's
+    // cryptic "CredentialManager requires a serverClientId".
+    if (Platform.isAndroid && GoogleOAuthConfig.webClientId.isEmpty) {
+      throw GoogleDriveNotConfiguredException(
+        'Google Drive sync needs a web OAuth client id on Android '
+        '(GOOGLE_OAUTH_WEB_CLIENT_ID). See docs/google-drive-sync-setup.md.',
+      );
+    }
     await GoogleSignIn.instance.initialize(
       clientId: Platform.isIOS && GoogleOAuthConfig.iosClientId.isNotEmpty
           ? GoogleOAuthConfig.iosClientId

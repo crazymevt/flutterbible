@@ -43,8 +43,9 @@ class GoogleOAuthConfig {
   static const String iosClientId =
       String.fromEnvironment('GOOGLE_OAUTH_IOS_CLIENT_ID');
 
-  /// Web OAuth client id, also used as the `serverClientId` on mobile when you
-  /// want an ID token for a backend (not required for Drive-only sync).
+  /// Web OAuth client id. **Required on Android**, where it is passed as the
+  /// `serverClientId` to Credential Manager (sign-in fails without it). Also the
+  /// client id used by the web build.
   static const String webClientId =
       String.fromEnvironment('GOOGLE_OAUTH_WEB_CLIENT_ID');
 
