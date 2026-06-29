@@ -6,7 +6,9 @@ Running list of known issues and follow-ups.
 
 ## Enhancements
 
-- [ ] **Sermon Print Button.** Make the print button its own icon in the sermon panel like it is in journals.
+- [x] **Sermon Print Button.** Dedicated print icon in the sermon editor (both
+  full-screen and side-panel layouts), next to Export. Prints the current sermon
+  straight to PDF, skipping the export dialog. Shipped 26.6.29+3.
 
 - [x] **Printing.** Print notes, journals, and sermons to a physical printer or
   PDF (cross-platform, via `printing`/`pdf` with an embedded Noto Sans font).
@@ -18,9 +20,14 @@ Running list of known issues and follow-ups.
 - [x] **Google Drive Sync.** Official sync to a hidden, app-private Google Drive
   folder (`appDataFolder`) — no manual sync folder needed. Implemented as a
   `GoogleDriveSyncStorage` backend (`lib/data/sync/`) with platform-appropriate
-  OAuth (desktop loopback + `google_sign_in` on mobile). Requires per-developer
-  OAuth client IDs supplied via `--dart-define`; see
-  `docs/google-drive-sync-setup.md`.
+  OAuth (desktop loopback + `google_sign_in` on mobile); takes precedence over
+  the file/SAF folder when connected. Shipped 26.6.29+3 (Android web-client fix
+  in +4), with verified end-to-end sync on desktop.
+  - **OAuth client IDs** come from `--dart-define-from-file=oauth.json` (gitignored);
+    release builds reconstruct it from the `OAUTH_JSON` CI secret. Android
+    additionally needs the **web** client id as `serverClientId` and the signing
+    keystore's **SHA-1** registered on the Android OAuth client.
+  - Full setup walkthrough in `docs/google-drive-sync-setup.md`.
 
 - [ ] **Import SWORD modules** (CrossWire format — translations, commentaries,
   dictionaries). Implementation lives in `lib/data/importer/sword/`. Phases
