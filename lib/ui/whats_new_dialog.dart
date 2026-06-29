@@ -36,7 +36,17 @@ class _WhatsNewDialogState extends ConsumerState<WhatsNewDialog> {
   }
 
   Future<List<Map<String, dynamic>>> _loadChangelog() async {
-    final String response = await rootBundle.loadString('assets/changelog.json');
+    // Decode on the main isolate rather than via [rootBundle.loadString], which
+    // hands UTF-8 decoding off to a background isolate (`compute`) once the
+    // asset reaches 50 KiB. That isolate hop costs more than it saves for a
+    // one-shot ~50 KB read, and it never completes under `tester.pump`, which
+    // would leave this dialog's FutureBuilder stuck in its loading state in
+    // widget tests.
+    final ByteData bytes = await rootBundle.load('assets/changelog.json');
+    final String response = utf8.decode(bytes.buffer.asUint8List(
+      bytes.offsetInBytes,
+      bytes.lengthInBytes,
+    ));
     final List<dynamic> data = json.decode(response);
     return data.cast<Map<String, dynamic>>();
   }
