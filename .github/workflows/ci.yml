@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
   pull_request:
+  # Allow other workflows (e.g. release.yml) to run this same quality gate so
+  # there is a single source of truth for lint + analyze + tests.
+  workflow_call:
 
 jobs:
   analyze-and-test:
