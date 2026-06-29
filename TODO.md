@@ -51,7 +51,13 @@ Running list of known issues and follow-ups.
 
 ## Issues
 
-- [ ] **com.example refs.** Still has an existing com.example url for windows. See if there are others and let's update these refs.
+- [x] **com.example refs.** The Windows EXE version-info block
+  (`windows/runner/Runner.rc`) still carried Flutter scaffold defaults —
+  `CompanyName`/`LegalCopyright` of `com.example` plus `study_bible*`
+  product/file names. Updated to "StudyBible Team" / "Study Bible" and the real
+  `StudyBible.exe` filename (matching `BINARY_NAME`). Repo-wide sweep confirmed
+  no other `com.example` app refs; Android/macOS already use
+  `io.github.crazymevt.studybible`.
 
 ## Archive
 
