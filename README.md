@@ -54,7 +54,7 @@ _Click any image to view it full size._
 - **Progress dashboard** — reading coverage + per-book drill-down, reading pace, achievements/badges, time tracker & analytics.
 - **Content manager** — install bibles/commentaries/dictionaries from ph4.org and SWORD repositories; OSIS, MyBible, and SWORD module import.
 - **Rich media** — local audio/video, YouTube overlay, image lightbox.
-- **Cross-device sync** — highlights, notes, bookmarks, journals, prayers, reading progress, and settings synced across devices (using zero-cost file-based sync like Syncthing or cloud folders).
+- **Cross-device sync** — highlights, notes, bookmarks, journals, prayers, reading progress, and settings synced across devices. Connect your **Google Drive** for one-tap sync to a private, app-only folder, or use zero-cost file-based sync (Syncthing or any cloud-synced folder).
 
 ## Architecture
 
@@ -69,7 +69,7 @@ This project strictly follows a **clean layered architecture**:
 - **State Management:** Riverpod
 - **Routing:** go_router
 - **Local Database:** Drift (SQLite)
-- **Sync:** File sync behind a `SyncEngine` interface (LWW merge)
+- **Sync:** Google Drive (private app-data folder) or any synced file folder, behind a `SyncEngine` interface (LWW merge)
 - **Networking:** dio
 - **Media:** just_audio, video_player, youtube_player_iframe
 
