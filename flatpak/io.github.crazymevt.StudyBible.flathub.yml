@@ -28,6 +28,8 @@ finish-args:
   - --share=ipc
   - --device=dri
   - --socket=pulseaudio
+  # Printing (the `printing` package talks to CUPS directly)
+  - --socket=cups
   - --share=network
   # File access (sync folder, imports) is portal-mediated; no static filesystem grant.
 

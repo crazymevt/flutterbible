@@ -27,6 +27,8 @@ finish-args:
   - --device=dri
   # Audio (just_audio / video_player)
   - --socket=pulseaudio
+  # Printing (the `printing` package talks to CUPS directly)
+  - --socket=cups
   # Content manager downloads + YouTube/web media
   - --share=network
   # NOTE: no static --filesystem grant. The sync-folder picker and any file

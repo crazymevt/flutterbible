@@ -82,6 +82,13 @@ class _ExportDialogState extends State<ExportDialog> {
             onPressed: () => _export(ExportAction.save),
             child: const Text('Save to Folder'),
           ),
+          // Printing always produces a PDF, so the format selection above
+          // doesn't apply to it.
+          TextButton.icon(
+            onPressed: () => _export(ExportAction.print),
+            icon: const Icon(Icons.print),
+            label: const Text('Print'),
+          ),
           ElevatedButton(
             onPressed: () => _export(ExportAction.share),
             child: const Text('Share'),

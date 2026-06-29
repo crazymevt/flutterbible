@@ -10,16 +10,26 @@ import 'package:archive/archive.dart';
 import 'package:file_selector/file_selector.dart';
 import '../user_store.dart';
 import '../logging.dart';
+import 'print_service.dart';
 import 'dart:io';
 
 enum ExportFormat { pdf, html, text }
-enum ExportAction { save, share }
+enum ExportAction { save, share, print }
 
 class SermonExporter {
   static Future<void> exportSermons(BuildContext context, List<Sermon> sermons, ExportFormat format, ExportAction action) async {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
-    
+
     try {
+      // Printing always produces a single combined PDF — the chosen export
+      // format and the multi-sermon zip path don't apply to a print job.
+      if (action == ExportAction.print) {
+        final bytes = await _generatePdf(sermons);
+        final name = sermons.length == 1 ? sermons.first.title : 'Sermons';
+        await PrintService.printPdf(bytes, documentName: name);
+        return;
+      }
+
       Uint8List bytes;
       String filename;
       String mimeType;
