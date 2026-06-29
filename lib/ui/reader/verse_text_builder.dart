@@ -241,13 +241,23 @@ class _FootnoteSheetState extends ConsumerState<_FootnoteSheet> {
   void _goToReference(int bookNumber, int chapter, int verse) {
     final bookName = mybibleBookMap[bookNumber];
     if (bookName == null) return;
+
+    // Apply the navigation synchronously so the verse list scrolls to the
+    // target the same way other in-app reference links do. Then close the
+    // sheet on the next frame: popping in the same gesture relayouts the
+    // reader while these providers are still dirty, which can remount
+    // ReaderScreen mid-layout and throw "setState() called during build".
     ref.read(selectedBookNameProvider.notifier).set(bookName);
     ref.read(selectedChapterProvider.notifier).set(chapter);
     ref.read(targetVerseToScrollProvider.notifier).set(verse);
     ref.read(selectedVersesProvider.notifier).clear();
     ref.read(selectedVersesProvider.notifier).toggle(verse);
     ref.read(navigationControllerProvider).recordHistory(verse: verse);
-    if (Navigator.of(context).canPop()) Navigator.of(context).pop();
+
+    final navigator = Navigator.of(context);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (navigator.canPop()) navigator.pop();
+    });
   }
 
   List<InlineSpan> _buildSpans(BuildContext context) {
