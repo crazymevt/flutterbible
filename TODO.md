@@ -10,6 +10,8 @@ Running list of known issues and follow-ups.
 
 - [x] **Delete Notes.**
 
+- [ ] **Printing.** Allow users to print content (e.g. the current chapter, search results, notes/journals/sermons) to a physical printer or PDF.
+
 - [ ] **Gesture navigation using PageView.** Implement swipe navigation in the Reader to change chapters by wrapping the content in a `PageView`. This will require refactoring the state to eagerly load adjacent chapters to support smooth swipe animations.
 
 ## Research
