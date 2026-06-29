@@ -2,8 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../app/content_providers.dart';
+import '../../app/reader_state.dart';
 import '../../data/content_store.dart';
 import '../../data/logging.dart';
+import '../../data/mybible_book_map.dart';
 import '../../theme/app_themes.dart';
 import '../../data/models/verse_segment.dart';
 
@@ -196,45 +200,130 @@ List<InlineSpan> buildVerseSpans({
 }
 
 /// Shows a footnote's full text in a modal sheet. The inline marker stays a
-/// compact superscript number so long notes (common in the CrossWire KJV) don't
-/// clutter the verse; the body lives here, behind a tap.
+/// compact superscript mark so long notes (common in the CrossWire KJV) don't
+/// clutter the verse; the body lives here, behind a tap. Cross-reference
+/// footnotes carry `{book:chapter:verse|label}` tokens (see
+/// `renderMyBibleCrossRef`) that render as tappable links to the verse.
 void _showFootnote(BuildContext context, String text) {
   showModalBottomSheet<void>(
     context: context,
     showDragHandle: true,
     isScrollControlled: true,
-    builder: (sheetContext) {
-      return SafeArea(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(sheetContext).size.height * 0.6,
-          ),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Footnote',
-                  style: Theme.of(sheetContext).textTheme.titleSmall?.copyWith(
-                        color: Theme.of(sheetContext).colorScheme.primary,
-                      ),
-                ),
-                const SizedBox(height: 8),
-                SelectableText(
-                  text,
-                  style: Theme.of(sheetContext).textTheme.bodyMedium?.copyWith(
+    builder: (sheetContext) => _FootnoteSheet(text: text),
+  );
+}
+
+/// Matches a cross-reference token `{book:chapter:verse|label}` emitted by
+/// `renderMyBibleCrossRef`. The label runs to the closing brace, so it may
+/// contain spaces, colons, and hyphens (e.g. "JHN 1:1-3").
+final RegExp _footnoteRefToken = RegExp(r'\{(\d+):(\d+):(\d+)\|([^}]*)\}');
+
+class _FootnoteSheet extends ConsumerStatefulWidget {
+  final String text;
+  const _FootnoteSheet({required this.text});
+
+  @override
+  ConsumerState<_FootnoteSheet> createState() => _FootnoteSheetState();
+}
+
+class _FootnoteSheetState extends ConsumerState<_FootnoteSheet> {
+  // Span tap recognizers must outlive build but be disposed with the sheet.
+  final List<TapGestureRecognizer> _recognizers = [];
+
+  @override
+  void dispose() {
+    for (final r in _recognizers) {
+      r.dispose();
+    }
+    super.dispose();
+  }
+
+  void _goToReference(int bookNumber, int chapter, int verse) {
+    final bookName = mybibleBookMap[bookNumber];
+    if (bookName == null) return;
+    ref.read(selectedBookNameProvider.notifier).set(bookName);
+    ref.read(selectedChapterProvider.notifier).set(chapter);
+    ref.read(targetVerseToScrollProvider.notifier).set(verse);
+    ref.read(selectedVersesProvider.notifier).clear();
+    ref.read(selectedVersesProvider.notifier).toggle(verse);
+    ref.read(navigationControllerProvider).recordHistory(verse: verse);
+    if (Navigator.of(context).canPop()) Navigator.of(context).pop();
+  }
+
+  List<InlineSpan> _buildSpans(BuildContext context) {
+    final linkStyle = TextStyle(
+      color: Theme.of(context).colorScheme.primary,
+      fontWeight: FontWeight.w600,
+    );
+    final spans = <InlineSpan>[];
+    var last = 0;
+    for (final m in _footnoteRefToken.allMatches(widget.text)) {
+      if (m.start > last) {
+        spans.add(TextSpan(text: widget.text.substring(last, m.start)));
+      }
+      final book = int.parse(m.group(1)!);
+      final chapter = int.parse(m.group(2)!);
+      final verse = int.parse(m.group(3)!);
+      final label = m.group(4) ?? '';
+      if (mybibleBookMap.containsKey(book)) {
+        final recognizer = TapGestureRecognizer()
+          ..onTap = () => _goToReference(book, chapter, verse);
+        _recognizers.add(recognizer);
+        spans.add(
+          TextSpan(text: label, style: linkStyle, recognizer: recognizer),
+        );
+      } else {
+        // Unknown book number: show the label but don't pretend it's tappable.
+        spans.add(TextSpan(text: label));
+      }
+      last = m.end;
+    }
+    if (last < widget.text.length) {
+      spans.add(TextSpan(text: widget.text.substring(last)));
+    }
+    return spans;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Rebuilt each build, so clear stale recognizers first to avoid leaks.
+    for (final r in _recognizers) {
+      r.dispose();
+    }
+    _recognizers.clear();
+
+    return SafeArea(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.6,
+        ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Footnote',
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+              ),
+              const SizedBox(height: 8),
+              SelectableText.rich(
+                TextSpan(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         height: 1.5,
                       ),
+                  children: _buildSpans(context),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
-      );
-    },
-  );
+      ),
+    );
+  }
 }
 
 List<InlineSpan> _buildHighlightedSpans(

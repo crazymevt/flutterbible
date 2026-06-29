@@ -657,14 +657,37 @@ class MyBibleImporter {
 }
 
 /// Renders a MyBible cross-reference cell — HTML such as
-/// `<a href='B:500 1:1'>JHN 1:1</a>,<a href='B:500 1:3'>3</a>` — into the plain,
-/// human-readable reference list shown in the footnote sheet (e.g.
-/// `JHN 1:1, 3`). The `B:<book> <c>:<v>` link targets aren't navigable in the
-/// reader, so only the visible labels are kept.
+/// `<a href='B:500 1:1'>JHN 1:1</a>,<a href='B:500 1:3'>3</a>` — into the
+/// footnote body shown in the reader. Each link becomes a compact, self-
+/// describing token `{book:chapter:verse|label}` (MyBible book numbers, matching
+/// [mybibleBookMap]) that the reader turns into a tappable reference; the
+/// separators between links are kept as plain text. So the example yields
+/// `{500:1:1|JHN 1:1}, {500:1:3|3}`. Input with no links (an ordinary textual
+/// footnote) passes through as plain, de-entitied text.
 String renderMyBibleCrossRef(String rawHtml) {
   if (rawHtml.isEmpty) return '';
-  final text = html_parser.parse(rawHtml).body?.text ?? rawHtml;
-  return text
+
+  String plain(String fragment) =>
+      html_parser.parse(fragment).body?.text ?? fragment;
+
+  final anchor = RegExp(
+    "<a\\b[^>]*?href=['\"]B:(\\d+)\\s+(\\d+):(\\d+)[^'\"]*['\"][^>]*>(.*?)</a>",
+    caseSensitive: false,
+    dotAll: true,
+  );
+
+  final out = StringBuffer();
+  var last = 0;
+  for (final m in anchor.allMatches(rawHtml)) {
+    out.write(plain(rawHtml.substring(last, m.start)));
+    final label = plain(m.group(4) ?? '').trim();
+    out.write('{${m.group(1)}:${m.group(2)}:${m.group(3)}|$label}');
+    last = m.end;
+  }
+  out.write(plain(rawHtml.substring(last)));
+
+  return out
+      .toString()
       .replaceAll(RegExp(r'\s+'), ' ')
       .replaceAll(RegExp(r'\s*;\s*'), '; ')
       .replaceAll(RegExp(r'\s*,\s*'), ', ')
