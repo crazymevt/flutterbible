@@ -6,6 +6,8 @@ Running list of known issues and follow-ups.
 
 ## Enhancements
 
+- [ ] **Sermon Print Button.** Make the print button its own icon in the sermon panel like it is in journals.
+
 - [x] **Printing.** Print notes, journals, and sermons to a physical printer or
   PDF (cross-platform, via `printing`/`pdf` with an embedded Noto Sans font).
   Reader-chapter and search-results printing were intentionally left out — not
