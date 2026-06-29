@@ -74,6 +74,17 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Write OAuth config for Google Drive sync
+        env:
+          OAUTH_JSON: ${{ secrets.OAUTH_JSON }}
+        run: |
+          if [ -n "$OAUTH_JSON" ]; then
+            printf '%s' "$OAUTH_JSON" > oauth.json
+          else
+            echo "::warning::No OAUTH_JSON secret set — Google Drive sync will be unconfigured in this build."
+            echo '{}' > oauth.json
+          fi
+
       - name: Configure Android signing
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -94,15 +105,15 @@ jobs:
           EOF
 
       - name: Build Android APK
-        run: flutter build apk --release
+        run: flutter build apk --release --dart-define-from-file=oauth.json
 
       - name: Build Android App Bundle
         # The .aab is the artifact uploaded to Google Play; the .apk above is
         # kept for direct download / sideloading from the GitHub release.
-        run: flutter build appbundle --release
+        run: flutter build appbundle --release --dart-define-from-file=oauth.json
 
       - name: Build Linux
-        run: flutter build linux --release
+        run: flutter build linux --release --dart-define-from-file=oauth.json
 
       - name: Compress Linux Build
         run: tar -czf StudyBible-Linux.tar.gz -C build/linux/x64/release/bundle .
@@ -140,8 +151,19 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Write OAuth config for Google Drive sync
+        env:
+          OAUTH_JSON: ${{ secrets.OAUTH_JSON }}
+        run: |
+          if [ -n "$OAUTH_JSON" ]; then
+            printf '%s' "$OAUTH_JSON" > oauth.json
+          else
+            echo "::warning::No OAUTH_JSON secret set — Google Drive sync will be unconfigured in this build."
+            echo '{}' > oauth.json
+          fi
+
       - name: Build macOS
-        run: flutter build macos --release
+        run: flutter build macos --release --dart-define-from-file=oauth.json
 
       - name: Compress macOS Build
         run: ditto -c -k --sequesterRsrc --keepParent "build/macos/Build/Products/Release/Study Bible.app" StudyBible-macOS.zip
@@ -171,8 +193,22 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Write OAuth config for Google Drive sync
+        env:
+          OAUTH_JSON: ${{ secrets.OAUTH_JSON }}
+        shell: pwsh
+        run: |
+          if ($env:OAUTH_JSON) {
+            # WriteAllText avoids the UTF-8 BOM that Out-File adds, which would
+            # break Dart's --dart-define-from-file JSON parsing.
+            [System.IO.File]::WriteAllText("oauth.json", $env:OAUTH_JSON)
+          } else {
+            Write-Warning "No OAUTH_JSON secret set — Google Drive sync will be unconfigured in this build."
+            [System.IO.File]::WriteAllText("oauth.json", "{}")
+          }
+
       - name: Build Windows
-        run: flutter build windows --release
+        run: flutter build windows --release --dart-define-from-file=oauth.json
 
       - name: Compile Inno Setup Script
         run: iscc windows\packaging\inno_setup.iss
@@ -222,8 +258,19 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Write OAuth config for Google Drive sync
+        env:
+          OAUTH_JSON: ${{ secrets.OAUTH_JSON }}
+        run: |
+          if [ -n "$OAUTH_JSON" ]; then
+            printf '%s' "$OAUTH_JSON" > oauth.json
+          else
+            echo "::warning::No OAUTH_JSON secret set — Google Drive sync will be unconfigured in this build."
+            echo '{}' > oauth.json
+          fi
+
       - name: Build Linux bundle
-        run: flutter build linux --release
+        run: flutter build linux --release --dart-define-from-file=oauth.json
 
       - name: Build Flatpak bundle
         run: |
