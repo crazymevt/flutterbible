@@ -3,7 +3,9 @@
 Welcome to the StudyBible application! This app is designed to help you read, study, and understand the Scriptures deeply, completely offline.
 
 ## Built for Offline
-Unlike many modern Bible apps that require a constant internet connection, StudyBible is built to be a robust, offline-first tool. Once you download your Bibles and dictionaries, everything works without an internet connection—perfect for church, airplanes, or deep study away from distractions.
+Unlike many modern Bible apps that require a constant internet connection, StudyBible is built to be a robust, offline-first tool. Once you download your Bibles and dictionaries, your reading, search, journals, sermons, and notes all work without an internet connection—perfect for church, airplanes, or deep study away from distractions.
+
+A handful of features pull in resources from the internet—downloading new content, streaming audio Bibles, and playing video media. Throughout this Help Center these are flagged with a **🌐 Needs internet** note so you always know what works offline and what doesn't.
 
 ## Core Features
 

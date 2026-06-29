@@ -22,3 +22,13 @@ Read daily devotionals (like Spurgeon's *Morning and Evening*).
 
 ## Topics & Places
 Explore Biblical topics and geographical locations referenced in the text.
+
+## Audio
+Listen to narrated, chapter-by-chapter audio of the text, with multiple voices, adjustable playback speed, and a sleep timer.
+
+> 🌐 **Needs internet** — Audio is streamed on demand, so playback requires a connection.
+
+## Media
+Browse and play related video media (such as teaching clips and dramatizations) tied to the chapter you are reading.
+
+> 🌐 **Needs internet** — Media is streamed from the web, so an internet connection is required.

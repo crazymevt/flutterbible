@@ -169,13 +169,30 @@ class _HelpArticle extends StatelessWidget {
         }
 
         final content = snapshot.data ?? 'No content found.';
+        final theme = Theme.of(context);
+        final scheme = theme.colorScheme;
         return Markdown(
           data: content,
           selectable: true,
-          styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
-            p: Theme.of(context).textTheme.bodyLarge?.copyWith(height: 1.5),
-            h1: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
-            h2: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+          styleSheet: MarkdownStyleSheet.fromTheme(theme).copyWith(
+            p: theme.textTheme.bodyLarge?.copyWith(height: 1.5),
+            h1: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+            h2: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            // Callout boxes (the "🌐 Needs internet" notes) are authored as
+            // blockquotes. Theme them from the color scheme so they stay legible
+            // in both light and dark mode instead of the default light fill.
+            blockquote: theme.textTheme.bodyLarge?.copyWith(
+              height: 1.5,
+              color: scheme.onSecondaryContainer,
+            ),
+            blockquoteDecoration: BoxDecoration(
+              color: scheme.secondaryContainer,
+              borderRadius: BorderRadius.circular(8),
+              border: Border(
+                left: BorderSide(color: scheme.primary, width: 4),
+              ),
+            ),
+            blockquotePadding: const EdgeInsets.all(12),
           ),
         );
       },

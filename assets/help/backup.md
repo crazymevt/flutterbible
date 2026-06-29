@@ -14,3 +14,5 @@ You can take a complete snapshot of your user data at any time.
 ## Sync Folder
 For automatic syncing across devices (like between your Mac and iPhone), you can configure a **Sync Folder** in the Settings.
 - If you set your Sync Folder to an iCloud Drive directory, StudyBible will automatically sync your changes seamlessly in the background!
+
+> 🌐 **Needs internet** — Writing the backup file itself is offline, but your cloud drive (iCloud, Google Drive, etc.) needs a connection to upload those changes and pull them down on your other devices.

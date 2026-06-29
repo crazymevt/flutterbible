@@ -13,4 +13,4 @@ The Reader is the core of the StudyBible app, allowing you to study God's Word w
 - **Reading Progress:** By default, you must manually tap the "Mark Chapter Read" button at the bottom of the chapter. You can change this in Settings to mark chapters as "read" automatically after a few seconds of viewing!
 
 ## Tools
-Open the right sidebar (or the tools menu on mobile) to access a vast array of study tools, including Commentaries, Reading Plans, Audio, and more! See the **Study Tools** section for a deep dive.
+Open the right sidebar (or the tools menu on mobile) to access a vast array of study tools, including Commentaries, Reading Plans, Audio (🌐 streamed), and more! See the **Study Tools** section for a deep dive.
