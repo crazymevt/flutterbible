@@ -1,5 +1,23 @@
 [
   {
+    "version": "26.6.30+3",
+    "date": "2026-06-30",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "route to onboarding when the content DB can't be read",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "Bugfixes",
+        "title": "hide redundant chapter arrows on phones so the breadcrumb labels fit",
+        "description": "",
+        "icon": "bug_report"
+      }
+    ]
+  },
+  {
     "version": "26.6.30+2",
     "date": "2026-06-30",
     "features": [
