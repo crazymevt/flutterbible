@@ -19,6 +19,7 @@ import '../domain/sync/lww_merge.dart';
 import 'user_providers.dart';
 import 'app_state.dart';
 import 'achievement_service.dart';
+import 'sermon_providers.dart';
 import 'package:macos_secure_bookmarks/macos_secure_bookmarks.dart';
 
 final deviceIdProvider = FutureProvider<String>((ref) async {
@@ -131,6 +132,8 @@ class SyncService {
       final localBookmarks = await _store.select(_store.bookmarks).get();
       final localJournals = await _store.select(_store.journals).get();
       final localSermons = await _store.select(_store.sermons).get();
+      final localSermonRevisions =
+          await _store.select(_store.sermonRevisions).get();
       final localPrayers = await _store.select(_store.prayers).get();
       final localReadingprogresses = await _store
           .select(_store.readingProgresses)
@@ -233,6 +236,26 @@ class SyncService {
               'title': item.title,
               'series': item.series,
               'content': item.content,
+            },
+          ),
+        ),
+      );
+      localRecords.addAll(
+        localSermonRevisions.map(
+          (item) => GenericSyncRecord(
+            id: item.id,
+            updatedAt: item.updatedAt,
+            deviceId: item.deviceId,
+            deleted: item.deleted,
+            payload: {
+              'type': 'sermonRevision',
+              'sermonId': item.sermonId,
+              'createdAt': item.createdAt,
+              'title': item.title,
+              'series': item.series,
+              'content': item.content,
+              'label': item.label,
+              'kind': item.kind,
             },
           ),
         ),
@@ -410,6 +433,11 @@ class SyncService {
       final merged = mergeRecords(localRecords, remoteRecords);
 
       // 4. Update local DB
+      final deviceId = await _ref.read(deviceIdProvider.future);
+      // Sermons whose local content this merge overwrote with a different
+      // device's version; we snapshot the losing content (below) and prune
+      // those snapshots after the transaction.
+      final conflictedSermonIds = <String>{};
       await _store.transaction(() async {
         for (final rec in merged) {
           final type = rec.payload['type'] as String?;
@@ -471,6 +499,44 @@ class SyncService {
                 .insert(item, mode: InsertMode.replace);
           } else if (type == 'sermon') {
             final content = rec.payload['content'] as String;
+            // Failsafe: if this merge is about to replace a locally-stored
+            // sermon's content with a different (winning) version, snapshot the
+            // local losing content first so a cross-device clobber can never
+            // silently destroy work. See lib/domain/sync/lww_merge.dart.
+            final localSermon = await (_store.select(_store.sermons)
+                  ..where((t) => t.id.equals(rec.id)))
+                .getSingleOrNull();
+            if (localSermon != null &&
+                !localSermon.deleted &&
+                localSermon.content != content) {
+              // Dedupe: don't re-snapshot content we've already preserved for
+              // this sermon (e.g. across repeated syncs).
+              final already = await (_store.select(_store.sermonRevisions)
+                    ..where((t) =>
+                        t.sermonId.equals(rec.id) &
+                        t.deleted.equals(false) &
+                        t.content.equals(localSermon.content)))
+                  .getSingleOrNull();
+              if (already == null) {
+                await _store.into(_store.sermonRevisions).insert(
+                      SermonRevisionsCompanion.insert(
+                        id: const Uuid().v4(),
+                        updatedAt: DateTime.now().millisecondsSinceEpoch,
+                        deviceId: deviceId,
+                        // Stamp with when the losing version was actually
+                        // written locally, not "now".
+                        createdAt: localSermon.updatedAt,
+                        sermonId: rec.id,
+                        title: localSermon.title,
+                        series: Value(localSermon.series),
+                        content: localSermon.content,
+                        label: const Value('Overwritten by another device'),
+                        kind: RevisionKind.conflict,
+                      ),
+                    );
+                conflictedSermonIds.add(rec.id);
+              }
+            }
             final item = Sermon(
               id: rec.id,
               updatedAt: rec.updatedAt,
@@ -486,6 +552,23 @@ class SyncService {
             );
             await _store
                 .into(_store.sermons)
+                .insert(item, mode: InsertMode.replace);
+          } else if (type == 'sermonRevision') {
+            final item = SermonRevision(
+              id: rec.id,
+              updatedAt: rec.updatedAt,
+              deviceId: rec.deviceId,
+              deleted: rec.deleted,
+              sermonId: rec.payload['sermonId'] as String,
+              createdAt: (rec.payload['createdAt'] as num).toInt(),
+              title: rec.payload['title'] as String,
+              series: rec.payload['series'] as String?,
+              content: rec.payload['content'] as String,
+              label: rec.payload['label'] as String?,
+              kind: rec.payload['kind'] as String,
+            );
+            await _store
+                .into(_store.sermonRevisions)
                 .insert(item, mode: InsertMode.replace);
           } else if (type == 'prayer') {
             final item = Prayer(
@@ -627,6 +710,30 @@ class SyncService {
           }
         }
       });
+
+      // 4b. Prune the conflict-backup revisions just created to the per-sermon
+      // retention cap (manual revisions are excluded and never pruned).
+      for (final sermonId in conflictedSermonIds) {
+        final auto = await (_store.select(_store.sermonRevisions)
+              ..where((t) =>
+                  t.sermonId.equals(sermonId) &
+                  t.deleted.equals(false) &
+                  t.kind.equals(RevisionKind.manual).not())
+              ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
+            .get();
+        if (auto.length <= kMaxAutoRevisions) continue;
+        final pruneTs = DateTime.now().millisecondsSinceEpoch;
+        for (final stale in auto.skip(kMaxAutoRevisions)) {
+          await (_store.update(_store.sermonRevisions)
+                ..where((t) => t.id.equals(stale.id)))
+              .write(
+            SermonRevisionsCompanion(
+              deleted: const Value(true),
+              updatedAt: Value(pruneTs),
+            ),
+          );
+        }
+      }
 
       // 5. Push the resulting state
       await _engine!.push(merged);

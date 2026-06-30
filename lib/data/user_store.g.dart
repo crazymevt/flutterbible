@@ -6732,6 +6732,657 @@ class SermonsCompanion extends UpdateCompanion<Sermon> {
   }
 }
 
+class $SermonRevisionsTable extends SermonRevisions
+    with TableInfo<$SermonRevisionsTable, SermonRevision> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SermonRevisionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deviceIdMeta = const VerificationMeta(
+    'deviceId',
+  );
+  @override
+  late final GeneratedColumn<String> deviceId = GeneratedColumn<String>(
+    'device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedMeta = const VerificationMeta(
+    'deleted',
+  );
+  @override
+  late final GeneratedColumn<bool> deleted = GeneratedColumn<bool>(
+    'deleted',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("deleted" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _sermonIdMeta = const VerificationMeta(
+    'sermonId',
+  );
+  @override
+  late final GeneratedColumn<String> sermonId = GeneratedColumn<String>(
+    'sermon_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _seriesMeta = const VerificationMeta('series');
+  @override
+  late final GeneratedColumn<String> series = GeneratedColumn<String>(
+    'series',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _contentMeta = const VerificationMeta(
+    'content',
+  );
+  @override
+  late final GeneratedColumn<String> content = GeneratedColumn<String>(
+    'content',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _labelMeta = const VerificationMeta('label');
+  @override
+  late final GeneratedColumn<String> label = GeneratedColumn<String>(
+    'label',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
+  @override
+  late final GeneratedColumn<String> kind = GeneratedColumn<String>(
+    'kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    updatedAt,
+    deviceId,
+    deleted,
+    sermonId,
+    createdAt,
+    title,
+    series,
+    content,
+    label,
+    kind,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'sermon_revisions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<SermonRevision> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('device_id')) {
+      context.handle(
+        _deviceIdMeta,
+        deviceId.isAcceptableOrUnknown(data['device_id']!, _deviceIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_deviceIdMeta);
+    }
+    if (data.containsKey('deleted')) {
+      context.handle(
+        _deletedMeta,
+        deleted.isAcceptableOrUnknown(data['deleted']!, _deletedMeta),
+      );
+    }
+    if (data.containsKey('sermon_id')) {
+      context.handle(
+        _sermonIdMeta,
+        sermonId.isAcceptableOrUnknown(data['sermon_id']!, _sermonIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sermonIdMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('series')) {
+      context.handle(
+        _seriesMeta,
+        series.isAcceptableOrUnknown(data['series']!, _seriesMeta),
+      );
+    }
+    if (data.containsKey('content')) {
+      context.handle(
+        _contentMeta,
+        content.isAcceptableOrUnknown(data['content']!, _contentMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_contentMeta);
+    }
+    if (data.containsKey('label')) {
+      context.handle(
+        _labelMeta,
+        label.isAcceptableOrUnknown(data['label']!, _labelMeta),
+      );
+    }
+    if (data.containsKey('kind')) {
+      context.handle(
+        _kindMeta,
+        kind.isAcceptableOrUnknown(data['kind']!, _kindMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_kindMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  SermonRevision map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SermonRevision(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deviceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}device_id'],
+      )!,
+      deleted: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}deleted'],
+      )!,
+      sermonId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sermon_id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      series: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}series'],
+      ),
+      content: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}content'],
+      )!,
+      label: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}label'],
+      ),
+      kind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}kind'],
+      )!,
+    );
+  }
+
+  @override
+  $SermonRevisionsTable createAlias(String alias) {
+    return $SermonRevisionsTable(attachedDatabase, alias);
+  }
+}
+
+class SermonRevision extends DataClass implements Insertable<SermonRevision> {
+  final String id;
+  final int updatedAt;
+  final String deviceId;
+  final bool deleted;
+  final String sermonId;
+  final int createdAt;
+  final String title;
+  final String? series;
+  final String content;
+  final String? label;
+  final String kind;
+  const SermonRevision({
+    required this.id,
+    required this.updatedAt,
+    required this.deviceId,
+    required this.deleted,
+    required this.sermonId,
+    required this.createdAt,
+    required this.title,
+    this.series,
+    required this.content,
+    this.label,
+    required this.kind,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['updated_at'] = Variable<int>(updatedAt);
+    map['device_id'] = Variable<String>(deviceId);
+    map['deleted'] = Variable<bool>(deleted);
+    map['sermon_id'] = Variable<String>(sermonId);
+    map['created_at'] = Variable<int>(createdAt);
+    map['title'] = Variable<String>(title);
+    if (!nullToAbsent || series != null) {
+      map['series'] = Variable<String>(series);
+    }
+    map['content'] = Variable<String>(content);
+    if (!nullToAbsent || label != null) {
+      map['label'] = Variable<String>(label);
+    }
+    map['kind'] = Variable<String>(kind);
+    return map;
+  }
+
+  SermonRevisionsCompanion toCompanion(bool nullToAbsent) {
+    return SermonRevisionsCompanion(
+      id: Value(id),
+      updatedAt: Value(updatedAt),
+      deviceId: Value(deviceId),
+      deleted: Value(deleted),
+      sermonId: Value(sermonId),
+      createdAt: Value(createdAt),
+      title: Value(title),
+      series: series == null && nullToAbsent
+          ? const Value.absent()
+          : Value(series),
+      content: Value(content),
+      label: label == null && nullToAbsent
+          ? const Value.absent()
+          : Value(label),
+      kind: Value(kind),
+    );
+  }
+
+  factory SermonRevision.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SermonRevision(
+      id: serializer.fromJson<String>(json['id']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+      deviceId: serializer.fromJson<String>(json['deviceId']),
+      deleted: serializer.fromJson<bool>(json['deleted']),
+      sermonId: serializer.fromJson<String>(json['sermonId']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+      title: serializer.fromJson<String>(json['title']),
+      series: serializer.fromJson<String?>(json['series']),
+      content: serializer.fromJson<String>(json['content']),
+      label: serializer.fromJson<String?>(json['label']),
+      kind: serializer.fromJson<String>(json['kind']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+      'deviceId': serializer.toJson<String>(deviceId),
+      'deleted': serializer.toJson<bool>(deleted),
+      'sermonId': serializer.toJson<String>(sermonId),
+      'createdAt': serializer.toJson<int>(createdAt),
+      'title': serializer.toJson<String>(title),
+      'series': serializer.toJson<String?>(series),
+      'content': serializer.toJson<String>(content),
+      'label': serializer.toJson<String?>(label),
+      'kind': serializer.toJson<String>(kind),
+    };
+  }
+
+  SermonRevision copyWith({
+    String? id,
+    int? updatedAt,
+    String? deviceId,
+    bool? deleted,
+    String? sermonId,
+    int? createdAt,
+    String? title,
+    Value<String?> series = const Value.absent(),
+    String? content,
+    Value<String?> label = const Value.absent(),
+    String? kind,
+  }) => SermonRevision(
+    id: id ?? this.id,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deviceId: deviceId ?? this.deviceId,
+    deleted: deleted ?? this.deleted,
+    sermonId: sermonId ?? this.sermonId,
+    createdAt: createdAt ?? this.createdAt,
+    title: title ?? this.title,
+    series: series.present ? series.value : this.series,
+    content: content ?? this.content,
+    label: label.present ? label.value : this.label,
+    kind: kind ?? this.kind,
+  );
+  SermonRevision copyWithCompanion(SermonRevisionsCompanion data) {
+    return SermonRevision(
+      id: data.id.present ? data.id.value : this.id,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deviceId: data.deviceId.present ? data.deviceId.value : this.deviceId,
+      deleted: data.deleted.present ? data.deleted.value : this.deleted,
+      sermonId: data.sermonId.present ? data.sermonId.value : this.sermonId,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      title: data.title.present ? data.title.value : this.title,
+      series: data.series.present ? data.series.value : this.series,
+      content: data.content.present ? data.content.value : this.content,
+      label: data.label.present ? data.label.value : this.label,
+      kind: data.kind.present ? data.kind.value : this.kind,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SermonRevision(')
+          ..write('id: $id, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('deleted: $deleted, ')
+          ..write('sermonId: $sermonId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('title: $title, ')
+          ..write('series: $series, ')
+          ..write('content: $content, ')
+          ..write('label: $label, ')
+          ..write('kind: $kind')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    updatedAt,
+    deviceId,
+    deleted,
+    sermonId,
+    createdAt,
+    title,
+    series,
+    content,
+    label,
+    kind,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SermonRevision &&
+          other.id == this.id &&
+          other.updatedAt == this.updatedAt &&
+          other.deviceId == this.deviceId &&
+          other.deleted == this.deleted &&
+          other.sermonId == this.sermonId &&
+          other.createdAt == this.createdAt &&
+          other.title == this.title &&
+          other.series == this.series &&
+          other.content == this.content &&
+          other.label == this.label &&
+          other.kind == this.kind);
+}
+
+class SermonRevisionsCompanion extends UpdateCompanion<SermonRevision> {
+  final Value<String> id;
+  final Value<int> updatedAt;
+  final Value<String> deviceId;
+  final Value<bool> deleted;
+  final Value<String> sermonId;
+  final Value<int> createdAt;
+  final Value<String> title;
+  final Value<String?> series;
+  final Value<String> content;
+  final Value<String?> label;
+  final Value<String> kind;
+  final Value<int> rowid;
+  const SermonRevisionsCompanion({
+    this.id = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deviceId = const Value.absent(),
+    this.deleted = const Value.absent(),
+    this.sermonId = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.title = const Value.absent(),
+    this.series = const Value.absent(),
+    this.content = const Value.absent(),
+    this.label = const Value.absent(),
+    this.kind = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  SermonRevisionsCompanion.insert({
+    required String id,
+    required int updatedAt,
+    required String deviceId,
+    this.deleted = const Value.absent(),
+    required String sermonId,
+    required int createdAt,
+    required String title,
+    this.series = const Value.absent(),
+    required String content,
+    this.label = const Value.absent(),
+    required String kind,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       updatedAt = Value(updatedAt),
+       deviceId = Value(deviceId),
+       sermonId = Value(sermonId),
+       createdAt = Value(createdAt),
+       title = Value(title),
+       content = Value(content),
+       kind = Value(kind);
+  static Insertable<SermonRevision> custom({
+    Expression<String>? id,
+    Expression<int>? updatedAt,
+    Expression<String>? deviceId,
+    Expression<bool>? deleted,
+    Expression<String>? sermonId,
+    Expression<int>? createdAt,
+    Expression<String>? title,
+    Expression<String>? series,
+    Expression<String>? content,
+    Expression<String>? label,
+    Expression<String>? kind,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deviceId != null) 'device_id': deviceId,
+      if (deleted != null) 'deleted': deleted,
+      if (sermonId != null) 'sermon_id': sermonId,
+      if (createdAt != null) 'created_at': createdAt,
+      if (title != null) 'title': title,
+      if (series != null) 'series': series,
+      if (content != null) 'content': content,
+      if (label != null) 'label': label,
+      if (kind != null) 'kind': kind,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  SermonRevisionsCompanion copyWith({
+    Value<String>? id,
+    Value<int>? updatedAt,
+    Value<String>? deviceId,
+    Value<bool>? deleted,
+    Value<String>? sermonId,
+    Value<int>? createdAt,
+    Value<String>? title,
+    Value<String?>? series,
+    Value<String>? content,
+    Value<String?>? label,
+    Value<String>? kind,
+    Value<int>? rowid,
+  }) {
+    return SermonRevisionsCompanion(
+      id: id ?? this.id,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deviceId: deviceId ?? this.deviceId,
+      deleted: deleted ?? this.deleted,
+      sermonId: sermonId ?? this.sermonId,
+      createdAt: createdAt ?? this.createdAt,
+      title: title ?? this.title,
+      series: series ?? this.series,
+      content: content ?? this.content,
+      label: label ?? this.label,
+      kind: kind ?? this.kind,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (deviceId.present) {
+      map['device_id'] = Variable<String>(deviceId.value);
+    }
+    if (deleted.present) {
+      map['deleted'] = Variable<bool>(deleted.value);
+    }
+    if (sermonId.present) {
+      map['sermon_id'] = Variable<String>(sermonId.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (series.present) {
+      map['series'] = Variable<String>(series.value);
+    }
+    if (content.present) {
+      map['content'] = Variable<String>(content.value);
+    }
+    if (label.present) {
+      map['label'] = Variable<String>(label.value);
+    }
+    if (kind.present) {
+      map['kind'] = Variable<String>(kind.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SermonRevisionsCompanion(')
+          ..write('id: $id, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('deleted: $deleted, ')
+          ..write('sermonId: $sermonId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('title: $title, ')
+          ..write('series: $series, ')
+          ..write('content: $content, ')
+          ..write('label: $label, ')
+          ..write('kind: $kind, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $TagsTable extends Tags with TableInfo<$TagsTable, Tag> {
   @override
   final GeneratedDatabase attachedDatabase;
@@ -7628,6 +8279,9 @@ abstract class _$UserStore extends GeneratedDatabase {
     this,
   );
   late final $SermonsTable sermons = $SermonsTable(this);
+  late final $SermonRevisionsTable sermonRevisions = $SermonRevisionsTable(
+    this,
+  );
   late final $TagsTable tags = $TagsTable(this);
   late final $EntityTagsTable entityTags = $EntityTagsTable(this);
   @override
@@ -7648,6 +8302,7 @@ abstract class _$UserStore extends GeneratedDatabase {
     readingPlanDays,
     readingPlanItems,
     sermons,
+    sermonRevisions,
     tags,
     entityTags,
   ];
@@ -11032,6 +11687,322 @@ typedef $$SermonsTableProcessedTableManager =
       Sermon,
       PrefetchHooks Function()
     >;
+typedef $$SermonRevisionsTableCreateCompanionBuilder =
+    SermonRevisionsCompanion Function({
+      required String id,
+      required int updatedAt,
+      required String deviceId,
+      Value<bool> deleted,
+      required String sermonId,
+      required int createdAt,
+      required String title,
+      Value<String?> series,
+      required String content,
+      Value<String?> label,
+      required String kind,
+      Value<int> rowid,
+    });
+typedef $$SermonRevisionsTableUpdateCompanionBuilder =
+    SermonRevisionsCompanion Function({
+      Value<String> id,
+      Value<int> updatedAt,
+      Value<String> deviceId,
+      Value<bool> deleted,
+      Value<String> sermonId,
+      Value<int> createdAt,
+      Value<String> title,
+      Value<String?> series,
+      Value<String> content,
+      Value<String?> label,
+      Value<String> kind,
+      Value<int> rowid,
+    });
+
+class $$SermonRevisionsTableFilterComposer
+    extends Composer<_$UserStore, $SermonRevisionsTable> {
+  $$SermonRevisionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get deleted => $composableBuilder(
+    column: $table.deleted,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sermonId => $composableBuilder(
+    column: $table.sermonId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get series => $composableBuilder(
+    column: $table.series,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get content => $composableBuilder(
+    column: $table.content,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get label => $composableBuilder(
+    column: $table.label,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$SermonRevisionsTableOrderingComposer
+    extends Composer<_$UserStore, $SermonRevisionsTable> {
+  $$SermonRevisionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get deleted => $composableBuilder(
+    column: $table.deleted,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sermonId => $composableBuilder(
+    column: $table.sermonId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get series => $composableBuilder(
+    column: $table.series,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get content => $composableBuilder(
+    column: $table.content,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get label => $composableBuilder(
+    column: $table.label,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$SermonRevisionsTableAnnotationComposer
+    extends Composer<_$UserStore, $SermonRevisionsTable> {
+  $$SermonRevisionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get deviceId =>
+      $composableBuilder(column: $table.deviceId, builder: (column) => column);
+
+  GeneratedColumn<bool> get deleted =>
+      $composableBuilder(column: $table.deleted, builder: (column) => column);
+
+  GeneratedColumn<String> get sermonId =>
+      $composableBuilder(column: $table.sermonId, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get series =>
+      $composableBuilder(column: $table.series, builder: (column) => column);
+
+  GeneratedColumn<String> get content =>
+      $composableBuilder(column: $table.content, builder: (column) => column);
+
+  GeneratedColumn<String> get label =>
+      $composableBuilder(column: $table.label, builder: (column) => column);
+
+  GeneratedColumn<String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+}
+
+class $$SermonRevisionsTableTableManager
+    extends
+        RootTableManager<
+          _$UserStore,
+          $SermonRevisionsTable,
+          SermonRevision,
+          $$SermonRevisionsTableFilterComposer,
+          $$SermonRevisionsTableOrderingComposer,
+          $$SermonRevisionsTableAnnotationComposer,
+          $$SermonRevisionsTableCreateCompanionBuilder,
+          $$SermonRevisionsTableUpdateCompanionBuilder,
+          (
+            SermonRevision,
+            BaseReferences<_$UserStore, $SermonRevisionsTable, SermonRevision>,
+          ),
+          SermonRevision,
+          PrefetchHooks Function()
+        > {
+  $$SermonRevisionsTableTableManager(
+    _$UserStore db,
+    $SermonRevisionsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$SermonRevisionsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SermonRevisionsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$SermonRevisionsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<String> deviceId = const Value.absent(),
+                Value<bool> deleted = const Value.absent(),
+                Value<String> sermonId = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String?> series = const Value.absent(),
+                Value<String> content = const Value.absent(),
+                Value<String?> label = const Value.absent(),
+                Value<String> kind = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => SermonRevisionsCompanion(
+                id: id,
+                updatedAt: updatedAt,
+                deviceId: deviceId,
+                deleted: deleted,
+                sermonId: sermonId,
+                createdAt: createdAt,
+                title: title,
+                series: series,
+                content: content,
+                label: label,
+                kind: kind,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required int updatedAt,
+                required String deviceId,
+                Value<bool> deleted = const Value.absent(),
+                required String sermonId,
+                required int createdAt,
+                required String title,
+                Value<String?> series = const Value.absent(),
+                required String content,
+                Value<String?> label = const Value.absent(),
+                required String kind,
+                Value<int> rowid = const Value.absent(),
+              }) => SermonRevisionsCompanion.insert(
+                id: id,
+                updatedAt: updatedAt,
+                deviceId: deviceId,
+                deleted: deleted,
+                sermonId: sermonId,
+                createdAt: createdAt,
+                title: title,
+                series: series,
+                content: content,
+                label: label,
+                kind: kind,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$SermonRevisionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$UserStore,
+      $SermonRevisionsTable,
+      SermonRevision,
+      $$SermonRevisionsTableFilterComposer,
+      $$SermonRevisionsTableOrderingComposer,
+      $$SermonRevisionsTableAnnotationComposer,
+      $$SermonRevisionsTableCreateCompanionBuilder,
+      $$SermonRevisionsTableUpdateCompanionBuilder,
+      (
+        SermonRevision,
+        BaseReferences<_$UserStore, $SermonRevisionsTable, SermonRevision>,
+      ),
+      SermonRevision,
+      PrefetchHooks Function()
+    >;
 typedef $$TagsTableCreateCompanionBuilder =
     TagsCompanion Function({
       required String id,
@@ -11506,6 +12477,8 @@ class $UserStoreManager {
       $$ReadingPlanItemsTableTableManager(_db, _db.readingPlanItems);
   $$SermonsTableTableManager get sermons =>
       $$SermonsTableTableManager(_db, _db.sermons);
+  $$SermonRevisionsTableTableManager get sermonRevisions =>
+      $$SermonRevisionsTableTableManager(_db, _db.sermonRevisions);
   $$TagsTableTableManager get tags => $$TagsTableTableManager(_db, _db.tags);
   $$EntityTagsTableTableManager get entityTags =>
       $$EntityTagsTableTableManager(_db, _db.entityTags);

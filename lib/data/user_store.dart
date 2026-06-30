@@ -24,6 +24,7 @@ part 'user_store.g.dart';
     ReadingPlanDays,
     ReadingPlanItems,
     Sermons,
+    SermonRevisions,
     Tags,
     EntityTags,
   ],
@@ -32,7 +33,7 @@ class UserStore extends _$UserStore {
   UserStore([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 17;
+  int get schemaVersion => 18;
 
   @override
   MigrationStrategy get migration {
@@ -499,6 +500,9 @@ class UserStore extends _$UserStore {
           // triggers and rebuild the index from scratch to heal every install.
           await _installSearchTriggers();
           await _rebuildSearchIndex();
+        }
+        if (from < 18) {
+          await m.createTable(sermonRevisions);
         }
       },
     );

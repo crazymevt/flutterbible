@@ -83,6 +83,32 @@ class Sermons extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+/// A point-in-time snapshot of a [Sermons] row. A revision's content is never
+/// edited after creation — it is only ever created or tombstoned (a delete
+/// bumps [updatedAt] so the tombstone wins) — so Last-Writer-Wins needs no
+/// special handling for them.
+@DataClassName('SermonRevision')
+class SermonRevisions extends Table {
+  TextColumn get id => text()(); // UUID of the revision
+  IntColumn get updatedAt => integer()(); // == createdAt; for the sync contract
+  TextColumn get deviceId => text()(); // device that captured the snapshot
+  BoolColumn get deleted => boolean().withDefault(const Constant(false))();
+
+  TextColumn get sermonId => text()(); // the sermon this snapshots
+  IntColumn get createdAt => integer()(); // epoch ms the snapshot was taken
+  TextColumn get title => text()(); // snapshot of the sermon title
+  TextColumn get series => text().nullable()();
+  TextColumn get content => text()(); // snapshot of the Delta JSON content
+  TextColumn get label => text().nullable()(); // optional user-supplied label
+  // 'manual' (user saved), 'conflict' (a remote edit overwrote local content),
+  // or 'restore' (auto-snapshot of the pre-restore state). Manual revisions are
+  // kept forever; the automatic kinds are capped per sermon.
+  TextColumn get kind => text()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 @DataClassName('Prayer')
 class Prayers extends Table {
   TextColumn get id => text()();
