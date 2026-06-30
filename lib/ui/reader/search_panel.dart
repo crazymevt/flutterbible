@@ -18,6 +18,7 @@ import '../tags/tags_tab_view.dart';
 import '../journals/journals_list_panel.dart';
 import '../journals/journal_editor_panel.dart';
 import '../common/breakpoints.dart';
+import '../common/skeleton.dart';
 
 class SearchPanel extends ConsumerStatefulWidget {
   const SearchPanel({super.key});
@@ -235,7 +236,7 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
                   ),
                 );
               },
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => const SkeletonList(),
               error: (err, stack) => Center(child: Text('Error: $err')),
             ),
             const TagsTabView(),

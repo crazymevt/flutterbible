@@ -6,6 +6,7 @@ import '../../app/reader_state.dart';
 import '../../app/topic_providers.dart';
 import '../../data/content_store.dart';
 import '../common/breakpoints.dart';
+import '../common/skeleton.dart';
 
 /// Open [topicId] in the Topics tool: the side panel on wide layouts, a
 /// bottom sheet on phones.
@@ -254,7 +255,7 @@ class _TopicsPanelState extends ConsumerState<TopicsPanel> {
           const Divider(height: 1),
           Expanded(
             child: ready.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => const SkeletonList(),
               error: (e, _) => Center(child: Text('Could not load topics: $e')),
               data: (_) => selectedTopic != null
                   ? _TopicDetailView(
@@ -294,7 +295,7 @@ class _TopicSearchResults extends ConsumerWidget {
     }
     final results = ref.watch(topicSearchResultsProvider);
     return results.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const SkeletonList(),
       error: (e, _) => Center(child: Text('Error: $e')),
       data: (topics) {
         if (topics.isEmpty) {
@@ -336,7 +337,7 @@ class _TopicDetailView extends ConsumerWidget {
     final detail = ref.watch(topicDetailProvider(topicId));
     final scheme = Theme.of(context).colorScheme;
     return detail.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const SkeletonList(),
       error: (e, _) => Center(child: Text('Error: $e')),
       data: (d) {
         if (d == null) return const SizedBox.shrink();

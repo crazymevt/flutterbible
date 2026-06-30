@@ -6,6 +6,8 @@ import '../../app/content_providers.dart';
 import '../../app/app_state.dart';
 import '../../app/reader_state.dart';
 import '../common/bible_link_handler.dart';
+import '../common/empty_state.dart';
+import '../common/skeleton.dart';
 
 class CommentaryPanel extends ConsumerWidget {
   const CommentaryPanel({super.key});
@@ -133,10 +135,17 @@ class CommentaryPanel extends ConsumerWidget {
           ),
           const Divider(height: 1),
           Expanded(
-            child: entriesAsync.when(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              child: entriesAsync.when(
               data: (entries) {
                 if (entries.isEmpty) {
-                  return const Center(child: Text('No commentary available.'));
+                  return const EmptyState(
+                    icon: Icons.menu_book_outlined,
+                    title: 'No commentary here',
+                    message:
+                        'Select a verse, or pick another commentary, to see notes for this passage.',
+                  );
                 }
                 return ListView.builder(
                   padding: const EdgeInsets.all(16),
@@ -182,8 +191,13 @@ class CommentaryPanel extends ConsumerWidget {
                   },
                 );
               },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, stack) => Center(child: Text('Error: $err')),
+              loading: () => const SkeletonList(),
+              error: (err, stack) => const EmptyState(
+                icon: Icons.error_outline,
+                title: 'Couldn\'t load commentary',
+                message: 'Something went wrong loading this commentary.',
+              ),
+            ),
             ),
           ),
         ],

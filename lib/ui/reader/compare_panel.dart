@@ -7,6 +7,8 @@ import '../../app/app_state.dart';
 import '../../data/importer/mybible_verse_parser.dart';
 import '../../theme/app_themes.dart';
 import '../common/breakpoints.dart';
+import '../common/empty_state.dart';
+import '../common/skeleton.dart';
 
 class ComparePanel extends ConsumerWidget {
   const ComparePanel({super.key});
@@ -97,10 +99,16 @@ class ComparePanel extends ConsumerWidget {
             ),
           ),
           Expanded(
-            child: compareAsync.when(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              child: compareAsync.when(
               data: (results) {
                 if (results.isEmpty) {
-                  return const Center(child: Text('No verses found.'));
+                  return const EmptyState(
+                    icon: Icons.difference_outlined,
+                    title: 'Nothing to compare',
+                    message: 'Select a verse to see it across your versions.',
+                  );
                 }
                 return ListView.separated(
                   itemCount: results.length,
@@ -116,8 +124,12 @@ class ComparePanel extends ConsumerWidget {
                   },
                 );
               },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, stack) => Center(child: Text('Error: $err')),
+              loading: () => const SkeletonList(),
+              error: (err, stack) => const EmptyState(
+                icon: Icons.error_outline,
+                title: 'Couldn\'t compare versions',
+              ),
+            ),
             ),
           ),
         ],

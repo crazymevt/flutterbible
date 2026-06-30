@@ -7,6 +7,8 @@ import '../../app/content_providers.dart';
 import '../../app/place_providers.dart';
 import '../../app/reader_state.dart';
 import '../common/breakpoints.dart';
+import '../common/empty_state.dart';
+import '../common/skeleton.dart';
 
 /// Maps the geographic places mentioned in the active passage (OpenBible.info
 /// geocoding). Place data is bundled/offline; only the OSM tile background needs
@@ -81,22 +83,20 @@ class _PlacesPanelState extends ConsumerState<PlacesPanel> {
           ),
           const Divider(height: 1),
           Expanded(
-            child: placesAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text('Could not load places: $e')),
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              child: placesAsync.when(
+              loading: () => const SkeletonList(),
+              error: (e, _) => const EmptyState(
+                icon: Icons.error_outline,
+                title: 'Couldn\'t load places',
+              ),
               data: (places) {
                 if (places.isEmpty) {
-                  return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Text(
-                        'No mapped places in this passage.',
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: scheme.onSurfaceVariant,
-                            ),
-                      ),
-                    ),
+                  return const EmptyState(
+                    icon: Icons.place_outlined,
+                    title: 'No mapped places',
+                    message: 'This passage doesn\'t mention any places we can map.',
                   );
                 }
                 return LayoutBuilder(
@@ -122,6 +122,7 @@ class _PlacesPanelState extends ConsumerState<PlacesPanel> {
                   },
                 );
               },
+            ),
             ),
           ),
         ],

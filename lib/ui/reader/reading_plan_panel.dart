@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../common/breakpoints.dart';
@@ -7,6 +8,7 @@ import '../../app/reading_plan_providers.dart';
 import '../../app/content_providers.dart';
 import '../../app/app_state.dart';
 import '../reading_plans/reading_plan_generator_screen.dart';
+import '../common/skeleton.dart';
 
 class SelectedPlanIdNotifier extends Notifier<String?> {
   @override
@@ -86,7 +88,7 @@ class ReadingPlanPanel extends ConsumerWidget {
                         ref.read(_selectedPlanIdProvider.notifier).set(id),
                   );
                 },
-                loading: () => const Center(child: CircularProgressIndicator()),
+                loading: () => const SkeletonList(),
                 error: (e, st) => Center(child: Text('Error: $e')),
               ),
             ),
@@ -255,7 +257,7 @@ class _ActivePlanView extends ConsumerWidget {
                 totalDays: days.length,
               );
             },
-            loading: () => const Center(child: CircularProgressIndicator()),
+            loading: () => const SkeletonList(),
             error: (e, st) => Center(child: Text('Error: $e')),
           ),
         ),
@@ -376,6 +378,7 @@ class _DayView extends ConsumerWidget {
                     leading: Checkbox(
                       value: item.completed,
                       onChanged: (val) {
+                        HapticFeedback.selectionClick();
                         ref
                             .read(readingPlanControllerProvider)
                             .toggleItemComplete(item, val ?? false);
@@ -401,7 +404,7 @@ class _DayView extends ConsumerWidget {
                 },
               );
             },
-            loading: () => const Center(child: CircularProgressIndicator()),
+            loading: () => const SkeletonList(),
             error: (e, st) => Center(child: Text('Error: $e')),
           ),
         ),
@@ -415,6 +418,8 @@ class _DayView extends ConsumerWidget {
             icon: const Icon(Icons.check_circle_outline),
             label: const Text('Complete Day', style: TextStyle(fontSize: 16)),
             onPressed: () {
+              // A firmer tap to mark the satisfying moment of finishing a day.
+              HapticFeedback.lightImpact();
               ref
                   .read(readingPlanControllerProvider)
                   .toggleDayComplete(day, true);

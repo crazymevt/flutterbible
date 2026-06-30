@@ -5,6 +5,8 @@ import '../../app/content_providers.dart';
 import '../../app/reader_state.dart';
 import '../../app/user_providers.dart';
 import '../../data/user_store.dart';
+import '../common/empty_state.dart';
+import '../common/skeleton.dart';
 
 /// The highlight swatch palette, mirroring the verse action bar, so the review
 /// list can show a friendly colour name and a matching filter.
@@ -81,7 +83,9 @@ class _HighlightsPanelState extends ConsumerState<HighlightsPanel> {
           _buildHeader(context),
           const Divider(height: 1),
           Expanded(
-            child: highlightsAsync.when(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              child: highlightsAsync.when(
               data: (highlights) {
                 final books = _booksWithHighlights(highlights, bookOrder);
                 final visible = _applyFilters(highlights, searchTexts, bookOrder);
@@ -93,12 +97,16 @@ class _HighlightsPanelState extends ConsumerState<HighlightsPanel> {
                     const Divider(height: 1),
                     Expanded(
                       child: visible.isEmpty
-                          ? Center(
-                              child: Text(
-                                highlights.isEmpty
-                                    ? 'No highlights yet.'
-                                    : 'No highlights match your filters.',
-                              ),
+                          ? EmptyState(
+                              icon: highlights.isEmpty
+                                  ? Icons.brush_outlined
+                                  : Icons.filter_alt_off_outlined,
+                              title: highlights.isEmpty
+                                  ? 'No highlights yet'
+                                  : 'No matches',
+                              message: highlights.isEmpty
+                                  ? 'Highlight a verse and it will show up here.'
+                                  : 'No highlights match your filters.',
                             )
                           : ListView.separated(
                               itemCount: visible.length,
@@ -113,9 +121,12 @@ class _HighlightsPanelState extends ConsumerState<HighlightsPanel> {
                   ],
                 );
               },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, stack) =>
-                  const Center(child: Text('Error loading highlights')),
+              loading: () => const SkeletonList(),
+              error: (err, stack) => const EmptyState(
+                icon: Icons.error_outline,
+                title: 'Couldn\'t load highlights',
+              ),
+            ),
             ),
           ),
         ],

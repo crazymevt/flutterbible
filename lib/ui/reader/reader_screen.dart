@@ -11,6 +11,8 @@ import 'parallel_view.dart';
 import 'verse_action_bar.dart';
 import 'book_chooser_sheet.dart';
 import '../common/breakpoints.dart';
+import '../common/empty_state.dart';
+import '../common/skeleton.dart';
 
 import 'mobile_tools_drawer.dart';
 import 'history_panel.dart';
@@ -192,6 +194,9 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
         entry.chapter == ref.read(selectedChapterProvider)) {
       return;
     }
+    // A light tick as the swipe settles onto a new chapter, mirroring the
+    // selection feedback elsewhere in the reader.
+    HapticFeedback.selectionClick();
     ref.read(selectedBookNameProvider.notifier).set(entry.bookName);
     ref.read(selectedChapterProvider.notifier).set(entry.chapter);
     ref.read(navigationControllerProvider).recordHistory();
@@ -867,8 +872,8 @@ class _ChapterPage extends ConsumerWidget {
         <int, List<String>>{};
 
     return versesAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (err, stack) => _ReaderMessage(
+      loading: () => const SkeletonList(rows: 8),
+      error: (err, stack) => EmptyState(
         icon: Icons.error_outline,
         title: 'Couldn\'t load this chapter',
         message: 'Something went wrong while loading $bookName $chapter.',
@@ -877,7 +882,7 @@ class _ChapterPage extends ConsumerWidget {
       ),
       data: (versesMap) {
         if (versesMap.isEmpty) {
-          return _ReaderMessage(
+          return EmptyState(
             icon: Icons.menu_book_outlined,
             title: 'Nothing to show here',
             message:
@@ -978,61 +983,6 @@ class _ChapterPage extends ConsumerWidget {
           headerWidget: headerWidget,
         );
       },
-    );
-  }
-}
-
-/// A centered, friendly placeholder for the reader's empty and error states,
-/// with an icon, message, and an optional recovery action.
-class _ReaderMessage extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String message;
-  final String? actionLabel;
-  final VoidCallback? onAction;
-
-  const _ReaderMessage({
-    required this.icon,
-    required this.title,
-    required this.message,
-    this.actionLabel,
-    this.onAction,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 48, color: theme.colorScheme.onSurfaceVariant),
-            const SizedBox(height: 16),
-            Text(
-              title,
-              style: theme.textTheme.titleMedium,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              message,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            if (actionLabel != null && onAction != null) ...[
-              const SizedBox(height: 24),
-              FilledButton.tonal(
-                onPressed: onAction,
-                child: Text(actionLabel!),
-              ),
-            ],
-          ],
-        ),
-      ),
     );
   }
 }

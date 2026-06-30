@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart' show CupertinoPageTransitionsBuilder;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -160,6 +161,19 @@ class AppThemes {
       colorScheme: colorScheme,
       useMaterial3: true,
       textTheme: textTheme,
+      // A consistent fade-through page transition on every platform, so pushing
+      // screens (settings, sermons, journals, reading-plan generator) animates
+      // the same way everywhere instead of defaulting to each OS's stock route
+      // animation (or none on desktop/web).
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android: FadeForwardsPageTransitionsBuilder(),
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.macOS: FadeForwardsPageTransitionsBuilder(),
+          TargetPlatform.windows: FadeForwardsPageTransitionsBuilder(),
+          TargetPlatform.linux: FadeForwardsPageTransitionsBuilder(),
+        },
+      ),
       extensions: [
         CustomAppColors(
           jesusWordsColor: customJesusWordsColor,

@@ -7,6 +7,8 @@ import '../../data/content_store.dart';
 import 'package:drift/drift.dart' hide Column;
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import '../common/breakpoints.dart';
+import '../common/empty_state.dart';
+import '../common/skeleton.dart';
 
 final currentDevotionalEntryProvider = FutureProvider<DevotionalEntry?>((ref) async {
   final id = ref.watch(selectedDevotionalIdProvider);
@@ -66,10 +68,16 @@ class DevotionalsPanel extends ConsumerWidget {
             ),
           ),
           Expanded(
-            child: devotionalsAsync.when(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              child: devotionalsAsync.when(
         data: (devotionals) {
           if (devotionals.isEmpty) {
-            return const Center(child: Text('No devotionals installed.'));
+            return const EmptyState(
+              icon: Icons.wb_sunny_outlined,
+              title: 'No devotionals installed',
+              message: 'Add a devotional from the content manager to read it here.',
+            );
           }
           final selectedId = selectedIdRaw ?? devotionals.first.id;
 
@@ -136,10 +144,16 @@ class DevotionalsPanel extends ConsumerWidget {
               ),
               const Divider(),
               Expanded(
-                child: entryAsync.when(
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 250),
+                  child: entryAsync.when(
                   data: (entry) {
                     if (entry == null) {
-                      return const Center(child: Text('No entry for this day.'));
+                      return const EmptyState(
+                        icon: Icons.event_busy_outlined,
+                        title: 'No entry for this day',
+                        message: 'Try another day using the arrows above.',
+                      );
                     }
                     return SingleChildScrollView(
                       padding: const EdgeInsets.all(16.0),
@@ -149,16 +163,24 @@ class DevotionalsPanel extends ConsumerWidget {
                       ),
                     );
                   },
-                  loading: () => const Center(child: CircularProgressIndicator()),
-                  error: (err, stack) => Center(child: Text('Error: $err')),
+                  loading: () => const SkeletonList(rows: 4),
+                  error: (err, stack) => const EmptyState(
+                    icon: Icons.error_outline,
+                    title: 'Couldn\'t load this entry',
+                  ),
+                ),
                 ),
               ),
             ],
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Error: $err')),
+        loading: () => const SkeletonList(),
+        error: (err, stack) => const EmptyState(
+          icon: Icons.error_outline,
+          title: 'Couldn\'t load devotionals',
+        ),
       ),
+            ),
     ),
         ],
       ),

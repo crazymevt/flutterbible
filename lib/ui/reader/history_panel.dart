@@ -4,6 +4,8 @@ import '../../app/user_providers.dart';
 import '../../app/app_state.dart';
 import '../../app/content_providers.dart';
 import '../../app/reader_state.dart';
+import '../common/empty_state.dart';
+import '../common/skeleton.dart';
 
 class HistoryPanel extends ConsumerWidget {
   const HistoryPanel({super.key});
@@ -45,10 +47,16 @@ class HistoryPanel extends ConsumerWidget {
           ),
           const Divider(height: 1),
           Expanded(
-            child: historyAsync.when(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              child: historyAsync.when(
               data: (history) {
                 if (history.isEmpty) {
-                  return const Center(child: Text('No history yet.'));
+                  return const EmptyState(
+                    icon: Icons.history,
+                    title: 'No history yet',
+                    message: 'Chapters and verses you visit appear here.',
+                  );
                 }
 
                 return ListView.separated(
@@ -109,9 +117,12 @@ class HistoryPanel extends ConsumerWidget {
                   },
                 );
               },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, stack) =>
-                  Center(child: Text('Error loading history')),
+              loading: () => const SkeletonList(),
+              error: (err, stack) => const EmptyState(
+                icon: Icons.error_outline,
+                title: 'Couldn\'t load history',
+              ),
+            ),
             ),
           ),
         ],

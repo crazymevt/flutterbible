@@ -5,6 +5,8 @@ import '../../app/app_state.dart';
 import '../../app/reader_state.dart';
 import '../../data/export/document_pdf.dart';
 import '../tags/tag_editor_dialog.dart';
+import '../common/empty_state.dart';
+import '../common/skeleton.dart';
 
 /// Heading shown for a note in the printed output and the panel list.
 String _noteLabel(dynamic note) {
@@ -80,11 +82,15 @@ class NotesPanel extends ConsumerWidget {
           ),
           const Divider(height: 1),
           Expanded(
-            child: notesAsync.when(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              child: notesAsync.when(
               data: (notes) {
                 if (notes.isEmpty) {
-                  return const Center(
-                    child: Text('No notes for this chapter.'),
+                  return const EmptyState(
+                    icon: Icons.edit_note_outlined,
+                    title: 'No notes yet',
+                    message: 'Notes you write for this chapter appear here.',
                   );
                 }
                 return ListView.separated(
@@ -169,8 +175,13 @@ class NotesPanel extends ConsumerWidget {
                   },
                 );
               },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, stack) => Center(child: Text('Error: $err')),
+              loading: () => const SkeletonList(),
+              error: (err, stack) => const EmptyState(
+                icon: Icons.error_outline,
+                title: 'Couldn\'t load notes',
+                message: 'Something went wrong. Pull up the panel again to retry.',
+              ),
+            ),
             ),
           ),
         ],
