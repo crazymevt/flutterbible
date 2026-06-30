@@ -26,14 +26,14 @@ const _topics = [
     icon: Icons.menu_book_rounded,
   ),
   HelpTopic(
+    title: 'Notes, Highlights & Sharing',
+    assetPath: 'assets/help/notes_highlights.md',
+    icon: Icons.brush_outlined,
+  ),
+  HelpTopic(
     title: 'Search',
     assetPath: 'assets/help/search.md',
     icon: Icons.search,
-  ),
-  HelpTopic(
-    title: 'Journals',
-    assetPath: 'assets/help/journals.md',
-    icon: Icons.edit_document,
   ),
   HelpTopic(
     title: 'Study Tools',
@@ -41,9 +41,19 @@ const _topics = [
     icon: Icons.view_sidebar,
   ),
   HelpTopic(
+    title: 'Journals & Prayers',
+    assetPath: 'assets/help/journals.md',
+    icon: Icons.edit_document,
+  ),
+  HelpTopic(
     title: 'Sermons',
     assetPath: 'assets/help/sermons.md',
     icon: Icons.co_present,
+  ),
+  HelpTopic(
+    title: 'Home & Dashboard',
+    assetPath: 'assets/help/dashboard.md',
+    icon: Icons.dashboard_outlined,
   ),
   HelpTopic(
     title: 'Content Manager',
@@ -54,6 +64,11 @@ const _topics = [
     title: 'Backup & Restore',
     assetPath: 'assets/help/backup.md',
     icon: Icons.backup,
+  ),
+  HelpTopic(
+    title: 'Settings & Personalization',
+    assetPath: 'assets/help/settings.md',
+    icon: Icons.settings_outlined,
   ),
 ];
 

@@ -9,12 +9,13 @@ A handful of features pull in resources from the internet—downloading new cont
 
 ## Core Features
 
-- **Reader:** Read multiple Bible translations side-by-side. Explore Greek and Hebrew roots using Strong's definitions.
-- **Study Tools:** Access Commentaries, Cross-References, Dictionaries, Reading Plans, Devotionals, and Media from the side panel.
+- **Reader:** Read multiple Bible translations side-by-side, highlight and note verses, and explore Greek and Hebrew roots using Strong's definitions.
+- **Study Tools:** Access Commentaries, Cross-References, Dictionaries, Reading Plans, Devotionals, Media, and offline **Read Aloud** narration from the side panel.
 - **Search:** Quickly find words, phrases, or topics across all your Bibles and notes instantly.
-- **Journals & Prayers:** Record your thoughts with rich text formatting, auto-linking verses, and track your active prayers.
-- **Sermons:** Create structured outlines and take notes during church, attaching them directly to specific verses.
-- **Content Manager:** Download new Bibles, dictionaries, and commentaries from the massive, free CrossWire library.
+- **Journals & Prayers:** Record your thoughts in dated entries with revision history, and track your active prayers.
+- **Sermons:** Write structured outlines, present them full-screen, and export or print them.
+- **Home Dashboard:** Track reading streaks, time, achievements, and your daily verse at a glance.
+- **Content Manager:** Download new Bibles, dictionaries, commentaries, and devotionals from several large, free libraries.
 
 Navigate between these features using the left navigation rail (on desktop/tablet) or the hamburger menu (on mobile). 
 
