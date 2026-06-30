@@ -233,7 +233,16 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
   }
 
   void _showVersionPicker() async {
-    final availableVersions = await ref.read(bibleVersionsProvider.future);
+    final loaded = await ref.read(bibleVersionsProvider.future);
+
+    // Present the list alphabetically rather than in install order, so a
+    // version is easy to find once several are installed. Sort a copy — the
+    // provider's list order is reused elsewhere (e.g. parallel columns).
+    final availableVersions = [...loaded]
+      ..sort((a, b) {
+        final byName = a.name.toLowerCase().compareTo(b.name.toLowerCase());
+        return byName != 0 ? byName : a.id.compareTo(b.id);
+      });
 
     if (!mounted) return;
     showModalBottomSheet(
