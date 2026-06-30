@@ -236,6 +236,10 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
     final bibleVersionIds = (bibleVersionsAsync.value ?? []).map((v) => v.id).toSet();
     final subheadingSourceIds = (subheadingSourcesAsync.value ?? []).map((v) => v.id).toSet();
 
+    // Order each installed section alphabetically by the label it shows,
+    // rather than the underlying install order, so items are easy to find.
+    int byKey(String a, String b) => a.toLowerCase().compareTo(b.toLowerCase());
+
     final q = _filterQuery;
     final bibles = versions
         .where((v) =>
@@ -243,7 +247,8 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
             (q.isEmpty ||
                 v.name.toLowerCase().contains(q) ||
                 v.id.toLowerCase().contains(q)))
-        .toList();
+        .toList()
+      ..sort((a, b) => byKey(a.name, b.name));
     final subheadings = versions
         .where((v) =>
             subheadingSourceIds.contains(v.id) &&
@@ -251,25 +256,29 @@ class _ContentManagerScreenState extends ConsumerState<ContentManagerScreen>
             (q.isEmpty ||
                 v.name.toLowerCase().contains(q) ||
                 v.id.toLowerCase().contains(q)))
-        .toList();
+        .toList()
+      ..sort((a, b) => byKey(a.name, b.name));
     final commentaries = allCommentaries
         .where((c) =>
             q.isEmpty ||
             c.abbreviation.toLowerCase().contains(q) ||
             c.name.toLowerCase().contains(q))
-        .toList();
+        .toList()
+      ..sort((a, b) => byKey(a.abbreviation, b.abbreviation));
     final dictionaries = allDictionaries
         .where((d) =>
             q.isEmpty ||
             d.abbreviation.toLowerCase().contains(q) ||
             d.name.toLowerCase().contains(q))
-        .toList();
+        .toList()
+      ..sort((a, b) => byKey(a.abbreviation, b.abbreviation));
     final devotionals = allDevotionals
         .where((d) =>
             q.isEmpty ||
             d.name.toLowerCase().contains(q) ||
             d.abbreviation.toLowerCase().contains(q))
-        .toList();
+        .toList()
+      ..sort((a, b) => byKey(a.name, b.name));
 
     if (q.isNotEmpty &&
         bibles.isEmpty &&
