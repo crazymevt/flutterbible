@@ -1141,25 +1141,31 @@ class _BreadcrumbBar extends ConsumerWidget {
                 ),
                 // Chapter prev/next sit immediately after the chapter selector
                 // so chapter navigation reads as a single grouped unit rather
-                // than being stranded at the far edge of the bar.
-                const SizedBox(width: 8),
-                IconButton(
-                  icon: const Icon(Icons.chevron_left),
-                  tooltip: 'Previous Chapter',
-                  iconSize: 20,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  onPressed: () => ref.read(navigationControllerProvider).previousChapter(),
-                ),
-                const SizedBox(width: 4),
-                IconButton(
-                  icon: const Icon(Icons.chevron_right),
-                  tooltip: 'Next Chapter',
-                  iconSize: 20,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  onPressed: () => ref.read(navigationControllerProvider).nextChapter(),
-                ),
+                // than being stranded at the far edge of the bar. On phones the
+                // bar is too narrow to fit them without squeezing the version
+                // and book labels to nothing, and chapter navigation is already
+                // covered by swipe paging and the footer's Previous/Next — so
+                // drop the arrows there.
+                if (!context.isPhone) ...[
+                  const SizedBox(width: 8),
+                  IconButton(
+                    icon: const Icon(Icons.chevron_left),
+                    tooltip: 'Previous Chapter',
+                    iconSize: 20,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    onPressed: () => ref.read(navigationControllerProvider).previousChapter(),
+                  ),
+                  const SizedBox(width: 4),
+                  IconButton(
+                    icon: const Icon(Icons.chevron_right),
+                    tooltip: 'Next Chapter',
+                    iconSize: 20,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    onPressed: () => ref.read(navigationControllerProvider).nextChapter(),
+                  ),
+                ],
               ],
             ),
           ),
