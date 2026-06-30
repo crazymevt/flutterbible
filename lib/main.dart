@@ -11,6 +11,8 @@ import 'package:window_manager/window_manager.dart';
 import 'ui/main_shell.dart';
 import 'app/shared_prefs.dart';
 import 'app/app_state.dart';
+import 'app/action_providers.dart';
+import 'data/user_store.dart';
 import 'data/logging.dart';
 import 'theme/app_themes.dart';
 import 'dart:ui';
@@ -225,6 +227,160 @@ class _StudyBibleAppState extends ConsumerState<StudyBibleApp>
         FlutterQuillLocalizations.delegate,
       ],
       home: const MainShell(),
+      // Render the action-due banner above the whole app (not via a Scaffold's
+      // ScaffoldMessenger) so it appears in the exact same place on every
+      // screen, including the reader (which nests its own Scaffold).
+      builder: (context, child) {
+        final content = child ?? const SizedBox.shrink();
+        return Column(
+          children: [
+            const ActionDueBanner(),
+            Expanded(
+              child: Consumer(
+                builder: (context, ref, _) {
+                  // When the banner is showing it has already consumed the top
+                  // (status-bar) inset, so strip it from the app below to avoid
+                  // a double gap above each screen's app bar.
+                  final showing =
+                      ref.watch(actionDueControllerProvider).isNotEmpty;
+                  return showing
+                      ? MediaQuery.removePadding(
+                          context: context,
+                          removeTop: true,
+                          child: content,
+                        )
+                      : content;
+                },
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+/// App-wide controller for the action-due reminder. Exposes the action items
+/// currently within their lead window or overdue and not yet dismissed; the
+/// banner widget watches this. Dismissals are remembered per action until it
+/// stops alerting (completed/deleted) or a new action comes due.
+class ActionDueController extends Notifier<List<ActionItem>> {
+  final Set<String> _dismissed = {};
+  Timer? _timer;
+
+  @override
+  List<ActionItem> build() {
+    // Recompute when the action list changes (add/edit/complete/delete/sync)…
+    ref.listen(actionItemsProvider, (_, _) => recompute());
+    // …and periodically, so actions crossing their lead/due time alert even
+    // when nothing else changes.
+    _timer = Timer.periodic(const Duration(minutes: 1), (_) => recompute());
+    ref.onDispose(() => _timer?.cancel());
+    return _compute();
+  }
+
+  List<ActionItem> _compute() {
+    final actions = ref.read(actionItemsProvider).value ?? const <ActionItem>[];
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final alerting = actionsNeedingAlert(actions, now);
+    final ids = alerting.map((a) => a.id).toSet();
+    _dismissed.removeWhere((id) => !ids.contains(id));
+    return alerting.where((a) => !_dismissed.contains(a.id)).toList();
+  }
+
+  void recompute() => state = _compute();
+
+  void dismiss() {
+    _dismissed.addAll(state.map((a) => a.id));
+    state = const [];
+  }
+}
+
+final actionDueControllerProvider =
+    NotifierProvider<ActionDueController, List<ActionItem>>(
+  ActionDueController.new,
+);
+
+/// The action-due reminder banner. Rendered at the very top of the app (above
+/// every screen's app bar) so its placement is identical everywhere. Shows
+/// nothing when no action is due. Colour is user-configurable
+/// ([actionBannerColorProvider]); text/icon auto-contrast for legibility.
+class ActionDueBanner extends ConsumerStatefulWidget {
+  const ActionDueBanner({super.key});
+
+  @override
+  ConsumerState<ActionDueBanner> createState() => _ActionDueBannerState();
+}
+
+class _ActionDueBannerState extends ConsumerState<ActionDueBanner>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      ref.read(actionDueControllerProvider.notifier).recompute();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final due = ref.watch(actionDueControllerProvider);
+    if (due.isEmpty) return const SizedBox.shrink();
+
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final bg = Color(
+        ref.watch(actionBannerColorProvider) ?? kDefaultActionBannerColor);
+    final fg = bg.computeLuminance() > 0.5 ? Colors.black : Colors.white;
+
+    final overdue = due.where((a) => now >= a.dueAt!).length;
+    final String message;
+    if (due.length == 1) {
+      final a = due.first;
+      message = '${now >= a.dueAt! ? 'Overdue' : 'Due soon'}: "${a.title}"';
+    } else if (overdue > 0) {
+      message = '${due.length} actions need attention ($overdue overdue).';
+    } else {
+      message = '${due.length} actions are due soon.';
+    }
+
+    return Material(
+      color: bg,
+      child: SafeArea(
+        bottom: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 6, 8, 6),
+              child: Row(
+                children: [
+                  Icon(Icons.alarm, color: fg, size: 20),
+                  const SizedBox(width: 12),
+                  Expanded(child: Text(message, style: TextStyle(color: fg))),
+                  TextButton(
+                    style: TextButton.styleFrom(foregroundColor: fg),
+                    onPressed: () =>
+                        ref.read(actionDueControllerProvider.notifier).dismiss(),
+                    child: const Text('Dismiss'),
+                  ),
+                ],
+              ),
+            ),
+            Divider(height: 1, thickness: 1, color: fg.withValues(alpha: 0.2)),
+          ],
+        ),
+      ),
     );
   }
 }

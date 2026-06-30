@@ -420,6 +420,35 @@ final googleDriveAccountProvider =
   () => GoogleDriveAccountNotifier(),
 );
 
+/// Default background colour for the action-due reminder banner — a noticeable
+/// yellow. Used when the user hasn't picked a custom colour.
+const int kDefaultActionBannerColor = 0xFFFFEB3B;
+
+/// User-chosen background colour (ARGB int) for the action-due reminder banner,
+/// or null to use [kDefaultActionBannerColor].
+class ActionBannerColorNotifier extends Notifier<int?> {
+  @override
+  int? build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getInt('actionBannerColor');
+  }
+
+  void setColor(int? color) {
+    state = color;
+    final prefs = ref.read(sharedPreferencesProvider);
+    if (color == null) {
+      prefs.remove('actionBannerColor');
+    } else {
+      prefs.setInt('actionBannerColor', color);
+    }
+  }
+}
+
+final actionBannerColorProvider =
+    NotifierProvider<ActionBannerColorNotifier, int?>(
+  () => ActionBannerColorNotifier(),
+);
+
 class CustomLightTextColorNotifier extends Notifier<int?> {
   @override
   int? build() {

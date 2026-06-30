@@ -150,6 +150,27 @@ class Prayers extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+/// A to-do / action item shown alongside journals and prayers. Mirrors
+/// [Prayers] (createdAt + a nullable completion timestamp) but adds an optional
+/// [dueAt] so the app can alert the user as it comes due.
+@DataClassName('ActionItem')
+class ActionItems extends Table {
+  TextColumn get id => text()();
+  IntColumn get updatedAt => integer()();
+  TextColumn get deviceId => text()();
+  BoolColumn get deleted => boolean().withDefault(const Constant(false))();
+
+  TextColumn get title => text()(); // the action
+  TextColumn get description => text().withDefault(const Constant(''))();
+  IntColumn get createdAt => integer()(); // epoch ms
+  IntColumn get dueAt => integer().nullable()(); // epoch ms, optional due date/time
+  IntColumn get completedAt =>
+      integer().nullable()(); // epoch ms, null while not completed
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 @DataClassName('ReadingProgress')
 class ReadingProgresses extends Table {
   TextColumn get id => text()();

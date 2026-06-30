@@ -609,6 +609,33 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
             child: Text(
+              'Actions',
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+          ),
+          _buildColorPickerTile(
+            context,
+            title: 'Due reminder banner colour',
+            subtitle:
+                'Shown when an action is due or overdue. Default is yellow.',
+            currentColor:
+                ref.watch(actionBannerColorProvider) ?? kDefaultActionBannerColor,
+            onColorChanged: (c) {
+              int? v;
+              try {
+                v = c?.toARGB32();
+              } catch (_) {
+                v = c?.value;
+              }
+              ref.read(actionBannerColorProvider.notifier).setColor(v);
+            },
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+            child: Text(
               'Reading progress',
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,

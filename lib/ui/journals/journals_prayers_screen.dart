@@ -4,6 +4,7 @@ import '../app_drawer.dart';
 import 'journals_list_panel.dart';
 import 'journal_editor_panel.dart';
 import 'prayer_tracker_panel.dart';
+import 'action_items_panel.dart';
 import '../common/search_title_bar.dart';
 import '../common/breakpoints.dart';
 import '../common/sync_button.dart';
@@ -54,11 +55,13 @@ class _JournalsPrayersScreenState extends ConsumerState<JournalsPrayersScreen> {
             ),
             Expanded(
               flex: 3,
-              child: _buildPanelCard(
+              child: _buildTabbedCard(
                 context,
-                title: 'Prayer Tracker',
-                icon: Icons.volunteer_activism,
-                child: const PrayerTrackerPanel(),
+                tabs: const [
+                  Tab(text: 'Prayers'),
+                  Tab(text: 'Actions'),
+                ],
+                views: const [PrayerTrackerPanel(), ActionItemsPanel()],
               ),
             ),
           ],
@@ -67,7 +70,7 @@ class _JournalsPrayersScreenState extends ConsumerState<JournalsPrayersScreen> {
     }
 
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Scaffold(
         drawer: const AppDrawer(),
         appBar: AppBar(
@@ -80,11 +83,16 @@ class _JournalsPrayersScreenState extends ConsumerState<JournalsPrayersScreen> {
             tabs: [
               Tab(text: 'Journals'),
               Tab(text: 'Prayers'),
+              Tab(text: 'Actions'),
             ],
           ),
         ),
         body: const TabBarView(
-          children: [JournalsListPanel(), PrayerTrackerPanel()],
+          children: [
+            JournalsListPanel(),
+            PrayerTrackerPanel(),
+            ActionItemsPanel(),
+          ],
         ),
       ),
     );
@@ -136,6 +144,49 @@ class _JournalsPrayersScreenState extends ConsumerState<JournalsPrayersScreen> {
           ),
           Expanded(child: child),
         ],
+      ),
+    );
+  }
+
+  /// Like [_buildPanelCard] but the header is a [TabBar] that switches between
+  /// the supplied [views] — used to fit Prayers and Actions into one column.
+  Widget _buildTabbedCard(
+    BuildContext context, {
+    required List<Tab> tabs,
+    required List<Widget> views,
+  }) {
+    final theme = Theme.of(context);
+    return Card(
+      margin: const EdgeInsets.all(8),
+      clipBehavior: Clip.antiAlias,
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+        ),
+      ),
+      child: DefaultTabController(
+        length: tabs.length,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceContainerHighest
+                    .withValues(alpha: 0.5),
+                border: Border(
+                  bottom: BorderSide(
+                    color:
+                        theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                  ),
+                ),
+              ),
+              child: TabBar(tabs: tabs),
+            ),
+            Expanded(child: TabBarView(children: views)),
+          ],
+        ),
       ),
     );
   }

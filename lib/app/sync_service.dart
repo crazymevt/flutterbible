@@ -137,6 +137,7 @@ class SyncService {
       final localSermonRevisions =
           await _store.select(_store.sermonRevisions).get();
       final localPrayers = await _store.select(_store.prayers).get();
+      final localActionItems = await _store.select(_store.actionItems).get();
       final localReadingprogresses = await _store
           .select(_store.readingProgresses)
           .get();
@@ -295,6 +296,24 @@ class SyncService {
               'description': item.description,
               'createdAt': item.createdAt,
               'answeredAt': item.answeredAt,
+            },
+          ),
+        ),
+      );
+      localRecords.addAll(
+        localActionItems.map(
+          (item) => GenericSyncRecord(
+            id: item.id,
+            updatedAt: item.updatedAt,
+            deviceId: item.deviceId,
+            deleted: item.deleted,
+            payload: {
+              'type': 'actionItem',
+              'title': item.title,
+              'description': item.description,
+              'createdAt': item.createdAt,
+              'dueAt': item.dueAt,
+              'completedAt': item.completedAt,
             },
           ),
         ),
@@ -658,6 +677,21 @@ class SyncService {
             );
             await _store
                 .into(_store.prayers)
+                .insert(item, mode: InsertMode.replace);
+          } else if (type == 'actionItem') {
+            final item = ActionItem(
+              id: rec.id,
+              updatedAt: rec.updatedAt,
+              deviceId: rec.deviceId,
+              deleted: rec.deleted,
+              title: rec.payload['title'] as String,
+              description: (rec.payload['description'] as String?) ?? '',
+              createdAt: (rec.payload['createdAt'] as num).toInt(),
+              dueAt: (rec.payload['dueAt'] as num?)?.toInt(),
+              completedAt: (rec.payload['completedAt'] as num?)?.toInt(),
+            );
+            await _store
+                .into(_store.actionItems)
                 .insert(item, mode: InsertMode.replace);
           } else if (type == 'readingProgress') {
             final item = ReadingProgress(
