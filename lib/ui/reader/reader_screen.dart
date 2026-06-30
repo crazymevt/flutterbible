@@ -1060,6 +1060,7 @@ class _BreadcrumbBar extends ConsumerWidget {
     final activeVersions = ref.watch(activeVersionsProvider);
     final bookName = ref.watch(selectedBookNameProvider);
     final chapter = ref.watch(selectedChapterProvider);
+    final showStrongs = ref.watch(appShowStrongNumbersProvider);
     final theme = Theme.of(context);
     final versionLabel = activeVersions.isNotEmpty
         ? activeVersions.join(', ')
@@ -1161,6 +1162,22 @@ class _BreadcrumbBar extends ConsumerWidget {
                 ),
               ],
             ),
+          ),
+          // Quick toggle for Strong's numbers — mirrors the setting in
+          // Settings, but kept here so it can be flipped while reading.
+          IconButton(
+            icon: const Icon(Icons.tag),
+            tooltip: showStrongs ? 'Hide Strong Numbers' : 'Show Strong Numbers',
+            iconSize: 20,
+            isSelected: showStrongs,
+            color: showStrongs
+                ? theme.colorScheme.primary
+                : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            onPressed: () => ref
+                .read(appShowStrongNumbersProvider.notifier)
+                .set(!showStrongs),
           ),
         ],
       ),
