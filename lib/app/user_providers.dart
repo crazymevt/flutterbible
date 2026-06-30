@@ -42,6 +42,17 @@ final chapterHighlightsProvider =
   );
 });
 
+/// Every non-deleted highlight across the whole Bible, for the "My Highlights"
+/// review panel. Ordered newest-first; the panel re-sorts into canonical book
+/// order using [primaryBookOrderProvider].
+final allHighlightsProvider = StreamProvider<List<Highlight>>((ref) {
+  final store = ref.watch(userStoreProvider);
+  return (store.select(store.highlights)
+        ..where((h) => h.deleted.equals(false))
+        ..orderBy([(h) => OrderingTerm.desc(h.updatedAt)]))
+      .watch();
+});
+
 final highlightActionProvider = Provider((ref) {
   return HighlightAction(ref);
 });

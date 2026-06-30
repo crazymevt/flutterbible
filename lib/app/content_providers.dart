@@ -306,6 +306,38 @@ final chapterIndexProvider =
   return index;
 });
 
+/// The id of the primary (left-most active, else first installed) Bible
+/// version, or null when nothing is installed. Mirrors the selection rule used
+/// by [chapterIndexProvider] and [chapterVersesProvider].
+final primaryVersionIdProvider = Provider<String?>((ref) {
+  final activeVersions = ref.watch(activeVersionsProvider);
+  final installedVersions = ref.watch(versionsProvider.select((v) => v.value));
+  if (installedVersions == null || installedVersions.isEmpty) return null;
+  final valid = activeVersions
+      .where((av) => installedVersions.any((iv) => iv.id == av))
+      .toList();
+  return valid.isEmpty ? installedVersions.first.id : valid.first;
+});
+
+/// Abbreviation of the primary version (e.g. "ESV"), or null when unavailable —
+/// used to cite the source in copied/shared verses.
+final primaryVersionAbbreviationProvider = Provider<String?>((ref) {
+  final id = ref.watch(primaryVersionIdProvider);
+  final installed = ref.watch(versionsProvider.select((v) => v.value));
+  if (id == null || installed == null) return null;
+  return installed.firstWhereOrNull((v) => v.id == id)?.abbreviation;
+});
+
+/// Maps each book name to its canonical position in the primary version, so the
+/// "My Highlights" panel can list highlights in Bible order rather than by
+/// insertion time. Empty when no version is installed.
+final primaryBookOrderProvider = FutureProvider<Map<String, int>>((ref) async {
+  final primary = ref.watch(primaryVersionIdProvider);
+  if (primary == null) return {};
+  final books = await ref.watch(booksForVersionProvider(primary).future);
+  return {for (final b in books) b.name: b.bookOrder};
+});
+
 class CompareResult {
   final Version version;
   final List<Verse> verses;

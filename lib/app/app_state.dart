@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../domain/scripture/verse_share_format.dart';
 import 'shared_prefs.dart';
 
 enum ActiveTool {
@@ -17,6 +18,7 @@ enum ActiveTool {
   devotionals,
   topics,
   places,
+  highlights,
 }
 
 class ActiveToolNotifier extends Notifier<ActiveTool> {
@@ -626,4 +628,44 @@ class CustomDarkAppBarColorNotifier extends Notifier<int?> {
 
 final customDarkAppBarColorProvider = NotifierProvider<CustomDarkAppBarColorNotifier, int?>(
   () => CustomDarkAppBarColorNotifier(),
+);
+
+/// How selected verses are rendered when copied or shared. Backed by three
+/// SharedPreferences keys so each toggle is independently persisted; exposed as
+/// a single immutable [VerseShareFormat] the verse action bar and settings read.
+class VerseShareFormatNotifier extends Notifier<VerseShareFormat> {
+  static const _numbersKey = 'shareIncludeVerseNumbers';
+  static const _versionKey = 'shareIncludeVersionAbbreviation';
+  static const _positionKey = 'shareReferencePosition';
+
+  @override
+  VerseShareFormat build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return VerseShareFormat(
+      includeVerseNumbers: prefs.getBool(_numbersKey) ?? true,
+      includeVersionAbbreviation: prefs.getBool(_versionKey) ?? false,
+      referencePosition:
+          VerseReferencePosition.fromName(prefs.getString(_positionKey)),
+    );
+  }
+
+  void setIncludeVerseNumbers(bool value) {
+    state = state.copyWith(includeVerseNumbers: value);
+    ref.read(sharedPreferencesProvider).setBool(_numbersKey, value);
+  }
+
+  void setIncludeVersionAbbreviation(bool value) {
+    state = state.copyWith(includeVersionAbbreviation: value);
+    ref.read(sharedPreferencesProvider).setBool(_versionKey, value);
+  }
+
+  void setReferencePosition(VerseReferencePosition position) {
+    state = state.copyWith(referencePosition: position);
+    ref.read(sharedPreferencesProvider).setString(_positionKey, position.name);
+  }
+}
+
+final verseShareFormatProvider =
+    NotifierProvider<VerseShareFormatNotifier, VerseShareFormat>(
+  () => VerseShareFormatNotifier(),
 );

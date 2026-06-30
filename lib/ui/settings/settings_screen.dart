@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/app_state.dart';
 import '../../app/content_providers.dart';
 import '../../app/shared_prefs.dart';
+import '../../domain/scripture/verse_share_format.dart';
 import '../../app/sync_service.dart';
 import '../../data/logging.dart';
 import '../../theme/app_themes.dart';
@@ -754,7 +755,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
           const Divider(),
 
-
+          // ── Copy & Share ──
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Text(
+              'Copy & Share',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
+            ),
+          ),
+          _buildCopyShareSection(context, ref),
+          const Divider(),
 
           // ── Sync ──
           Padding(
@@ -821,6 +831,79 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           const SizedBox(height: 24),
         ],
       ),
+    );
+  }
+
+  Widget _buildCopyShareSection(BuildContext context, WidgetRef ref) {
+    final format = ref.watch(verseShareFormatProvider);
+    final notifier = ref.read(verseShareFormatProvider.notifier);
+
+    // Live preview so the toggles have a visible, immediate effect.
+    final preview = VerseShareFormatter.format(
+      bookName: 'John',
+      chapter: 3,
+      verses: const [
+        (number: 16, text: 'For God so loved the world.'),
+        (number: 17, text: 'For God sent not his Son to condemn the world.'),
+      ],
+      versionAbbreviation: 'ESV',
+      format: format,
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SwitchListTile(
+          title: const Text('Include verse numbers'),
+          subtitle: const Text('Prefix each verse with its number'),
+          value: format.includeVerseNumbers,
+          onChanged: notifier.setIncludeVerseNumbers,
+        ),
+        SwitchListTile(
+          title: const Text('Include version abbreviation'),
+          subtitle: const Text('Cite the source version, e.g. "John 3:16 (ESV)"'),
+          value: format.includeVersionAbbreviation,
+          onChanged: notifier.setIncludeVersionAbbreviation,
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+          child: Row(
+            children: [
+              const Expanded(child: Text('Reference position')),
+              SegmentedButton<VerseReferencePosition>(
+                segments: const [
+                  ButtonSegment(
+                    value: VerseReferencePosition.top,
+                    label: Text('Top'),
+                  ),
+                  ButtonSegment(
+                    value: VerseReferencePosition.bottom,
+                    label: Text('Bottom'),
+                  ),
+                ],
+                selected: {format.referencePosition},
+                onSelectionChanged: (s) =>
+                    notifier.setReferencePosition(s.first),
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              preview,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ),
+        ),
+      ],
     );
   }
 

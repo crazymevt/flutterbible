@@ -1,16 +1,65 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../app/reader_state.dart';
 import '../../app/user_providers.dart';
 import '../../app/app_state.dart';
 import '../../app/content_providers.dart';
 import '../../data/importer/mybible_verse_parser.dart';
+import '../../domain/scripture/verse_share_format.dart';
 import 'note_editor.dart';
 import 'compare_panel.dart';
 import 'topics_panel.dart';
+import 'verse_image_card.dart';
 import '../tags/tag_editor_dialog.dart';
 import '../common/breakpoints.dart';
+
+/// The selected verses gathered for copy/share, with text already cleaned of
+/// inline markup (see [[verse-textcontent-has-markup]]).
+typedef _Selection = ({
+  String book,
+  int chapter,
+  List<int> numbers,
+  List<ShareVerse> verses,
+  String? abbreviation,
+});
+
+/// Reads the current verse selection and the primary version's verse text,
+/// returning null when nothing usable is selected.
+_Selection? _collectSelection(WidgetRef ref) {
+  final versesMap = ref.read(parallelVersesProvider).value;
+  if (versesMap == null || versesMap.isEmpty) return null;
+  final verses = versesMap.values.first;
+
+  final selected = ref.read(selectedVersesProvider).toList()..sort();
+  final selectedModels =
+      verses.where((v) => selected.contains(v.verse)).toList()
+        ..sort((a, b) => a.verse.compareTo(b.verse));
+  if (selectedModels.isEmpty) return null;
+
+  final parser = MyBibleVerseParser();
+  final shareVerses = <ShareVerse>[
+    for (final v in selectedModels)
+      (
+        number: v.verse,
+        text: parser
+            .parseVerse(v.textContent)
+            .map((s) => s.text)
+            .join('')
+            .replaceAll(RegExp(r'\s+'), ' ')
+            .trim(),
+      ),
+  ];
+
+  return (
+    book: ref.read(selectedBookNameProvider),
+    chapter: ref.read(selectedChapterProvider),
+    numbers: selected,
+    verses: shareVerses,
+    abbreviation: ref.read(primaryVersionAbbreviationProvider),
+  );
+}
 
 class VerseActionBar extends ConsumerWidget {
   const VerseActionBar({super.key});
@@ -177,49 +226,17 @@ class VerseActionBar extends ConsumerWidget {
                 color: onBarColor,
                 showLabel: showLabels,
                 onTap: () async {
-                  final versesMap = ref.read(parallelVersesProvider).value;
-                  if (versesMap == null || versesMap.isEmpty) return;
-                  final verses = versesMap.values.first;
-
-                  final selected = ref.read(selectedVersesProvider).toList()..sort();
-                  final selectedVerseModels = verses.where((v) => selected.contains(v.verse)).toList();
-                  if (selectedVerseModels.isEmpty) return;
-
-                  final book = ref.read(selectedBookNameProvider);
-                  final chapter = ref.read(selectedChapterProvider);
-                  
-                  String formatVerseList(List<int> verses) {
-                    if (verses.isEmpty) return '';
-                    final parts = <String>[];
-                    int start = verses.first;
-                    int end = verses.first;
-
-                    for (int i = 1; i < verses.length; i++) {
-                      if (verses[i] == end + 1) {
-                        end = verses[i];
-                      } else {
-                        parts.add(start == end ? '$start' : '$start-$end');
-                        start = verses[i];
-                        end = verses[i];
-                      }
-                    }
-                    parts.add(start == end ? '$start' : '$start-$end');
-                    return parts.join(', ');
-                  }
-
-                  final verseNumbers = formatVerseList(selected);
-
-                  final buffer = StringBuffer();
-                  buffer.writeln('$book $chapter:$verseNumbers');
-
-                  final parser = MyBibleVerseParser();
-                  for (final v in selectedVerseModels) {
-                    final cleanText = parser.parseVerse(v.textContent).map((s) => s.text).join('').replaceAll(RegExp(r'\s+'), ' ').trim();
-                    buffer.writeln('${v.verse} $cleanText');
-                  }
-
-                  await Clipboard.setData(ClipboardData(text: buffer.toString().trim()));
-
+                  final sel = _collectSelection(ref);
+                  if (sel == null) return;
+                  final format = ref.read(verseShareFormatProvider);
+                  final text = VerseShareFormatter.format(
+                    bookName: sel.book,
+                    chapter: sel.chapter,
+                    verses: sel.verses,
+                    versionAbbreviation: sel.abbreviation,
+                    format: format,
+                  );
+                  await Clipboard.setData(ClipboardData(text: text));
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Copied to clipboard')),
@@ -229,6 +246,13 @@ class VerseActionBar extends ConsumerWidget {
                 },
               ),
               _ActionIcon(
+                icon: Icons.ios_share,
+                label: 'Share',
+                color: onBarColor,
+                showLabel: showLabels,
+                onTap: () => _showShareSheet(context, ref),
+              ),
+              _ActionIcon(
                 icon: Icons.close,
                 label: 'Deselect',
                 color: onBarColor,
@@ -236,6 +260,86 @@ class VerseActionBar extends ConsumerWidget {
                 onTap: () => ref.read(selectedVersesProvider.notifier).clear(),
               ),
     ];
+  }
+
+  /// iPad/macOS popovers need an anchor rectangle for the share sheet.
+  Rect? _shareOrigin(BuildContext context) {
+    final box = context.findRenderObject() as RenderBox?;
+    if (box == null || !box.hasSize) return null;
+    return box.localToGlobal(Offset.zero) & box.size;
+  }
+
+  void _showShareSheet(BuildContext context, WidgetRef ref) {
+    final origin = _shareOrigin(context);
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.text_snippet_outlined),
+                title: const Text('Share text'),
+                onTap: () async {
+                  Navigator.of(sheetContext).pop();
+                  await _shareText(ref, origin);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.image_outlined),
+                title: const Text('Share as image'),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  _shareImage(context, ref);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _shareText(WidgetRef ref, Rect? origin) async {
+    final sel = _collectSelection(ref);
+    if (sel == null) return;
+    final format = ref.read(verseShareFormatProvider);
+    final text = VerseShareFormatter.format(
+      bookName: sel.book,
+      chapter: sel.chapter,
+      verses: sel.verses,
+      versionAbbreviation: sel.abbreviation,
+      format: format,
+    );
+    final subject = VerseShareFormatter.reference(
+      bookName: sel.book,
+      chapter: sel.chapter,
+      verseNumbers: sel.numbers,
+    );
+    await SharePlus.instance.share(
+      ShareParams(text: text, subject: subject, sharePositionOrigin: origin),
+    );
+    ref.read(selectedVersesProvider.notifier).clear();
+  }
+
+  void _shareImage(BuildContext context, WidgetRef ref) {
+    final sel = _collectSelection(ref);
+    if (sel == null) return;
+    // The image always cites the version (when known) and flows the verse text
+    // into a single quotable block, independent of the text-format preference.
+    final reference = VerseShareFormatter.reference(
+      bookName: sel.book,
+      chapter: sel.chapter,
+      verseNumbers: sel.numbers,
+      versionAbbreviation: sel.abbreviation,
+    );
+    final body = sel.verses.map((v) => v.text).join(' ');
+    ref.read(selectedVersesProvider.notifier).clear();
+    showDialog<void>(
+      context: context,
+      builder: (_) => VerseImageShareDialog(reference: reference, verseText: body),
+    );
   }
 }
 
