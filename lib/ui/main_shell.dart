@@ -91,11 +91,18 @@ class _MainShellState extends ConsumerState<MainShell> {
       return const BackupRestoreScreen();
     }
 
-    // Intercept with OnboardingScreen if no bibles are installed
+    // Intercept with OnboardingScreen if no bibles are installed. On *error*
+    // the content DB is unreadable (e.g. a corrupt or half-written store, such
+    // as an uninstall/reinstall that happened while the app held the DB open) —
+    // route to onboarding so the user can re-download content, which recreates
+    // the store. Otherwise the shell would render the reader and strand the
+    // user on its "Couldn't load this chapter" error with no way to install or
+    // repair content ("Try again" just re-runs the failing query). Loading
+    // stays false so we don't flash onboarding during a normal cold start.
     final hasNoBibles = versionsAsync.when(
       data: (versions) => versions.isEmpty,
-      loading: () => false, // Don't show while loading
-      error: (_, _) => false,
+      loading: () => false,
+      error: (_, _) => true,
     );
 
     // The "recommended resources" batch installs a Bible first, which would
