@@ -72,6 +72,24 @@ class ContentManagerController extends Notifier<Map<String, DownloadProgress>> {
   @override
   Map<String, DownloadProgress> build() => {};
 
+  /// Drops the reader's cached content after an (re)import. The import replaces
+  /// the affected version's books/verses with new row ids, so without this an
+  /// already-open reader keeps serving the old copy — stale footnote markers,
+  /// mismatched ids, and the occasional read error — until the app restarts.
+  void _refreshReaderContent() {
+    ref.invalidate(booksForVersionProvider);
+    ref.invalidate(chapterCountProvider);
+    ref.invalidate(bookByNameProvider);
+    ref.invalidate(chapterSubheadingsProvider);
+    ref.invalidate(chapterVersesProvider);
+    ref.invalidate(parallelVersesProvider);
+    ref.invalidate(chapterIndexProvider);
+    ref.invalidate(compareVersesProvider);
+    ref.invalidate(hasBookIntroProvider);
+    ref.invalidate(commentaryEntriesProvider);
+    ref.invalidate(dictionaryEntriesProvider);
+  }
+
   /// Download and import a single ph4.org MyBible [module]. When [onProgress]
   /// is supplied (e.g. by [downloadRecommended]) it receives the download
   /// fraction (0–1) so a caller can fold it into an aggregate bar; the module's
@@ -170,6 +188,7 @@ class ContentManagerController extends Notifier<Map<String, DownloadProgress>> {
       ref.read(dictionariesProvider.notifier).reload();
       ref.read(devotionalsProvider.notifier).reload();
       ref.read(installedModuleIdsProvider.notifier).reload();
+      _refreshReaderContent();
     } catch (e, stack) {
       logError(e, stack, context: 'ContentManager.downloadAndImport');
       state = {...state, stateKey: DownloadProgress(0, 'Error: $e')};
@@ -327,6 +346,7 @@ class ContentManagerController extends Notifier<Map<String, DownloadProgress>> {
       ref.read(dictionariesProvider.notifier).reload();
       ref.read(devotionalsProvider.notifier).reload();
       ref.read(installedModuleIdsProvider.notifier).reload();
+      _refreshReaderContent();
     } catch (e, stack) {
       logError(e, stack, context: 'ContentManager.downloadAndImportOsis');
       state = {...state, stateKey: DownloadProgress(0, 'Error: $e')};
@@ -502,6 +522,7 @@ class ContentManagerController extends Notifier<Map<String, DownloadProgress>> {
       ref.read(commentariesProvider.notifier).reload();
       ref.read(dictionariesProvider.notifier).reload();
       ref.read(installedModuleIdsProvider.notifier).reload();
+      _refreshReaderContent();
 
       return 'Imported ${config.description ?? config.name} '
           '(${config.name.toUpperCase()})';

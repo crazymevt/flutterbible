@@ -588,7 +588,13 @@ class MyBibleImporter {
     if (marker == null || marker.isEmpty) return seg;
     final resolved = crossRefs['$bookNumber:$chapter:$verse:$marker'];
     if (resolved == null || resolved.isEmpty) return seg;
-    return VerseSegment(isFootnote: true, footnoteText: resolved);
+    // Keep the module's own marker (e.g. "[1]" -> "1") as the inline label so
+    // the reader shows it instead of a generic symbol.
+    return VerseSegment(
+      isFootnote: true,
+      footnoteText: resolved,
+      footnoteLabel: footnoteLabelFromMarker(marker),
+    );
   }
 
   /// Builds a `(book:chapter:verse:marker) -> text` lookup from a Bible
@@ -664,6 +670,17 @@ class MyBibleImporter {
 /// separators between links are kept as plain text. So the example yields
 /// `{500:1:1|JHN 1:1}, {500:1:3|3}`. Input with no links (an ordinary textual
 /// footnote) passes through as plain, de-entitied text.
+/// Turns a source footnote marker into a compact inline label for the reader:
+/// strips a single enclosing bracket/paren/brace pair so "[1]" reads as "1",
+/// and returns null for an empty result so the reader falls back to a symbol.
+String? footnoteLabelFromMarker(String marker) {
+  final stripped = marker
+      .replaceFirst(RegExp(r'^[\[\(\{]'), '')
+      .replaceFirst(RegExp(r'[\]\)\}]$'), '')
+      .trim();
+  return stripped.isEmpty ? null : stripped;
+}
+
 String renderMyBibleCrossRef(String rawHtml) {
   if (rawHtml.isEmpty) return '';
 

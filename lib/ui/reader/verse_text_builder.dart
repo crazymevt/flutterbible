@@ -96,13 +96,17 @@ List<InlineSpan> buildVerseSpans({
         // dumping the whole body inline made verses hard to read. The full text
         // is shown on tap.
         //
-        // Conventional footnote marks rather than a number: numbering can't be
-        // chapter-continuous here (buildVerseSpans runs per verse, and the list
-        // builds verses lazily/out of order), so a per-verse number would just
-        // render "1" on almost every verse. Marks cycle within a verse and read
-        // as footnote indicators.
+        // Prefer the module's own marker (e.g. "1" from a `<f>[1]</f>`
+        // reference) when it provides one. Otherwise fall back to conventional
+        // footnote marks: numbering can't be chapter-continuous here
+        // (buildVerseSpans runs per verse, and the list builds verses lazily/out
+        // of order), so a per-verse number would just render "1" on almost every
+        // verse. Marks cycle within a verse and read as footnote indicators.
         const marks = ['*', '†', '‡', '§'];
-        final mark = marks[footnoteCount % marks.length];
+        final label = seg.footnoteLabel;
+        final mark = (label != null && label.isNotEmpty)
+            ? label
+            : marks[footnoteCount % marks.length];
         footnoteCount++;
         spans.add(
           WidgetSpan(

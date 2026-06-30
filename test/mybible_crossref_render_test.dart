@@ -47,4 +47,22 @@ void main() {
       );
     });
   });
+
+  group('footnoteLabelFromMarker', () {
+    test('strips an enclosing bracket pair', () {
+      expect(footnoteLabelFromMarker('[1]'), '1');
+      expect(footnoteLabelFromMarker('(a)'), 'a');
+      expect(footnoteLabelFromMarker('{x}'), 'x');
+    });
+
+    test('leaves an unbracketed marker as-is', () {
+      expect(footnoteLabelFromMarker('1'), '1');
+      expect(footnoteLabelFromMarker('a'), 'a');
+    });
+
+    test('returns null when nothing is left', () {
+      expect(footnoteLabelFromMarker('[]'), isNull);
+      expect(footnoteLabelFromMarker('   '), isNull);
+    });
+  });
 }
