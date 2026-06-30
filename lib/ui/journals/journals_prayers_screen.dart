@@ -6,6 +6,7 @@ import 'journal_editor_panel.dart';
 import 'prayer_tracker_panel.dart';
 import '../common/search_title_bar.dart';
 import '../common/breakpoints.dart';
+import '../common/sync_button.dart';
 
 class JournalsPrayersScreen extends ConsumerStatefulWidget {
   const JournalsPrayersScreen({super.key});
@@ -28,6 +29,7 @@ class _JournalsPrayersScreenState extends ConsumerState<JournalsPrayersScreen> {
           foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
           centerTitle: true,
           title: const SearchTitleBar(),
+          actions: const [SyncButton()],
         ),
         body: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -73,6 +75,7 @@ class _JournalsPrayersScreenState extends ConsumerState<JournalsPrayersScreen> {
           foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
           centerTitle: true,
           title: const SearchTitleBar(),
+          actions: const [SyncButton()],
           bottom: const TabBar(
             tabs: [
               Tab(text: 'Journals'),
