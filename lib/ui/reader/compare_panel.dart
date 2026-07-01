@@ -234,11 +234,14 @@ class _CompareResultCard extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                '${result.version.name} (${result.version.id})',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              Expanded(
+                child: Text(
+                  '${result.version.name} (${result.version.id})',
+                  style:
+                      const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
               ),
               IconButton(
                 icon: const Icon(Icons.copy, size: 20),
