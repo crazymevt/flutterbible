@@ -1,14 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/journal_providers.dart';
+import '../../app/shared_prefs.dart';
 import '../tags/tag_editor_dialog.dart';
 import '../common/empty_state.dart';
 import '../common/skeleton.dart';
 
 class HideAnsweredPrayersNotifier extends Notifier<bool> {
+  static const _prefsKey = 'hideAnsweredPrayers';
+
   @override
-  bool build() => false;
-  void setHide(bool val) => state = val;
+  bool build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getBool(_prefsKey) ?? false;
+  }
+
+  void setHide(bool val) {
+    state = val;
+    ref.read(sharedPreferencesProvider).setBool(_prefsKey, val);
+  }
 }
 
 final hideAnsweredPrayersProvider =
