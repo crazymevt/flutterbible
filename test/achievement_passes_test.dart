@@ -179,4 +179,35 @@ void main() {
           isFalse);
     });
   });
+
+  group('chapterReadForCurrentPass', () {
+    test('unread chapter is not read for the current pass', () {
+      expect(chapterReadForCurrentPass('John', 3, {}), isFalse);
+    });
+
+    test('read once (mid first pass) is read for the current pass', () {
+      // No full pass completed yet, so a single read is ahead of 0 passes.
+      expect(chapterReadForCurrentPass('John', 3, {'John_3': 1}), isTrue);
+    });
+
+    test('after a full pass, every chapter becomes markable again', () {
+      // Whole Bible read once -> 1 completed pass. A chapter still at count 1
+      // is no longer ahead of the completed passes, so it is markable again.
+      final counts = _wholeBibleReadCounts(1);
+      expect(chapterReadForCurrentPass('John', 3, counts), isFalse);
+    });
+
+    test('re-reading a chapter within the same pass locks it again', () {
+      // Whole Bible once, then John 3 read a second time -> its count (2) is
+      // ahead of the single completed pass, so it is read for this pass.
+      final counts = _wholeBibleReadCounts(1);
+      counts['John_3'] = 2;
+      expect(chapterReadForCurrentPass('John', 3, counts), isTrue);
+    });
+
+    test('non-canonical book: read after a single read', () {
+      expect(chapterReadForCurrentPass('Tobit', 1, {}), isFalse);
+      expect(chapterReadForCurrentPass('Tobit', 1, {'Tobit_1': 1}), isTrue);
+    });
+  });
 }

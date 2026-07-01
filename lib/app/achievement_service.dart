@@ -323,6 +323,27 @@ int completedBiblePasses(Map<String, int> readCounts) {
   return min == -1 ? 0 : min;
 }
 
+/// Whether [bookName] chapter [chapter] has already been recorded for the
+/// current reading pass, given per-chapter [readCounts].
+///
+/// This is the single source of truth for "already read": both the write path
+/// (markChapterRead) and the reader's "Mark Chapter Read" button use it so they
+/// can't diverge. A canonical chapter counts as read for this pass once its
+/// read-count is ahead of the number of completed full Bible passes, so after
+/// finishing the Bible every chapter becomes markable again for the next pass.
+/// A non-canonical chapter (apocryphal sections) counts as read after one read.
+bool chapterReadForCurrentPass(
+  String bookName,
+  int chapter,
+  Map<String, int> readCounts,
+) {
+  final count = readCounts['${bookName}_$chapter'] ?? 0;
+  if (bibleChapters.containsKey(bookName)) {
+    return count > completedBiblePasses(readCounts);
+  }
+  return count > 0;
+}
+
 /// Whether any book was fully read within a single calendar day, on some
 /// reading iteration — the "In One Sitting" achievement. Books of every length
 /// qualify, including single-chapter ones (Jude, Obadiah, Philemon, 2/3 John).

@@ -228,22 +228,18 @@ class DashboardAction {
           ..where((r) => r.deleted.equals(false)))
         .get();
     final counts = chapterReadCounts(all);
-    final thisCount = counts['${bookName}_$chapter'] ?? 0;
 
-    final int iteration;
-    if (bibleChapters.containsKey(bookName)) {
-      // Canonical book: the current pass is one past the fewest-read chapter.
-      // If this chapter is already at (or beyond) that pass it's been read this
-      // time through, so there is nothing to record.
-      final completedPasses = completedBiblePasses(counts);
-      if (thisCount > completedPasses) return;
-      iteration = completedPasses + 1;
-    } else {
-      // Non-canonical book (e.g. an apocryphal section a version may include):
-      // the pass model doesn't apply, so just record a single read.
-      if (thisCount > 0) return;
-      iteration = 1;
-    }
+    // Already recorded for the current pass? Nothing to do. This shares its
+    // eligibility rule with the reader's "Mark Chapter Read" button, so the
+    // button re-enables for exactly the chapters this would record.
+    if (chapterReadForCurrentPass(bookName, chapter, counts)) return;
+
+    // Canonical book: the current pass is one past the fewest-read chapter.
+    // Non-canonical book (e.g. an apocryphal section a version may include):
+    // the pass model doesn't apply, so just record a single read.
+    final iteration = bibleChapters.containsKey(bookName)
+        ? completedBiblePasses(counts) + 1
+        : 1;
 
     final newProgress = ReadingProgress(
       id: '${bookName}_${chapter}_$iteration',

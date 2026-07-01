@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../app/achievement_service.dart';
 import '../../app/app_state.dart';
 import '../../app/content_providers.dart';
 import '../../app/dashboard_providers.dart';
@@ -61,8 +62,15 @@ class _MarkChapterReadButton extends ConsumerWidget {
     final book = ref.watch(selectedBookNameProvider);
     final chapter = ref.watch(selectedChapterProvider);
     final progress = ref.watch(readingProgressProvider).value ?? const [];
-    final isRead =
-        progress.any((r) => r.bookName == book && r.chapter == chapter);
+    // "Read" for the *current pass*, not "ever read": after a full pass through
+    // the Bible every chapter becomes markable again so multi-read achievements
+    // (Thrice Through, Well-Worn Bible) are reachable. Shares its rule with
+    // markChapterRead via chapterReadForCurrentPass.
+    final isRead = chapterReadForCurrentPass(
+      book,
+      chapter,
+      chapterReadCounts(progress),
+    );
 
     return SizedBox(
       width: double.infinity,
