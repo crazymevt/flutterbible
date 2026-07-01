@@ -86,8 +86,13 @@ class JournalsListPanel extends ConsumerWidget {
     final entriesSliver = journalsAsync.when(
       data: (journals) {
         if (journals.isEmpty) {
+          // Default hasScrollBody (true) sizes the child to the remaining
+          // extent without querying intrinsics. hasScrollBody: false would ask
+          // EmptyState for its intrinsic height, but EmptyState is built on a
+          // LayoutBuilder, which can't answer intrinsic queries — that throws
+          // during layout and blanks the whole panel (calendar included) once
+          // the last entry is deleted. Matches the loading/error branches.
           return const SliverFillRemaining(
-            hasScrollBody: false,
             child: EmptyState(
               icon: Icons.book_outlined,
               title: 'No journal entries yet',
