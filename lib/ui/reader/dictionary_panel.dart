@@ -38,6 +38,7 @@ class _DictionaryPanelState extends ConsumerState<DictionaryPanel> {
   @override
   Widget build(BuildContext context) {
     final entriesAsync = ref.watch(dictionaryEntriesProvider);
+    final includeBody = ref.watch(dictionaryIncludeBodyProvider);
 
     return Material(
       color: Theme.of(context).colorScheme.surface,
@@ -96,6 +97,30 @@ class _DictionaryPanelState extends ConsumerState<DictionaryPanel> {
                         .read(dictionarySearchQueryProvider.notifier)
                         .setQuery(value);
                   },
+                ),
+                const SizedBox(height: 8),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: FilterChip(
+                    label: const Text('Search definitions'),
+                    tooltip:
+                        'Also match words inside entry definitions, not just '
+                        'the headword',
+                    selected: includeBody,
+                    onSelected: (value) {
+                      ref
+                          .read(dictionaryIncludeBodyProvider.notifier)
+                          .set(value);
+                      // Re-run the current box search so the toggle takes
+                      // effect immediately instead of on the next submit.
+                      final text = _controller.text.trim();
+                      if (text.isNotEmpty) {
+                        ref
+                            .read(dictionarySearchQueryProvider.notifier)
+                            .setQuery(text);
+                      }
+                    },
+                  ),
                 ),
               ],
             ),
