@@ -127,6 +127,20 @@ class TagController {
     }
   }
 
+  /// Set (or clear, with null) the colour of an existing tag globally.
+  /// Bumps [updatedAt] so the change syncs; deviceId is left untouched since
+  /// it records the tag's creator, not its last editor.
+  Future<void> setTagColor(String tagId, String? colorHex) async {
+    final db = ref.read(userStoreProvider);
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await (db.update(db.tags)..where((t) => t.id.equals(tagId))).write(
+      TagsCompanion(
+        colorHex: Value(colorHex),
+        updatedAt: Value(now),
+      ),
+    );
+  }
+
   Future<void> removeTagFromEntity(String entityTagId) async {
     final db = ref.read(userStoreProvider);
     final now = DateTime.now().millisecondsSinceEpoch;

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/tag_providers.dart';
 import '../../data/logging.dart';
+import 'tag_palette.dart';
 
 class TagEditorDialog extends ConsumerStatefulWidget {
   final String entityId;
@@ -21,6 +22,9 @@ class _TagEditorDialogState extends ConsumerState<TagEditorDialog> {
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   bool _isSaving = false;
+  // Colour applied to the *next* newly-created tag. Ignored when the typed
+  // name matches an existing tag (existing tags keep their own colour).
+  String? _newTagColor;
 
   @override
   void initState() {
@@ -49,6 +53,7 @@ class _TagEditorDialogState extends ConsumerState<TagEditorDialog> {
             entityId: widget.entityId,
             entityType: widget.entityType,
             tagName: cleanName,
+            colorHex: _newTagColor,
           );
       if (mounted) {
         _controller.clear();
@@ -66,6 +71,45 @@ class _TagEditorDialogState extends ConsumerState<TagEditorDialog> {
         setState(() => _isSaving = false);
       }
     }
+  }
+
+  Future<void> _showRecolorSheet(TagData tag) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Colour for #${tag.name}',
+                style: Theme.of(sheetContext).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              const SizedBox(height: 16),
+              TagSwatchRow(
+                selectedHex: tag.colorHex,
+                onSelected: (hex) async {
+                  Navigator.of(sheetContext).pop();
+                  try {
+                    await ref
+                        .read(tagControllerProvider)
+                        .setTagColor(tag.id, hex);
+                  } catch (e, stack) {
+                    logError(e, stack,
+                        context: 'TagEditorDialog.setTagColor');
+                  }
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -119,13 +163,17 @@ class _TagEditorDialogState extends ConsumerState<TagEditorDialog> {
                     spacing: 8,
                     runSpacing: 8,
                     children: tags.map((et) {
+                      final style = tagChipStyle(context, et.tag.colorHex);
                       return InputChip(
-                        label: Text('#${et.tag.name}'),
+                        label: Text('#${et.tag.name}',
+                            style: TextStyle(color: style.foreground)),
+                        onPressed: () => _showRecolorSheet(et.tag),
                         onDeleted: () async {
                           await ref.read(tagControllerProvider).removeTagFromEntity(et.id);
                         },
                         deleteIconColor: theme.colorScheme.onSurfaceVariant,
-                        backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                        backgroundColor: style.background,
+                        side: BorderSide(color: style.border),
                       );
                     }).toList(),
                   ),
@@ -165,6 +213,19 @@ class _TagEditorDialogState extends ConsumerState<TagEditorDialog> {
               onSubmitted: _isSaving ? null : _addTag,
             ),
 
+            const SizedBox(height: 12),
+            Text(
+              'Colour for new tag',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 8),
+            TagSwatchRow(
+              selectedHex: _newTagColor,
+              onSelected: (hex) => setState(() => _newTagColor = hex),
+            ),
+
             const SizedBox(height: 24),
             Text(
               'Existing Tags',
@@ -192,9 +253,12 @@ class _TagEditorDialogState extends ConsumerState<TagEditorDialog> {
                       spacing: 8,
                       runSpacing: 8,
                       children: availableTags.map((t) {
+                        final style = tagChipStyle(context, t.colorHex);
                         return ActionChip(
-                          label: Text('#${t.name}'),
-                          backgroundColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                          label: Text('#${t.name}',
+                              style: TextStyle(color: style.foreground)),
+                          backgroundColor: style.background,
+                          side: BorderSide(color: style.border),
                           onPressed: () => _addTag(t.name),
                         );
                       }).toList(),

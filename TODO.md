@@ -57,8 +57,11 @@ Running list of known issues and follow-ups.
   users can navigate from the sermon to each passage (and ideally back). A
   "chain" of linked verses with in-app navigation between them.
 
-- [ ] **Colored tags.** Add a color to tags so notes/sermons/etc. can be
+- [x] **Colored tags.** Add a color to tags so notes/sermons/etc. can be
   visually grouped and filtered by color. Shared tag model across content types.
+  Done: fixed palette picker in the tag editor (assign on create + recolor an
+  existing tag), colored chips everywhere, and a color filter in the Tags tab.
+  Deferred: tinting the reader's tagged-verse indicator by tag color.
 
 - [ ] **Sermon list: sort & tag search.** Update the sermon list to sort
   alphabetically and by created date, and make it searchable by tags.
