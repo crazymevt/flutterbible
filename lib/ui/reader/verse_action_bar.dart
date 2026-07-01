@@ -6,6 +6,7 @@ import '../../app/reader_state.dart';
 import '../../app/user_providers.dart';
 import '../../app/app_state.dart';
 import '../../app/content_providers.dart';
+import '../../app/highlight_palette.dart';
 import '../../data/importer/mybible_verse_parser.dart';
 import '../../domain/scripture/verse_share_format.dart';
 import 'note_editor.dart';
@@ -84,10 +85,13 @@ class VerseActionBar extends ConsumerWidget {
     final swatchSize = compact ? 36.0 : 40.0;
 
     final swatches = [
-      _ColorSwatch(color: const Color(0xFFFBE083), hex: '#FBE083', name: 'Yellow', size: swatchSize),
-      _ColorSwatch(color: const Color(0xFF98E2C6), hex: '#98E2C6', name: 'Green', size: swatchSize),
-      _ColorSwatch(color: const Color(0xFFB5E2FA), hex: '#B5E2FA', name: 'Blue', size: swatchSize),
-      _ColorSwatch(color: const Color(0xFFF4A8C4), hex: '#F4A8C4', name: 'Pink', size: swatchSize),
+      for (final s in highlightPalette)
+        _ColorSwatch(
+          color: Color(int.parse(s.hex.replaceFirst('#', '0xFF'))),
+          hex: s.hex,
+          name: s.name,
+          size: swatchSize,
+        ),
       _ClearHighlightSwatch(size: swatchSize),
     ];
 
