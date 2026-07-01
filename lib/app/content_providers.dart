@@ -79,7 +79,7 @@ class InstalledModuleIdsNotifier extends AsyncNotifier<Set<String>> {
     final commentaries = await store.select(store.commentaries).get();
     final dictionaries = await store.select(store.dictionaries).get();
     final devotionals = await store.select(store.devotionals).get();
-    
+
     final set = <String>{};
     for (final v in versions) {
       set.add(v.id.toUpperCase());
@@ -98,9 +98,10 @@ class InstalledModuleIdsNotifier extends AsyncNotifier<Set<String>> {
   }
 }
 
-final installedModuleIdsProvider = AsyncNotifierProvider<InstalledModuleIdsNotifier, Set<String>>(
-  () => InstalledModuleIdsNotifier(),
-);
+final installedModuleIdsProvider =
+    AsyncNotifierProvider<InstalledModuleIdsNotifier, Set<String>>(
+      () => InstalledModuleIdsNotifier(),
+    );
 
 class BibleVersionsNotifier extends AsyncNotifier<List<Version>> {
   @override
@@ -114,15 +115,20 @@ class BibleVersionsNotifier extends AsyncNotifier<List<Version>> {
 
   Future<List<Version>> _fetch(ContentStore store) async {
     final allVersions = await store.select(store.versions).get();
-    final bookVersions = await store.customSelect('SELECT DISTINCT version_id FROM books').get();
-    final bookVersionIds = bookVersions.map((row) => row.read<String>('version_id')).toSet();
+    final bookVersions = await store
+        .customSelect('SELECT DISTINCT version_id FROM books')
+        .get();
+    final bookVersionIds = bookVersions
+        .map((row) => row.read<String>('version_id'))
+        .toSet();
     return allVersions.where((v) => bookVersionIds.contains(v.id)).toList();
   }
 }
 
-final bibleVersionsProvider = AsyncNotifierProvider<BibleVersionsNotifier, List<Version>>(
-  () => BibleVersionsNotifier(),
-);
+final bibleVersionsProvider =
+    AsyncNotifierProvider<BibleVersionsNotifier, List<Version>>(
+      () => BibleVersionsNotifier(),
+    );
 
 class SubheadingSourcesNotifier extends AsyncNotifier<List<Version>> {
   @override
@@ -136,15 +142,20 @@ class SubheadingSourcesNotifier extends AsyncNotifier<List<Version>> {
 
   Future<List<Version>> _fetch(ContentStore store) async {
     final allVersions = await store.select(store.versions).get();
-    final shVersions = await store.customSelect('SELECT DISTINCT version_id FROM subheadings').get();
-    final shVersionIds = shVersions.map((row) => row.read<String>('version_id')).toSet();
+    final shVersions = await store
+        .customSelect('SELECT DISTINCT version_id FROM subheadings')
+        .get();
+    final shVersionIds = shVersions
+        .map((row) => row.read<String>('version_id'))
+        .toSet();
     return allVersions.where((v) => shVersionIds.contains(v.id)).toList();
   }
 }
 
-final subheadingSourcesProvider = AsyncNotifierProvider<SubheadingSourcesNotifier, List<Version>>(
-  () => SubheadingSourcesNotifier(),
-);
+final subheadingSourcesProvider =
+    AsyncNotifierProvider<SubheadingSourcesNotifier, List<Version>>(
+      () => SubheadingSourcesNotifier(),
+    );
 
 final booksForVersionProvider = FutureProvider.family<List<Book>, String>((
   ref,
@@ -202,34 +213,46 @@ final bookByNameProvider =
       }).firstOrNull;
     });
 
-final chapterSubheadingsProvider = FutureProvider.family<Map<int, List<String>>, ({String bookName, int chapter})>((ref, args) async {
-  final sourceVersionId = ref.watch(subheadingsSourceProvider);
-  if (sourceVersionId == null || sourceVersionId.isEmpty) {
-    return {};
-  }
-  
-  final activeVersions = ref.watch(activeVersionsProvider);
-  if (activeVersions.isEmpty) return {};
-  
-  final primaryBibleId = activeVersions.first;
-  final book = await ref.watch(bookByNameProvider((versionId: primaryBibleId, name: args.bookName)).future);
-  if (book == null) return {};
-  
-  final store = ref.watch(contentStoreProvider);
-  final query = store.select(store.subheadings)
-    ..where((s) => s.versionId.equals(sourceVersionId))
-    ..where((s) => s.bookOrder.equals(book.bookOrder))
-    ..where((s) => s.chapter.equals(args.chapter))
-    ..orderBy([(s) => OrderingTerm(expression: s.verse), (s) => OrderingTerm(expression: s.orderIfSeveral)]);
-    
-  final results = await query.get();
-  
-  final map = <int, List<String>>{};
-  for (final row in results) {
-    map.putIfAbsent(row.verse, () => []).add(row.textContent);
-  }
-  return map;
-});
+final chapterSubheadingsProvider =
+    FutureProvider.family<
+      Map<int, List<String>>,
+      ({String bookName, int chapter})
+    >((ref, args) async {
+      final sourceVersionId = ref.watch(subheadingsSourceProvider);
+      if (sourceVersionId == null || sourceVersionId.isEmpty) {
+        return {};
+      }
+
+      final activeVersions = ref.watch(activeVersionsProvider);
+      if (activeVersions.isEmpty) return {};
+
+      final primaryBibleId = activeVersions.first;
+      final book = await ref.watch(
+        bookByNameProvider((
+          versionId: primaryBibleId,
+          name: args.bookName,
+        )).future,
+      );
+      if (book == null) return {};
+
+      final store = ref.watch(contentStoreProvider);
+      final query = store.select(store.subheadings)
+        ..where((s) => s.versionId.equals(sourceVersionId))
+        ..where((s) => s.bookOrder.equals(book.bookOrder))
+        ..where((s) => s.chapter.equals(args.chapter))
+        ..orderBy([
+          (s) => OrderingTerm(expression: s.verse),
+          (s) => OrderingTerm(expression: s.orderIfSeveral),
+        ]);
+
+      final results = await query.get();
+
+      final map = <int, List<String>>{};
+      for (final row in results) {
+        map.putIfAbsent(row.verse, () => []).add(row.textContent);
+      }
+      return map;
+    });
 
 /// The active versions filtered to those actually installed, falling back to
 /// the first installed version when none are valid.
@@ -237,40 +260,50 @@ final chapterSubheadingsProvider = FutureProvider.family<Map<int, List<String>>,
 /// Pure derivation — it must not write back to [activeVersionsProvider]. The
 /// stored preference is self-healed by [ActiveVersionsNotifier] instead;
 /// mutating a watched dependency here threw "setState() called during build".
-final chapterVersesProvider = FutureProvider.family<Map<String, List<Verse>>,
-    ({String bookName, int chapter})>((ref, args) async {
-  final activeVersions = ref.watch(activeVersionsProvider);
-  final installedVersions = ref.watch(versionsProvider.select((v) => v.value));
-
-  List<String> versions;
-  if (installedVersions == null) {
-    versions = activeVersions.isEmpty ? ['KJV'] : activeVersions;
-  } else if (installedVersions.isEmpty) {
-    versions = [];
-  } else {
-    final valid = activeVersions
-        .where((av) => installedVersions.any((iv) => iv.id == av))
-        .toList();
-    versions = valid.isEmpty ? [installedVersions.first.id] : valid;
-  }
-
-  final map = <String, List<Verse>>{};
-  for (final versionId in versions) {
-    final book = await ref.watch(
-      bookByNameProvider((versionId: versionId, name: args.bookName)).future,
-    );
-    if (book != null) {
-      final verses = await ref.watch(
-        versesForChapterProvider((bookId: book.id, chapter: args.chapter))
-            .future,
+final chapterVersesProvider =
+    FutureProvider.family<
+      Map<String, List<Verse>>,
+      ({String bookName, int chapter})
+    >((ref, args) async {
+      final activeVersions = ref.watch(activeVersionsProvider);
+      final installedVersions = ref.watch(
+        versionsProvider.select((v) => v.value),
       );
-      map[versionId] = verses;
-    } else {
-      map[versionId] = [];
-    }
-  }
-  return map;
-});
+
+      List<String> versions;
+      if (installedVersions == null) {
+        versions = activeVersions.isEmpty ? ['KJV'] : activeVersions;
+      } else if (installedVersions.isEmpty) {
+        versions = [];
+      } else {
+        final valid = activeVersions
+            .where((av) => installedVersions.any((iv) => iv.id == av))
+            .toList();
+        versions = valid.isEmpty ? [installedVersions.first.id] : valid;
+      }
+
+      final map = <String, List<Verse>>{};
+      for (final versionId in versions) {
+        final book = await ref.watch(
+          bookByNameProvider((
+            versionId: versionId,
+            name: args.bookName,
+          )).future,
+        );
+        if (book != null) {
+          final verses = await ref.watch(
+            versesForChapterProvider((
+              bookId: book.id,
+              chapter: args.chapter,
+            )).future,
+          );
+          map[versionId] = verses;
+        } else {
+          map[versionId] = [];
+        }
+      }
+      return map;
+    });
 
 /// How many Bible versions the reader will display side-by-side for a chapter,
 /// derived from the active/installed selection WITHOUT loading any verses.
@@ -298,8 +331,9 @@ final displayedVersionCountProvider = Provider<int>((ref) {
 final parallelVersesProvider = FutureProvider<Map<String, List<Verse>>>((ref) {
   final bookName = ref.watch(selectedBookNameProvider);
   final chapter = ref.watch(selectedChapterProvider);
-  return ref
-      .watch(chapterVersesProvider((bookName: bookName, chapter: chapter)).future);
+  return ref.watch(
+    chapterVersesProvider((bookName: bookName, chapter: chapter)).future,
+  );
 });
 
 /// A flat, ordered list of every (book, chapter) in the primary version — the
@@ -307,25 +341,27 @@ final parallelVersesProvider = FutureProvider<Map<String, List<Verse>>>((ref) {
 /// when the active/installed versions change.
 final chapterIndexProvider =
     FutureProvider<List<({String bookName, int chapter})>>((ref) async {
-  final activeVersions = ref.watch(activeVersionsProvider);
-  final installedVersions = ref.watch(versionsProvider.select((v) => v.value));
-  if (installedVersions == null || installedVersions.isEmpty) return [];
+      final activeVersions = ref.watch(activeVersionsProvider);
+      final installedVersions = ref.watch(
+        versionsProvider.select((v) => v.value),
+      );
+      if (installedVersions == null || installedVersions.isEmpty) return [];
 
-  final valid = activeVersions
-      .where((av) => installedVersions.any((iv) => iv.id == av))
-      .toList();
-  final primary = valid.isEmpty ? installedVersions.first.id : valid.first;
+      final valid = activeVersions
+          .where((av) => installedVersions.any((iv) => iv.id == av))
+          .toList();
+      final primary = valid.isEmpty ? installedVersions.first.id : valid.first;
 
-  final books = await ref.watch(booksForVersionProvider(primary).future);
-  final index = <({String bookName, int chapter})>[];
-  for (final book in books) {
-    final count = await ref.watch(chapterCountProvider(book.id).future);
-    for (var c = 1; c <= count; c++) {
-      index.add((bookName: book.name, chapter: c));
-    }
-  }
-  return index;
-});
+      final books = await ref.watch(booksForVersionProvider(primary).future);
+      final index = <({String bookName, int chapter})>[];
+      for (final book in books) {
+        final count = await ref.watch(chapterCountProvider(book.id).future);
+        for (var c = 1; c <= count; c++) {
+          index.add((bookName: book.name, chapter: c));
+        }
+      }
+      return index;
+    });
 
 /// The id of the primary (left-most active, else first installed) Bible
 /// version, or null when nothing is installed. Mirrors the selection rule used
@@ -362,28 +398,34 @@ final primaryBookOrderProvider = FutureProvider<Map<String, int>>((ref) async {
 /// Cleaned plain text for every verse of a chapter in the primary version,
 /// keyed by verse number. Family-cached per chapter, so the highlights list can
 /// load each row's text lazily while rows that share a chapter resolve once.
-final chapterVerseTextProvider = FutureProvider.family<Map<int, String>,
-    ({String bookName, int chapter})>((ref, args) async {
-  final primary = ref.watch(primaryVersionIdProvider);
-  if (primary == null) return {};
-  final book = await ref.watch(
-    bookByNameProvider((versionId: primary, name: args.bookName)).future,
-  );
-  if (book == null) return {};
-  final verses = await ref.watch(
-    versesForChapterProvider((bookId: book.id, chapter: args.chapter)).future,
-  );
-  final parser = MyBibleVerseParser();
-  return {
-    for (final v in verses)
-      v.verse: parser
-          .parseVerse(v.textContent)
-          .map((s) => s.text)
-          .join('')
-          .replaceAll(RegExp(r'\s+'), ' ')
-          .trim(),
-  };
-});
+final chapterVerseTextProvider =
+    FutureProvider.family<Map<int, String>, ({String bookName, int chapter})>((
+      ref,
+      args,
+    ) async {
+      final primary = ref.watch(primaryVersionIdProvider);
+      if (primary == null) return {};
+      final book = await ref.watch(
+        bookByNameProvider((versionId: primary, name: args.bookName)).future,
+      );
+      if (book == null) return {};
+      final verses = await ref.watch(
+        versesForChapterProvider((
+          bookId: book.id,
+          chapter: args.chapter,
+        )).future,
+      );
+      final parser = MyBibleVerseParser();
+      return {
+        for (final v in verses)
+          v.verse: parser
+              .parseVerse(v.textContent)
+              .map((s) => s.text)
+              .join('')
+              .replaceAll(RegExp(r'\s+'), ' ')
+              .trim(),
+      };
+    });
 
 /// Builds a "bookName|chapter|verse" key for the aggregate highlight-text map.
 String highlightTextKey(String bookName, int chapter, int verse) =>
@@ -393,8 +435,9 @@ String highlightTextKey(String bookName, int chapter, int verse) =>
 /// Reuses [chapterVerseTextProvider]'s per-chapter cache, so this only does
 /// work for chapters not already loaded by scrolling. Watched by the highlights
 /// panel solely while a text search is active, keeping normal browsing lazy.
-final allHighlightTextsProvider =
-    FutureProvider<Map<String, String>>((ref) async {
+final allHighlightTextsProvider = FutureProvider<Map<String, String>>((
+  ref,
+) async {
   final highlights = ref.watch(allHighlightsProvider).value ?? const [];
   final chapters = <({String bookName, int chapter})>{
     for (final h in highlights) (bookName: h.bookName, chapter: h.chapter),
@@ -415,32 +458,45 @@ class CompareResult {
   CompareResult({required this.version, required this.verses});
 }
 
-final compareVersesProvider = FutureProvider.family<List<CompareResult>, ({String bookName, int chapter, String selectedVersesStr})>((ref, args) async {
-  final versions = ref.watch(versionsProvider.select((v) => v.value));
-  if (versions == null) return [];
-  final results = <CompareResult>[];
-  final contentStore = ref.watch(contentStoreProvider);
+final compareVersesProvider =
+    FutureProvider.family<
+      List<CompareResult>,
+      ({String bookName, int chapter, String selectedVersesStr})
+    >((ref, args) async {
+      final versions = ref.watch(versionsProvider.select((v) => v.value));
+      if (versions == null) return [];
+      final results = <CompareResult>[];
+      final contentStore = ref.watch(contentStoreProvider);
 
-  final selectedVerses = args.selectedVersesStr.split(',').map((e) => int.tryParse(e) ?? 0).where((e) => e > 0).toList();
+      final selectedVerses = args.selectedVersesStr
+          .split(',')
+          .map((e) => int.tryParse(e) ?? 0)
+          .where((e) => e > 0)
+          .toList();
 
-  for (final v in versions) {
-    final book = await ref.watch(bookByNameProvider((versionId: v.id, name: args.bookName)).future);
-    if (book != null) {
-      final verses = await (contentStore.select(contentStore.verses)
-            ..where((t) =>
-                t.bookId.equals(book.id) &
-                t.chapter.equals(args.chapter) &
-                t.verse.isIn(selectedVerses))
-            ..orderBy([(t) => OrderingTerm.asc(t.verse)]))
-          .get();
+      for (final v in versions) {
+        final book = await ref.watch(
+          bookByNameProvider((versionId: v.id, name: args.bookName)).future,
+        );
+        if (book != null) {
+          final verses =
+              await (contentStore.select(contentStore.verses)
+                    ..where(
+                      (t) =>
+                          t.bookId.equals(book.id) &
+                          t.chapter.equals(args.chapter) &
+                          t.verse.isIn(selectedVerses),
+                    )
+                    ..orderBy([(t) => OrderingTerm.asc(t.verse)]))
+                  .get();
 
-      if (verses.isNotEmpty) {
-        results.add(CompareResult(version: v, verses: verses));
+          if (verses.isNotEmpty) {
+            results.add(CompareResult(version: v, verses: verses));
+          }
+        }
       }
-    }
-  }
-  return results;
-});
+      return results;
+    });
 
 final crossReferencesProvider =
     FutureProvider.family<List<CrossReference>, int>((ref, verse) {
@@ -456,8 +512,10 @@ final crossReferencesProvider =
                   (c.sourceVerse.equals(verse)),
             )
             ..orderBy([
-              (c) =>
-                  drift.OrderingTerm(expression: c.votes, mode: drift.OrderingMode.desc)
+              (c) => drift.OrderingTerm(
+                expression: c.votes,
+                mode: drift.OrderingMode.desc,
+              ),
             ]))
           .get();
     });
@@ -503,9 +561,10 @@ class CommentariesNotifier extends AsyncNotifier<List<Commentary>> {
   }
 }
 
-final commentariesProvider = AsyncNotifierProvider<CommentariesNotifier, List<Commentary>>(
-  () => CommentariesNotifier(),
-);
+final commentariesProvider =
+    AsyncNotifierProvider<CommentariesNotifier, List<Commentary>>(
+      () => CommentariesNotifier(),
+    );
 
 class DictionariesNotifier extends AsyncNotifier<List<Dictionary>> {
   @override
@@ -520,9 +579,10 @@ class DictionariesNotifier extends AsyncNotifier<List<Dictionary>> {
   }
 }
 
-final dictionariesProvider = AsyncNotifierProvider<DictionariesNotifier, List<Dictionary>>(
-  () => DictionariesNotifier(),
-);
+final dictionariesProvider =
+    AsyncNotifierProvider<DictionariesNotifier, List<Dictionary>>(
+      () => DictionariesNotifier(),
+    );
 
 class DevotionalsNotifier extends AsyncNotifier<List<Devotional>> {
   @override
@@ -537,9 +597,10 @@ class DevotionalsNotifier extends AsyncNotifier<List<Devotional>> {
   }
 }
 
-final devotionalsProvider = AsyncNotifierProvider<DevotionalsNotifier, List<Devotional>>(
-  () => DevotionalsNotifier(),
-);
+final devotionalsProvider =
+    AsyncNotifierProvider<DevotionalsNotifier, List<Devotional>>(
+      () => DevotionalsNotifier(),
+    );
 
 class ShowBookIntroNotifier extends Notifier<bool> {
   @override
@@ -558,16 +619,19 @@ final hasBookIntroProvider = FutureProvider<bool>((ref) async {
   final store = ref.watch(contentStoreProvider);
   final bookName = ref.watch(selectedBookNameProvider);
   final selectedCommentaryId = ref.watch(selectedCommentaryProvider);
-  
+
   if (selectedCommentaryId == null) return false;
-  
+
   final countExp = store.commentaryEntries.id.count();
   final query = store.selectOnly(store.commentaryEntries)
     ..addColumns([countExp])
-    ..where(store.commentaryEntries.commentaryId.equals(selectedCommentaryId) &
-            store.commentaryEntries.bookName.equals(bookName) &
-            (store.commentaryEntries.chapter.equals(0) | store.commentaryEntries.chapter.isNull()));
-            
+    ..where(
+      store.commentaryEntries.commentaryId.equals(selectedCommentaryId) &
+          store.commentaryEntries.bookName.equals(bookName) &
+          (store.commentaryEntries.chapter.equals(0) |
+              store.commentaryEntries.chapter.isNull()),
+    );
+
   final result = await query.getSingle();
   return (result.read(countExp) ?? 0) > 0;
 });
@@ -604,7 +668,7 @@ final commentaryEntriesProvider = FutureProvider<List<CommentaryEntry>>((
           )
           ..orderBy([
             (c) => OrderingTerm.asc(c.verse),
-            (c) => OrderingTerm.asc(c.commentaryId)
+            (c) => OrderingTerm.asc(c.commentaryId),
           ]))
         .get();
   } else {
@@ -646,15 +710,34 @@ final dictionarySearchQueryProvider =
       () => DictionarySearchQueryNotifier(),
     );
 
+/// When on, a free-text dictionary search also matches the entry body
+/// (definition), not just the headword — so searching e.g. "βίβλος" surfaces
+/// Strong's entries that merely mention it in their gloss. Applies to the
+/// search box only (non-exact lookups); reader word-taps still resolve the
+/// exact headword.
+class DictionaryIncludeBodyNotifier extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  void set(bool value) => state = value;
+}
+
+final dictionaryIncludeBodyProvider =
+    NotifierProvider<DictionaryIncludeBodyNotifier, bool>(
+      () => DictionaryIncludeBodyNotifier(),
+    );
+
 final dictionaryEntriesProvider = FutureProvider<List<DictionaryEntryWithDict>>(
   (ref) async {
     final store = ref.watch(contentStoreProvider);
     final query = ref.watch(dictionarySearchQueryProvider);
+    final includeBody = ref.watch(dictionaryIncludeBodyProvider);
     final term = query.term.trim();
     if (term.isEmpty) return [];
 
     Future<List<DictionaryEntryWithDict>> runWhere(
-        Expression<bool> predicate) async {
+      Expression<bool> predicate,
+    ) async {
       final q = store.select(store.dictionaryEntries).join([
         innerJoin(
           store.dictionaries,
@@ -691,7 +774,32 @@ final dictionaryEntriesProvider = FutureProvider<List<DictionaryEntryWithDict>>(
     // fall back to a substring search: showing unrelated words that merely
     // contain the term is worse than an honest "not found".
     final pattern = query.exact ? term : '%$term%';
-    return runWhere(store.dictionaryEntries.word.like(pattern));
+    var predicate = store.dictionaryEntries.word.like(pattern);
+
+    // Body search only makes sense for the free-text box, so it's gated on
+    // !exact: a substring term also matches definitions, letting a Greek/Hebrew
+    // word cited inside a gloss surface its Strong's entry.
+    final bodySearch = includeBody && !query.exact;
+    if (bodySearch) {
+      predicate =
+          predicate | store.dictionaryEntries.definition.like('%$term%');
+    }
+
+    final results = await runWhere(predicate);
+    if (!bodySearch) return results;
+
+    // Headword hits are almost always the entry the user wants, so float them
+    // above body-only matches. Partitioning (rather than sort) keeps each
+    // group in its original order.
+    final needle = term.toLowerCase();
+    final headword = <DictionaryEntryWithDict>[];
+    final bodyOnly = <DictionaryEntryWithDict>[];
+    for (final r in results) {
+      (r.entry.word.toLowerCase().contains(needle) ? headword : bodyOnly).add(
+        r,
+      );
+    }
+    return [...headword, ...bodyOnly];
   },
 );
 
@@ -718,8 +826,9 @@ List<String> strongsLookupForms(String term) {
   for (var width = 2; width <= 5; width++) {
     numbers.add(digits.padLeft(width, '0'));
   }
-  final prefixes =
-      prefix.isNotEmpty ? <String>{'', prefix} : <String>{'', 'H', 'G'};
+  final prefixes = prefix.isNotEmpty
+      ? <String>{'', prefix}
+      : <String>{'', 'H', 'G'};
   final forms = <String>{};
   for (final n in numbers) {
     for (final p in prefixes) {
