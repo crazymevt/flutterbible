@@ -45,7 +45,10 @@ class _DictionaryPanelState extends ConsumerState<DictionaryPanel> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 8.0,
+            ),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surfaceContainerHighest,
             ),
@@ -102,60 +105,66 @@ class _DictionaryPanelState extends ConsumerState<DictionaryPanel> {
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 250),
               child: entriesAsync.when(
-              data: (entries) {
-                if (entries.isEmpty) {
-                  return const EmptyState(
-                    icon: Icons.search,
-                    title: 'No definitions',
-                    message: 'Search for a word above to look it up.',
-                  );
-                }
-                return ListView.separated(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: entries.length,
-                  separatorBuilder: (_, _) => const Divider(height: 32),
-                  itemBuilder: (context, index) {
-                    final item = entries[index];
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text(
-                          item.dictionary.name,
-                          style: Theme.of(context).textTheme.labelSmall
-                              ?.copyWith(
-                                color: Theme.of(context).colorScheme.primary,
-                                fontWeight: FontWeight.bold,
-                              ),
-                        ),
-                        // The headword being defined (e.g. the Strong's number
-                        // "H7225"), so it's clear which entry you're reading —
-                        // important when several codes resolve similar glosses.
-                        if (item.entry.word.isNotEmpty)
-                          Text(
-                            item.entry.word,
-                            style: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(fontWeight: FontWeight.bold),
-                          ),
-                        const SizedBox(height: 8),
-                        HtmlWidget(
-                          item.entry.definition,
-                          textStyle: Theme.of(context).textTheme.bodyMedium,
-                          onErrorBuilder: (context, element, error) => const SizedBox.shrink(),
-                          onLoadingBuilder: (context, element, progress) => const SizedBox.shrink(),
-                          onTapUrl: (url) =>
-                              handleBibleRefTap(ref, context, url),
-                        ),
-                      ],
+                data: (entries) {
+                  if (entries.isEmpty) {
+                    return const EmptyState(
+                      icon: Icons.search,
+                      title: 'No definitions',
+                      message: 'Search for a word above to look it up.',
                     );
-                  },
-                );
-              },
-              loading: () => const SkeletonList(),
-              error: (err, stack) => const EmptyState(
-                icon: Icons.error_outline,
-                title: 'Couldn\'t load definitions',
+                  }
+                  return SelectionArea(
+                    child: ListView.separated(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: entries.length,
+                      separatorBuilder: (_, _) => const Divider(height: 32),
+                      itemBuilder: (context, index) {
+                        final item = entries[index];
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              item.dictionary.name,
+                              style: Theme.of(context).textTheme.labelSmall
+                                  ?.copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                            // The headword being defined (e.g. the Strong's number
+                            // "H7225"), so it's clear which entry you're reading —
+                            // important when several codes resolve similar glosses.
+                            if (item.entry.word.isNotEmpty)
+                              Text(
+                                item.entry.word,
+                                style: Theme.of(context).textTheme.titleMedium
+                                    ?.copyWith(fontWeight: FontWeight.bold),
+                              ),
+                            const SizedBox(height: 8),
+                            HtmlWidget(
+                              item.entry.definition,
+                              textStyle: Theme.of(context).textTheme.bodyMedium,
+                              onErrorBuilder: (context, element, error) =>
+                                  const SizedBox.shrink(),
+                              onLoadingBuilder: (context, element, progress) =>
+                                  const SizedBox.shrink(),
+                              onTapUrl: (url) =>
+                                  handleBibleRefTap(ref, context, url),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  );
+                },
+                loading: () => const SkeletonList(),
+                error: (err, stack) => const EmptyState(
+                  icon: Icons.error_outline,
+                  title: 'Couldn\'t load definitions',
+                ),
               ),
-            ),
             ),
           ),
         ],
