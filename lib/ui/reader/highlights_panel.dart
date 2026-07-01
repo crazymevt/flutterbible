@@ -2,20 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/app_state.dart';
 import '../../app/content_providers.dart';
+import '../../app/highlight_palette.dart';
 import '../../app/reader_state.dart';
 import '../../app/user_providers.dart';
 import '../../data/user_store.dart';
 import '../common/empty_state.dart';
 import '../common/skeleton.dart';
-
-/// The highlight swatch palette, mirroring the verse action bar, so the review
-/// list can show a friendly colour name and a matching filter.
-const _highlightSwatches = <({String hex, String name})>[
-  (hex: '#FBE083', name: 'Yellow'),
-  (hex: '#98E2C6', name: 'Green'),
-  (hex: '#B5E2FA', name: 'Blue'),
-  (hex: '#F4A8C4', name: 'Pink'),
-];
 
 /// How the highlights list is ordered.
 enum HighlightSort {
@@ -37,7 +29,7 @@ Color? _parseHex(String hex) {
 }
 
 String _nameForHex(String hex) {
-  for (final s in _highlightSwatches) {
+  for (final s in highlightPalette) {
     if (s.hex.toLowerCase() == hex.toLowerCase()) return s.name;
   }
   return 'Highlight';
@@ -246,7 +238,7 @@ class _HighlightsPanelState extends ConsumerState<HighlightsPanel> {
                   onSelected: (_) => setState(() => _colorFilter = null),
                 ),
                 const SizedBox(width: 8),
-                for (final s in _highlightSwatches) ...[
+                for (final s in highlightPalette) ...[
                   ChoiceChip(
                     avatar: CircleAvatar(backgroundColor: _parseHex(s.hex)),
                     label: Text(s.name),

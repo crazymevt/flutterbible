@@ -4,6 +4,7 @@ import 'package:drift/drift.dart' hide Column;
 import '../data/user_store.dart';
 import '../data/models/achievement_def.dart';
 import '../main.dart';
+import 'highlight_palette.dart';
 import 'user_providers.dart';
 import 'sync_service.dart';
 
@@ -202,7 +203,7 @@ class AchievementService {
     if (highlightsCount >= 1) earnedIds.add('illuminator');
     if (highlightsCount >= 25) earnedIds.add('highlighter');
     if (highlightsCount >= 100) earnedIds.add('luminary');
-    if (highlightColors.length >= 5) earnedIds.add('rainbow'); // Simplified check for "all colors"
+    if (usedEveryHighlightColor(highlightColors)) earnedIds.add('rainbow');
     if (answeredPrayersCount >= 1) earnedIds.add('answered');
     if (prayersCount >= 10) earnedIds.add('prayerful');
     if (sermonsCount >= 1) earnedIds.add('expositor');
@@ -295,6 +296,17 @@ const singleChapterBooks = ['Obadiah', 'Philemon', '2 John', '3 John', 'Jude'];
 /// achievement.
 bool allShortBooksFinished(Set<String> readSet) =>
     singleChapterBooks.every((b) => checkBookFinished(b, readSet));
+
+/// Whether [usedColorHexes] covers every colour in [highlightPalette] — the
+/// "Full Palette" achievement. Derived from the palette rather than a hardcoded
+/// count so the reward stays exactly as reachable as the colours on offer, and
+/// hexes are normalised so palette membership survives formatting differences.
+bool usedEveryHighlightColor(Iterable<String> usedColorHexes) {
+  final used = usedColorHexes.map(normalizeHighlightHex).toSet();
+  return highlightPalette
+      .map((s) => normalizeHighlightHex(s.hex))
+      .every(used.contains);
+}
 
 /// Per-chapter read counts ("BookName_chapter" -> times read) from a set of
 /// reading-progress rows. Each row is one read of one chapter at one iteration,

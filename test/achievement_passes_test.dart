@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:study_bible/app/achievement_service.dart';
+import 'package:study_bible/app/highlight_palette.dart';
 import 'package:study_bible/data/user_store.dart';
 
 /// Read counts for every canonical chapter set to [times].
@@ -177,6 +178,40 @@ void main() {
     test('reading other books does not earn it', () {
       expect(allShortBooksFinished(readSetForBooks(['Philippians', 'Ruth'])),
           isFalse);
+    });
+  });
+
+  group('usedEveryHighlightColor (Full Palette)', () {
+    final allHexes = [for (final s in highlightPalette) s.hex];
+
+    test('no highlights -> not earned', () {
+      expect(usedEveryHighlightColor(const []), isFalse);
+    });
+
+    test('every palette colour used -> earned', () {
+      // Regression: the old check required 5 distinct colours but the palette
+      // only offers 4, so "Full Palette" was impossible to earn.
+      expect(usedEveryHighlightColor(allHexes), isTrue);
+    });
+
+    test('missing one colour -> not earned', () {
+      expect(usedEveryHighlightColor(allHexes.skip(1)), isFalse);
+    });
+
+    test('normalises case and stray "#" so real stored hexes still count', () {
+      final messy = [
+        for (final hex in allHexes) hex.replaceAll('#', '').toLowerCase(),
+      ];
+      expect(usedEveryHighlightColor(messy), isTrue);
+    });
+
+    test('duplicates and off-palette colours do not stand in for a colour', () {
+      final missingLast = [
+        ...allHexes.take(allHexes.length - 1),
+        allHexes.first, // duplicate
+        '#123456', // off-palette
+      ];
+      expect(usedEveryHighlightColor(missingLast), isFalse);
     });
   });
 
