@@ -125,15 +125,26 @@ final globalSearchResultsProvider = FutureProvider<GlobalSearchResults>((
   SearchScope? scope;
   String terms = query.trim();
 
+  // A leading `#` is an explicit tag search: match tag names only, and suppress
+  // the content/user full-text search, the reference shortcut, and the
+  // testament/book scopes. A bare `#` has no term, so it yields nothing.
+  final tagMode = terms.startsWith('#');
+  String? tagTerm;
+  if (tagMode) {
+    tagTerm = terms.substring(1).trim();
+    if (tagTerm.isEmpty) return const GlobalSearchResults([]);
+    scope = SearchScope(label: '#$tagTerm', bareTerms: tagTerm);
+  }
+
   final ts = parseTestamentScope(query);
-  if (ts.testament != null && ts.terms.isNotEmpty) {
+  if (!tagMode && ts.testament != null && ts.terms.isNotEmpty) {
     testament = ts.testament;
     terms = ts.terms;
     scope = SearchScope(
       label: testament == 'OT' ? 'Old Testament' : 'New Testament',
       bareTerms: terms,
     );
-  } else if (activeVersions.isNotEmpty) {
+  } else if (!tagMode && activeVersions.isNotEmpty) {
     // Book scope: split on the first colon. The left side must resolve to a
     // bare book — reference forms like "John 3:16" leave a chapter number on
     // the left, don't resolve, and so fall through to the nav shortcut below.
@@ -190,7 +201,7 @@ final globalSearchResultsProvider = FutureProvider<GlobalSearchResults>((
 
   // Check if query is a reference for quick navigation. A scoped search is a
   // word search, so skip the reference shortcut there.
-  if (!scoped && activeVersions.isNotEmpty) {
+  if (!scoped && !tagMode && activeVersions.isNotEmpty) {
     try {
       final books = await ref.watch(
         booksForVersionProvider(activeVersions.first).future,
@@ -267,12 +278,18 @@ final globalSearchResultsProvider = FutureProvider<GlobalSearchResults>((
     LIMIT 100
   ''';
 
-  final contentRows = await contentStore
-      .customSelect(
-        contentQuery,
-        variables: [Variable.withString(searchPattern), ...verseFilterVars],
-      )
-      .get();
+  // Tag mode matches tag names only — skip the scripture/content full-text search.
+  final contentRows = tagMode
+      ? const <QueryRow>[]
+      : await contentStore
+            .customSelect(
+              contentQuery,
+              variables: [
+                Variable.withString(searchPattern),
+                ...verseFilterVars,
+              ],
+            )
+            .get();
   for (final row in contentRows) {
     final type = row.read<String>('type');
     final refId = row.read<int>('reference_id').toString();
@@ -371,12 +388,15 @@ final globalSearchResultsProvider = FutureProvider<GlobalSearchResults>((
   ''';
 
     try {
-      final userRows = await userStore
-          .customSelect(
-            userQuery,
-            variables: [Variable.withString(searchPattern)],
-          )
-          .get();
+      // Tag mode matches tag names only — skip the user free-text search.
+      final userRows = tagMode
+          ? const <QueryRow>[]
+          : await userStore
+                .customSelect(
+                  userQuery,
+                  variables: [Variable.withString(searchPattern)],
+                )
+                .get();
       for (final row in userRows) {
         final type = row.readNullable<String>('type');
         if (type == null) continue;
@@ -482,7 +502,8 @@ final globalSearchResultsProvider = FutureProvider<GlobalSearchResults>((
 
     // 3. Direct tag search — don't rely on FTS triggers for tags
     try {
-      final tagSearchPattern = query.trim().replaceAll(RegExp(r'^#'), '');
+      final tagSearchPattern =
+          tagMode ? tagTerm! : query.trim().replaceAll(RegExp(r'^#'), '');
       if (tagSearchPattern.isNotEmpty) {
         final tagQuery = '''
         SELECT et.entity_id, et.entity_type, t.name as tag_name,

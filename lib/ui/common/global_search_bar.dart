@@ -4,6 +4,7 @@ import 'package:drift/drift.dart' as drift;
 import '../../app/search_providers.dart';
 import '../../app/app_state.dart';
 import '../../app/content_providers.dart';
+import '../../app/user_providers.dart';
 import '../../domain/search/reference_parser.dart';
 import '../../app/reader_state.dart';
 
@@ -54,7 +55,25 @@ class _GlobalSearchBarState extends ConsumerState<GlobalSearchBar> {
         if (text.trim().isEmpty) {
           return const Iterable<String>.empty();
         }
-        
+
+        // A leading `#` is a tag search; suggest matching tag names instead of
+        // content words or references.
+        if (text.trimLeft().startsWith('#')) {
+          final term = text.trim().substring(1).toLowerCase();
+          if (term.isEmpty) return const Iterable<String>.empty();
+          final safeTerm = term.replaceAll("'", "''");
+          try {
+            final rows = await ref.read(userStoreProvider).customSelect(
+              "SELECT DISTINCT name FROM tags WHERE deleted = 0 "
+              "AND LOWER(name) LIKE ? ORDER BY name LIMIT 15",
+              variables: [drift.Variable.withString('$safeTerm%')],
+            ).get();
+            return rows.map((row) => '#${row.read<String>('name')}');
+          } catch (e) {
+            return const Iterable<String>.empty();
+          }
+        }
+
         final contentStore = ref.read(contentStoreProvider);
         final List<String> results = [];
         final currentModule = ref.read(appModuleProvider);
@@ -190,10 +209,15 @@ class _GlobalSearchBarState extends ConsumerState<GlobalSearchBar> {
                   final String option = options.elementAt(index);
                   final isGoto = option.startsWith('Go to: ');
                   final isFind = option.startsWith('Find on page: ');
+                  final isTag = option.startsWith('#');
                   return ListTile(
                     dense: true,
                     leading: Icon(
-                      isGoto ? Icons.menu_book : (isFind ? Icons.find_in_page : Icons.search),
+                      isGoto
+                          ? Icons.menu_book
+                          : (isFind
+                              ? Icons.find_in_page
+                              : (isTag ? Icons.label : Icons.search)),
                       size: 16,
                       color: Theme.of(context).colorScheme.primary,
                     ),
