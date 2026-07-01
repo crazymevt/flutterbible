@@ -418,20 +418,39 @@ class _JournalEditorPanelState extends ConsumerState<JournalEditorPanel> {
           ),
         ),
         const Divider(height: 1),
-        if (controller != null) ...[
-          QuillSimpleToolbar(
-            controller: controller,
-            config: const QuillSimpleToolbarConfig(),
-          ),
-          const Divider(height: 1),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: QuillEditor.basic(controller: controller),
-            ),
-          ),
-        ] else
-          const Expanded(child: SizedBox.shrink()),
+        Expanded(
+          child: controller == null
+              ? const SizedBox.shrink()
+              : LayoutBuilder(
+                  builder: (context, constraints) {
+                    // Let the toolbar wrap onto multiple rows when there's room,
+                    // but collapse to a single horizontally-scrolling row when
+                    // space is tight (e.g. the soft keyboard shrinks the panel)
+                    // so it doesn't crowd out the editor.
+                    const minEditorHeight = 160.0;
+                    const multiRowToolbarHeight = 150.0;
+                    final multiRow = constraints.maxHeight >=
+                        minEditorHeight + multiRowToolbarHeight;
+                    return Column(
+                      children: [
+                        QuillSimpleToolbar(
+                          controller: controller,
+                          config: QuillSimpleToolbarConfig(
+                            multiRowsDisplay: multiRow,
+                          ),
+                        ),
+                        const Divider(height: 1),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: QuillEditor.basic(controller: controller),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+        ),
       ],
     );
   }
