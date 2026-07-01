@@ -518,7 +518,25 @@ class UserStore extends _$UserStore {
           // snippets aren't polluted with JSON. Legacy markdown/plain rows are
           // left as-is (the editor reads them back as plain text) and their
           // content_plain is just the original text.
-          await m.addColumn(journals, journals.contentPlain);
+          //
+          // Keep this light and journal-scoped. This runs on the first launch
+          // after upgrade; a full FTS rebuild here (notes + sermons + prayers +
+          // tags too) needlessly widens the migration's transaction and its
+          // race with the UI's first DB reads, which could leave the dashboard
+          // blank until a restart. Only the journal rows changed, so only they
+          // are re-indexed (mirroring the v13 sermon migration).
+
+          // Idempotent: ALTER TABLE ADD COLUMN auto-commits in SQLite, so if a
+          // prior attempt at this migration was rolled back after adding the
+          // column, re-running must not fail with "duplicate column name".
+          final hasColumn = await customSelect(
+            "SELECT 1 FROM pragma_table_info('journals') "
+            "WHERE name = 'content_plain'",
+          ).get();
+          if (hasColumn.isEmpty) {
+            await m.addColumn(journals, journals.contentPlain);
+          }
+
           final existingJournals =
               await customSelect('SELECT id, content FROM journals').get();
           for (final row in existingJournals) {
@@ -530,9 +548,26 @@ class UserStore extends _$UserStore {
               ],
             );
           }
-          // Point the journal FTS trigger at content_plain and rebuild.
+
+          // Repoint the journal FTS trigger at content_plain (cheap DDL), then
+          // re-index only the journal rows — re-adding their tag rows, which
+          // share (type, reference_id) with the content row and would otherwise
+          // be dropped by the delete.
           await _installSearchTriggers();
-          await _rebuildSearchIndex();
+          await customStatement(
+              "DELETE FROM user_search WHERE type = 'journal';");
+          await customStatement(
+            "INSERT INTO user_search(type, reference_id, text_content) "
+            "SELECT 'journal', id, title || ' ' || COALESCE(content_plain, '') "
+            "FROM journals WHERE deleted = 0;",
+          );
+          await customStatement('''
+            INSERT INTO user_search(type, reference_id, text_content)
+            SELECT et.entity_type, et.entity_id, '#' || t.name
+            FROM entity_tags et
+            JOIN tags t ON et.tag_id = t.id
+            WHERE et.deleted = 0 AND et.entity_type = 'journal';
+          ''');
         }
       },
     );
