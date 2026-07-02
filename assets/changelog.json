@@ -1,5 +1,35 @@
 [
   {
+    "version": "26.7.1+5",
+    "date": "2026-07-01",
+    "features": [
+      {
+        "category": "New Features",
+        "title": "search, tag filter, and sorting for the sermons list",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "add app-wide Text Weight setting for readability",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "#tagname syntax for tag-only global search",
+        "description": "",
+        "icon": "star"
+      },
+      {
+        "category": "New Features",
+        "title": "colored tags with palette picker and color filter",
+        "description": "",
+        "icon": "star"
+      }
+    ]
+  },
+  {
     "version": "26.7.1+4",
     "date": "2026-07-01",
     "features": [
