@@ -1,5 +1,17 @@
 [
   {
+    "version": "26.7.2+4",
+    "date": "2026-07-02",
+    "features": [
+      {
+        "category": "New Features",
+        "title": "interactive Bible timeline of people and events",
+        "description": "",
+        "icon": "star"
+      }
+    ]
+  },
+  {
     "version": "26.7.2+3",
     "date": "2026-07-02",
     "features": [
