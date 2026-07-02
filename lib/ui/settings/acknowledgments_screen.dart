@@ -64,6 +64,14 @@ class AcknowledgmentsScreen extends StatelessWidget {
             url: 'https://github.com/BradyStephenson/bible-data',
           ),
           _buildCredit(
+            title: 'Theographic Bible Metadata',
+            subtitle:
+                'Knowledge graph of the people, groups, and events of the Bible, '
+                'by Robert Rouse / Viz.Bible (CC BY-SA 4.0). The bundled people '
+                'dataset is derived from it and remains CC BY-SA 4.0.',
+            url: 'https://github.com/robertrouse/theographic-bible-metadata',
+          ),
+          _buildCredit(
             title: 'Berean Study Bible',
             subtitle: 'Public domain Bible text and audio resources.',
             url: 'https://berean.bible/',

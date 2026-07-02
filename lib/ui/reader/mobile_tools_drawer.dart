@@ -13,6 +13,7 @@ import 'devotionals_panel.dart';
 import 'topics_panel.dart';
 import 'harmony_panel.dart';
 import 'places_panel.dart';
+import 'people_panel.dart';
 import 'highlights_panel.dart';
 import 'scratch_panel.dart';
 import '../common/tool_groups.dart';
@@ -67,6 +68,8 @@ class MobileToolsDrawer extends ConsumerWidget {
         return const HarmonyPanel();
       case ActiveTool.places:
         return const PlacesPanel();
+      case ActiveTool.people:
+        return const PeoplePanel();
       case ActiveTool.highlights:
         return const HighlightsPanel();
       case ActiveTool.scratch:

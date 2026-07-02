@@ -4,11 +4,12 @@ import '../data/importer/mybible_verse_parser.dart';
 import '../domain/search/reference_parser.dart';
 import '../domain/search/testament_scope.dart';
 import 'content_providers.dart';
+import 'people_providers.dart';
 import 'user_providers.dart';
 import 'reader_state.dart';
 
 class SearchResult {
-  final String type; // 'verse', 'note', 'commentary', 'dictionary'
+  final String type; // 'verse', 'note', 'commentary', 'dictionary', ...
   final String referenceId;
   final String textContent;
   final String title;
@@ -111,6 +112,13 @@ final globalSearchResultsProvider = FutureProvider<GlobalSearchResults>((
   ref.onDispose(() => sub.cancel());
 
   if (query.trim().isEmpty) return const GlobalSearchResults([]);
+
+  // People are searchable without the People panel having been opened first;
+  // ensureLoaded is a fast no-op after the one-time import. A failure here
+  // (e.g. missing asset in tests) must not take down the whole search.
+  try {
+    await ref.watch(peopleReadyProvider.future);
+  } catch (_) {}
 
   final activeVersions = ref.watch(activeVersionsProvider);
 
@@ -264,7 +272,9 @@ final globalSearchResultsProvider = FutureProvider<GlobalSearchResults>((
       v.chapter as verse_chapter, v.verse as verse_num, b.name as verse_book, b.book_order as verse_book_order,
       ce.book_name as comm_book, ce.chapter as comm_chapter, c.name as comm_name,
       de.word as dict_word, de.definition as dict_def, d.name as dict_name,
-      tp.name as topic_name
+      tp.name as topic_name,
+      bp.display_title as person_title, bp.bio as person_bio,
+      bp.also_called as person_aka, bp.verse_count as person_verse_count
     FROM content_search f
     LEFT JOIN verses v ON f.type = 'verse' AND f.reference_id = v.id
     LEFT JOIN books b ON v.book_id = b.id
@@ -273,6 +283,7 @@ final globalSearchResultsProvider = FutureProvider<GlobalSearchResults>((
     LEFT JOIN dictionary_entries de ON f.type = 'dictionary' AND f.reference_id = de.id
     LEFT JOIN dictionaries d ON de.dictionary_id = d.id
     LEFT JOIN topics tp ON f.type = 'topic' AND f.reference_id = tp.id
+    LEFT JOIN bible_people bp ON f.type = 'person' AND f.reference_id = bp.id
     WHERE content_search MATCH ?$verseFilters
     ORDER BY rank
     LIMIT 100
@@ -359,6 +370,26 @@ final globalSearchResultsProvider = FutureProvider<GlobalSearchResults>((
           textContent: '',
           title: _titleCaseTopic(name),
           sourceName: "Nave's Topical Bible",
+        ),
+      );
+    } else if (type == 'person') {
+      final title = row.readNullable<String>('person_title') ?? text;
+      final aka = row.readNullable<String>('person_aka');
+      final bio = row.readNullable<String>('person_bio');
+      final verseCount = row.readNullable<int>('person_verse_count') ?? 0;
+      final snippet = bio != null
+          ? _snippet(bio)
+          : [
+              if (aka != null) 'Also called $aka',
+              'Mentioned in $verseCount ${verseCount == 1 ? 'verse' : 'verses'}',
+            ].join(' · ');
+      results.add(
+        SearchResult(
+          type: type,
+          referenceId: refId,
+          textContent: snippet,
+          title: title,
+          sourceName: 'People of the Bible',
         ),
       );
     }
@@ -660,6 +691,14 @@ final globalSearchResultsProvider = FutureProvider<GlobalSearchResults>((
 
   return GlobalSearchResults([...uniqueVerses, ...others], scope: scope);
 });
+
+/// The opening of a person's bio, cut at a word boundary, for the result tile.
+String _snippet(String text, [int max = 200]) {
+  final flat = text.replaceAll(RegExp(r'\s+'), ' ').trim();
+  if (flat.length <= max) return flat;
+  final cut = flat.lastIndexOf(' ', max);
+  return '${flat.substring(0, cut > 0 ? cut : max)}…';
+}
 
 /// Nave's topic names are stored upper-cased; display them in title case.
 String _titleCaseTopic(String s) {

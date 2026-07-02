@@ -11,7 +11,9 @@ import 'dictionary_panel.dart';
 import 'commentary_panel.dart';
 import 'notes_panel.dart';
 import 'topics_panel.dart';
+import 'people_panel.dart';
 import '../../app/topic_providers.dart';
+import '../../app/people_providers.dart';
 import '../../app/user_providers.dart';
 import '../sermons/sermon_editor_screen.dart';
 import '../tags/tags_tab_view.dart';
@@ -198,11 +200,12 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
                      .where((r) => r.type == 'dictionary')
                      .toList();
                  final topics = results.where((r) => r.type == 'topic').toList();
+                 final people = results.where((r) => r.type == 'person').toList();
 
                  final combinedVerses = [...navigation, ...verses];
 
                  return DefaultTabController(
-                   length: 8,
+                   length: 9,
                    child: Column(
                      children: [
                        TabBar(
@@ -216,6 +219,7 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
                           Tab(text: 'Comm. (${commentaries.length})'),
                           Tab(text: 'Dict. (${dictionaries.length})'),
                           Tab(text: 'Topics (${topics.length})'),
+                          Tab(text: 'People (${people.length})'),
                         ],
                       ),
                       Expanded(
@@ -229,6 +233,7 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
                             GroupedSearchResultsList(results: commentaries),
                             GroupedSearchResultsList(results: dictionaries),
                             SearchResultsList(results: topics),
+                            SearchResultsList(results: people),
                           ],
                         ),
                       ),
@@ -402,6 +407,27 @@ class SearchResultsList extends ConsumerWidget {
                 );
               } else {
                 ref.read(activeToolProvider.notifier).setTool(ActiveTool.topics);
+              }
+            } else if (item.type == 'person') {
+              ref
+                  .read(selectedPersonProvider.notifier)
+                  .select(int.parse(item.referenceId));
+              if (MediaQuery.sizeOf(context).width <= Breakpoints.compact) {
+                Navigator.of(context).pop();
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  useSafeArea: true,
+                  builder: (context) => DraggableScrollableSheet(
+                    initialChildSize: 0.9,
+                    minChildSize: 0.5,
+                    maxChildSize: 1.0,
+                    expand: false,
+                    builder: (_, scrollController) => const PeoplePanel(),
+                  ),
+                );
+              } else {
+                ref.read(activeToolProvider.notifier).setTool(ActiveTool.people);
               }
             } else if (item.type == 'journal') {
               ref.read(selectedJournalIdProvider.notifier).setId(item.referenceId);

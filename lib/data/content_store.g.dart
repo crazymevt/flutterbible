@@ -5790,6 +5790,2830 @@ class PlaceVersesCompanion extends UpdateCompanion<PlaceVerse> {
   }
 }
 
+class $BiblePeopleTable extends BiblePeople
+    with TableInfo<$BiblePeopleTable, BiblePerson> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BiblePeopleTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _slugMeta = const VerificationMeta('slug');
+  @override
+  late final GeneratedColumn<String> slug = GeneratedColumn<String>(
+    'slug',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _displayTitleMeta = const VerificationMeta(
+    'displayTitle',
+  );
+  @override
+  late final GeneratedColumn<String> displayTitle = GeneratedColumn<String>(
+    'display_title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _genderMeta = const VerificationMeta('gender');
+  @override
+  late final GeneratedColumn<String> gender = GeneratedColumn<String>(
+    'gender',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _alsoCalledMeta = const VerificationMeta(
+    'alsoCalled',
+  );
+  @override
+  late final GeneratedColumn<String> alsoCalled = GeneratedColumn<String>(
+    'also_called',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _birthYearMeta = const VerificationMeta(
+    'birthYear',
+  );
+  @override
+  late final GeneratedColumn<int> birthYear = GeneratedColumn<int>(
+    'birth_year',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _deathYearMeta = const VerificationMeta(
+    'deathYear',
+  );
+  @override
+  late final GeneratedColumn<int> deathYear = GeneratedColumn<int>(
+    'death_year',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _minYearMeta = const VerificationMeta(
+    'minYear',
+  );
+  @override
+  late final GeneratedColumn<int> minYear = GeneratedColumn<int>(
+    'min_year',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _maxYearMeta = const VerificationMeta(
+    'maxYear',
+  );
+  @override
+  late final GeneratedColumn<int> maxYear = GeneratedColumn<int>(
+    'max_year',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _fatherIdMeta = const VerificationMeta(
+    'fatherId',
+  );
+  @override
+  late final GeneratedColumn<int> fatherId = GeneratedColumn<int>(
+    'father_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _motherIdMeta = const VerificationMeta(
+    'motherId',
+  );
+  @override
+  late final GeneratedColumn<int> motherId = GeneratedColumn<int>(
+    'mother_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _bioMeta = const VerificationMeta('bio');
+  @override
+  late final GeneratedColumn<String> bio = GeneratedColumn<String>(
+    'bio',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _verseCountMeta = const VerificationMeta(
+    'verseCount',
+  );
+  @override
+  late final GeneratedColumn<int> verseCount = GeneratedColumn<int>(
+    'verse_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    slug,
+    name,
+    displayTitle,
+    gender,
+    alsoCalled,
+    birthYear,
+    deathYear,
+    minYear,
+    maxYear,
+    fatherId,
+    motherId,
+    bio,
+    verseCount,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'bible_people';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<BiblePerson> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('slug')) {
+      context.handle(
+        _slugMeta,
+        slug.isAcceptableOrUnknown(data['slug']!, _slugMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_slugMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('display_title')) {
+      context.handle(
+        _displayTitleMeta,
+        displayTitle.isAcceptableOrUnknown(
+          data['display_title']!,
+          _displayTitleMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_displayTitleMeta);
+    }
+    if (data.containsKey('gender')) {
+      context.handle(
+        _genderMeta,
+        gender.isAcceptableOrUnknown(data['gender']!, _genderMeta),
+      );
+    }
+    if (data.containsKey('also_called')) {
+      context.handle(
+        _alsoCalledMeta,
+        alsoCalled.isAcceptableOrUnknown(data['also_called']!, _alsoCalledMeta),
+      );
+    }
+    if (data.containsKey('birth_year')) {
+      context.handle(
+        _birthYearMeta,
+        birthYear.isAcceptableOrUnknown(data['birth_year']!, _birthYearMeta),
+      );
+    }
+    if (data.containsKey('death_year')) {
+      context.handle(
+        _deathYearMeta,
+        deathYear.isAcceptableOrUnknown(data['death_year']!, _deathYearMeta),
+      );
+    }
+    if (data.containsKey('min_year')) {
+      context.handle(
+        _minYearMeta,
+        minYear.isAcceptableOrUnknown(data['min_year']!, _minYearMeta),
+      );
+    }
+    if (data.containsKey('max_year')) {
+      context.handle(
+        _maxYearMeta,
+        maxYear.isAcceptableOrUnknown(data['max_year']!, _maxYearMeta),
+      );
+    }
+    if (data.containsKey('father_id')) {
+      context.handle(
+        _fatherIdMeta,
+        fatherId.isAcceptableOrUnknown(data['father_id']!, _fatherIdMeta),
+      );
+    }
+    if (data.containsKey('mother_id')) {
+      context.handle(
+        _motherIdMeta,
+        motherId.isAcceptableOrUnknown(data['mother_id']!, _motherIdMeta),
+      );
+    }
+    if (data.containsKey('bio')) {
+      context.handle(
+        _bioMeta,
+        bio.isAcceptableOrUnknown(data['bio']!, _bioMeta),
+      );
+    }
+    if (data.containsKey('verse_count')) {
+      context.handle(
+        _verseCountMeta,
+        verseCount.isAcceptableOrUnknown(data['verse_count']!, _verseCountMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_verseCountMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  BiblePerson map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return BiblePerson(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      slug: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}slug'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      displayTitle: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}display_title'],
+      )!,
+      gender: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}gender'],
+      ),
+      alsoCalled: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}also_called'],
+      ),
+      birthYear: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}birth_year'],
+      ),
+      deathYear: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}death_year'],
+      ),
+      minYear: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}min_year'],
+      ),
+      maxYear: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}max_year'],
+      ),
+      fatherId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}father_id'],
+      ),
+      motherId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}mother_id'],
+      ),
+      bio: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}bio'],
+      ),
+      verseCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}verse_count'],
+      )!,
+    );
+  }
+
+  @override
+  $BiblePeopleTable createAlias(String alias) {
+    return $BiblePeopleTable(attachedDatabase, alias);
+  }
+}
+
+class BiblePerson extends DataClass implements Insertable<BiblePerson> {
+  final int id;
+  final String slug;
+  final String name;
+
+  /// Name plus a disambiguator where several people share it,
+  /// e.g. "Abiel (Arbathite)".
+  final String displayTitle;
+  final String? gender;
+
+  /// Other names this person goes by, comma-joined ("Ner, Jehiel").
+  final String? alsoCalled;
+  final int? birthYear;
+  final int? deathYear;
+  final int? minYear;
+  final int? maxYear;
+  final int? fatherId;
+  final int? motherId;
+
+  /// Easton's Bible Dictionary entry for this person (plain text), when one
+  /// exists.
+  final String? bio;
+  final int verseCount;
+  const BiblePerson({
+    required this.id,
+    required this.slug,
+    required this.name,
+    required this.displayTitle,
+    this.gender,
+    this.alsoCalled,
+    this.birthYear,
+    this.deathYear,
+    this.minYear,
+    this.maxYear,
+    this.fatherId,
+    this.motherId,
+    this.bio,
+    required this.verseCount,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['slug'] = Variable<String>(slug);
+    map['name'] = Variable<String>(name);
+    map['display_title'] = Variable<String>(displayTitle);
+    if (!nullToAbsent || gender != null) {
+      map['gender'] = Variable<String>(gender);
+    }
+    if (!nullToAbsent || alsoCalled != null) {
+      map['also_called'] = Variable<String>(alsoCalled);
+    }
+    if (!nullToAbsent || birthYear != null) {
+      map['birth_year'] = Variable<int>(birthYear);
+    }
+    if (!nullToAbsent || deathYear != null) {
+      map['death_year'] = Variable<int>(deathYear);
+    }
+    if (!nullToAbsent || minYear != null) {
+      map['min_year'] = Variable<int>(minYear);
+    }
+    if (!nullToAbsent || maxYear != null) {
+      map['max_year'] = Variable<int>(maxYear);
+    }
+    if (!nullToAbsent || fatherId != null) {
+      map['father_id'] = Variable<int>(fatherId);
+    }
+    if (!nullToAbsent || motherId != null) {
+      map['mother_id'] = Variable<int>(motherId);
+    }
+    if (!nullToAbsent || bio != null) {
+      map['bio'] = Variable<String>(bio);
+    }
+    map['verse_count'] = Variable<int>(verseCount);
+    return map;
+  }
+
+  BiblePeopleCompanion toCompanion(bool nullToAbsent) {
+    return BiblePeopleCompanion(
+      id: Value(id),
+      slug: Value(slug),
+      name: Value(name),
+      displayTitle: Value(displayTitle),
+      gender: gender == null && nullToAbsent
+          ? const Value.absent()
+          : Value(gender),
+      alsoCalled: alsoCalled == null && nullToAbsent
+          ? const Value.absent()
+          : Value(alsoCalled),
+      birthYear: birthYear == null && nullToAbsent
+          ? const Value.absent()
+          : Value(birthYear),
+      deathYear: deathYear == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deathYear),
+      minYear: minYear == null && nullToAbsent
+          ? const Value.absent()
+          : Value(minYear),
+      maxYear: maxYear == null && nullToAbsent
+          ? const Value.absent()
+          : Value(maxYear),
+      fatherId: fatherId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(fatherId),
+      motherId: motherId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(motherId),
+      bio: bio == null && nullToAbsent ? const Value.absent() : Value(bio),
+      verseCount: Value(verseCount),
+    );
+  }
+
+  factory BiblePerson.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return BiblePerson(
+      id: serializer.fromJson<int>(json['id']),
+      slug: serializer.fromJson<String>(json['slug']),
+      name: serializer.fromJson<String>(json['name']),
+      displayTitle: serializer.fromJson<String>(json['displayTitle']),
+      gender: serializer.fromJson<String?>(json['gender']),
+      alsoCalled: serializer.fromJson<String?>(json['alsoCalled']),
+      birthYear: serializer.fromJson<int?>(json['birthYear']),
+      deathYear: serializer.fromJson<int?>(json['deathYear']),
+      minYear: serializer.fromJson<int?>(json['minYear']),
+      maxYear: serializer.fromJson<int?>(json['maxYear']),
+      fatherId: serializer.fromJson<int?>(json['fatherId']),
+      motherId: serializer.fromJson<int?>(json['motherId']),
+      bio: serializer.fromJson<String?>(json['bio']),
+      verseCount: serializer.fromJson<int>(json['verseCount']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'slug': serializer.toJson<String>(slug),
+      'name': serializer.toJson<String>(name),
+      'displayTitle': serializer.toJson<String>(displayTitle),
+      'gender': serializer.toJson<String?>(gender),
+      'alsoCalled': serializer.toJson<String?>(alsoCalled),
+      'birthYear': serializer.toJson<int?>(birthYear),
+      'deathYear': serializer.toJson<int?>(deathYear),
+      'minYear': serializer.toJson<int?>(minYear),
+      'maxYear': serializer.toJson<int?>(maxYear),
+      'fatherId': serializer.toJson<int?>(fatherId),
+      'motherId': serializer.toJson<int?>(motherId),
+      'bio': serializer.toJson<String?>(bio),
+      'verseCount': serializer.toJson<int>(verseCount),
+    };
+  }
+
+  BiblePerson copyWith({
+    int? id,
+    String? slug,
+    String? name,
+    String? displayTitle,
+    Value<String?> gender = const Value.absent(),
+    Value<String?> alsoCalled = const Value.absent(),
+    Value<int?> birthYear = const Value.absent(),
+    Value<int?> deathYear = const Value.absent(),
+    Value<int?> minYear = const Value.absent(),
+    Value<int?> maxYear = const Value.absent(),
+    Value<int?> fatherId = const Value.absent(),
+    Value<int?> motherId = const Value.absent(),
+    Value<String?> bio = const Value.absent(),
+    int? verseCount,
+  }) => BiblePerson(
+    id: id ?? this.id,
+    slug: slug ?? this.slug,
+    name: name ?? this.name,
+    displayTitle: displayTitle ?? this.displayTitle,
+    gender: gender.present ? gender.value : this.gender,
+    alsoCalled: alsoCalled.present ? alsoCalled.value : this.alsoCalled,
+    birthYear: birthYear.present ? birthYear.value : this.birthYear,
+    deathYear: deathYear.present ? deathYear.value : this.deathYear,
+    minYear: minYear.present ? minYear.value : this.minYear,
+    maxYear: maxYear.present ? maxYear.value : this.maxYear,
+    fatherId: fatherId.present ? fatherId.value : this.fatherId,
+    motherId: motherId.present ? motherId.value : this.motherId,
+    bio: bio.present ? bio.value : this.bio,
+    verseCount: verseCount ?? this.verseCount,
+  );
+  BiblePerson copyWithCompanion(BiblePeopleCompanion data) {
+    return BiblePerson(
+      id: data.id.present ? data.id.value : this.id,
+      slug: data.slug.present ? data.slug.value : this.slug,
+      name: data.name.present ? data.name.value : this.name,
+      displayTitle: data.displayTitle.present
+          ? data.displayTitle.value
+          : this.displayTitle,
+      gender: data.gender.present ? data.gender.value : this.gender,
+      alsoCalled: data.alsoCalled.present
+          ? data.alsoCalled.value
+          : this.alsoCalled,
+      birthYear: data.birthYear.present ? data.birthYear.value : this.birthYear,
+      deathYear: data.deathYear.present ? data.deathYear.value : this.deathYear,
+      minYear: data.minYear.present ? data.minYear.value : this.minYear,
+      maxYear: data.maxYear.present ? data.maxYear.value : this.maxYear,
+      fatherId: data.fatherId.present ? data.fatherId.value : this.fatherId,
+      motherId: data.motherId.present ? data.motherId.value : this.motherId,
+      bio: data.bio.present ? data.bio.value : this.bio,
+      verseCount: data.verseCount.present
+          ? data.verseCount.value
+          : this.verseCount,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BiblePerson(')
+          ..write('id: $id, ')
+          ..write('slug: $slug, ')
+          ..write('name: $name, ')
+          ..write('displayTitle: $displayTitle, ')
+          ..write('gender: $gender, ')
+          ..write('alsoCalled: $alsoCalled, ')
+          ..write('birthYear: $birthYear, ')
+          ..write('deathYear: $deathYear, ')
+          ..write('minYear: $minYear, ')
+          ..write('maxYear: $maxYear, ')
+          ..write('fatherId: $fatherId, ')
+          ..write('motherId: $motherId, ')
+          ..write('bio: $bio, ')
+          ..write('verseCount: $verseCount')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    slug,
+    name,
+    displayTitle,
+    gender,
+    alsoCalled,
+    birthYear,
+    deathYear,
+    minYear,
+    maxYear,
+    fatherId,
+    motherId,
+    bio,
+    verseCount,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is BiblePerson &&
+          other.id == this.id &&
+          other.slug == this.slug &&
+          other.name == this.name &&
+          other.displayTitle == this.displayTitle &&
+          other.gender == this.gender &&
+          other.alsoCalled == this.alsoCalled &&
+          other.birthYear == this.birthYear &&
+          other.deathYear == this.deathYear &&
+          other.minYear == this.minYear &&
+          other.maxYear == this.maxYear &&
+          other.fatherId == this.fatherId &&
+          other.motherId == this.motherId &&
+          other.bio == this.bio &&
+          other.verseCount == this.verseCount);
+}
+
+class BiblePeopleCompanion extends UpdateCompanion<BiblePerson> {
+  final Value<int> id;
+  final Value<String> slug;
+  final Value<String> name;
+  final Value<String> displayTitle;
+  final Value<String?> gender;
+  final Value<String?> alsoCalled;
+  final Value<int?> birthYear;
+  final Value<int?> deathYear;
+  final Value<int?> minYear;
+  final Value<int?> maxYear;
+  final Value<int?> fatherId;
+  final Value<int?> motherId;
+  final Value<String?> bio;
+  final Value<int> verseCount;
+  const BiblePeopleCompanion({
+    this.id = const Value.absent(),
+    this.slug = const Value.absent(),
+    this.name = const Value.absent(),
+    this.displayTitle = const Value.absent(),
+    this.gender = const Value.absent(),
+    this.alsoCalled = const Value.absent(),
+    this.birthYear = const Value.absent(),
+    this.deathYear = const Value.absent(),
+    this.minYear = const Value.absent(),
+    this.maxYear = const Value.absent(),
+    this.fatherId = const Value.absent(),
+    this.motherId = const Value.absent(),
+    this.bio = const Value.absent(),
+    this.verseCount = const Value.absent(),
+  });
+  BiblePeopleCompanion.insert({
+    this.id = const Value.absent(),
+    required String slug,
+    required String name,
+    required String displayTitle,
+    this.gender = const Value.absent(),
+    this.alsoCalled = const Value.absent(),
+    this.birthYear = const Value.absent(),
+    this.deathYear = const Value.absent(),
+    this.minYear = const Value.absent(),
+    this.maxYear = const Value.absent(),
+    this.fatherId = const Value.absent(),
+    this.motherId = const Value.absent(),
+    this.bio = const Value.absent(),
+    required int verseCount,
+  }) : slug = Value(slug),
+       name = Value(name),
+       displayTitle = Value(displayTitle),
+       verseCount = Value(verseCount);
+  static Insertable<BiblePerson> custom({
+    Expression<int>? id,
+    Expression<String>? slug,
+    Expression<String>? name,
+    Expression<String>? displayTitle,
+    Expression<String>? gender,
+    Expression<String>? alsoCalled,
+    Expression<int>? birthYear,
+    Expression<int>? deathYear,
+    Expression<int>? minYear,
+    Expression<int>? maxYear,
+    Expression<int>? fatherId,
+    Expression<int>? motherId,
+    Expression<String>? bio,
+    Expression<int>? verseCount,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (slug != null) 'slug': slug,
+      if (name != null) 'name': name,
+      if (displayTitle != null) 'display_title': displayTitle,
+      if (gender != null) 'gender': gender,
+      if (alsoCalled != null) 'also_called': alsoCalled,
+      if (birthYear != null) 'birth_year': birthYear,
+      if (deathYear != null) 'death_year': deathYear,
+      if (minYear != null) 'min_year': minYear,
+      if (maxYear != null) 'max_year': maxYear,
+      if (fatherId != null) 'father_id': fatherId,
+      if (motherId != null) 'mother_id': motherId,
+      if (bio != null) 'bio': bio,
+      if (verseCount != null) 'verse_count': verseCount,
+    });
+  }
+
+  BiblePeopleCompanion copyWith({
+    Value<int>? id,
+    Value<String>? slug,
+    Value<String>? name,
+    Value<String>? displayTitle,
+    Value<String?>? gender,
+    Value<String?>? alsoCalled,
+    Value<int?>? birthYear,
+    Value<int?>? deathYear,
+    Value<int?>? minYear,
+    Value<int?>? maxYear,
+    Value<int?>? fatherId,
+    Value<int?>? motherId,
+    Value<String?>? bio,
+    Value<int>? verseCount,
+  }) {
+    return BiblePeopleCompanion(
+      id: id ?? this.id,
+      slug: slug ?? this.slug,
+      name: name ?? this.name,
+      displayTitle: displayTitle ?? this.displayTitle,
+      gender: gender ?? this.gender,
+      alsoCalled: alsoCalled ?? this.alsoCalled,
+      birthYear: birthYear ?? this.birthYear,
+      deathYear: deathYear ?? this.deathYear,
+      minYear: minYear ?? this.minYear,
+      maxYear: maxYear ?? this.maxYear,
+      fatherId: fatherId ?? this.fatherId,
+      motherId: motherId ?? this.motherId,
+      bio: bio ?? this.bio,
+      verseCount: verseCount ?? this.verseCount,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (slug.present) {
+      map['slug'] = Variable<String>(slug.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (displayTitle.present) {
+      map['display_title'] = Variable<String>(displayTitle.value);
+    }
+    if (gender.present) {
+      map['gender'] = Variable<String>(gender.value);
+    }
+    if (alsoCalled.present) {
+      map['also_called'] = Variable<String>(alsoCalled.value);
+    }
+    if (birthYear.present) {
+      map['birth_year'] = Variable<int>(birthYear.value);
+    }
+    if (deathYear.present) {
+      map['death_year'] = Variable<int>(deathYear.value);
+    }
+    if (minYear.present) {
+      map['min_year'] = Variable<int>(minYear.value);
+    }
+    if (maxYear.present) {
+      map['max_year'] = Variable<int>(maxYear.value);
+    }
+    if (fatherId.present) {
+      map['father_id'] = Variable<int>(fatherId.value);
+    }
+    if (motherId.present) {
+      map['mother_id'] = Variable<int>(motherId.value);
+    }
+    if (bio.present) {
+      map['bio'] = Variable<String>(bio.value);
+    }
+    if (verseCount.present) {
+      map['verse_count'] = Variable<int>(verseCount.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BiblePeopleCompanion(')
+          ..write('id: $id, ')
+          ..write('slug: $slug, ')
+          ..write('name: $name, ')
+          ..write('displayTitle: $displayTitle, ')
+          ..write('gender: $gender, ')
+          ..write('alsoCalled: $alsoCalled, ')
+          ..write('birthYear: $birthYear, ')
+          ..write('deathYear: $deathYear, ')
+          ..write('minYear: $minYear, ')
+          ..write('maxYear: $maxYear, ')
+          ..write('fatherId: $fatherId, ')
+          ..write('motherId: $motherId, ')
+          ..write('bio: $bio, ')
+          ..write('verseCount: $verseCount')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PersonPartnersTable extends PersonPartners
+    with TableInfo<$PersonPartnersTable, PersonPartner> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PersonPartnersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _personIdMeta = const VerificationMeta(
+    'personId',
+  );
+  @override
+  late final GeneratedColumn<int> personId = GeneratedColumn<int>(
+    'person_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES bible_people (id)',
+    ),
+  );
+  static const VerificationMeta _partnerIdMeta = const VerificationMeta(
+    'partnerId',
+  );
+  @override
+  late final GeneratedColumn<int> partnerId = GeneratedColumn<int>(
+    'partner_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES bible_people (id)',
+    ),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, personId, partnerId];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'person_partners';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PersonPartner> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('person_id')) {
+      context.handle(
+        _personIdMeta,
+        personId.isAcceptableOrUnknown(data['person_id']!, _personIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_personIdMeta);
+    }
+    if (data.containsKey('partner_id')) {
+      context.handle(
+        _partnerIdMeta,
+        partnerId.isAcceptableOrUnknown(data['partner_id']!, _partnerIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_partnerIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PersonPartner map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PersonPartner(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      personId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}person_id'],
+      )!,
+      partnerId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}partner_id'],
+      )!,
+    );
+  }
+
+  @override
+  $PersonPartnersTable createAlias(String alias) {
+    return $PersonPartnersTable(attachedDatabase, alias);
+  }
+}
+
+class PersonPartner extends DataClass implements Insertable<PersonPartner> {
+  final int id;
+  final int personId;
+  final int partnerId;
+  const PersonPartner({
+    required this.id,
+    required this.personId,
+    required this.partnerId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['person_id'] = Variable<int>(personId);
+    map['partner_id'] = Variable<int>(partnerId);
+    return map;
+  }
+
+  PersonPartnersCompanion toCompanion(bool nullToAbsent) {
+    return PersonPartnersCompanion(
+      id: Value(id),
+      personId: Value(personId),
+      partnerId: Value(partnerId),
+    );
+  }
+
+  factory PersonPartner.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PersonPartner(
+      id: serializer.fromJson<int>(json['id']),
+      personId: serializer.fromJson<int>(json['personId']),
+      partnerId: serializer.fromJson<int>(json['partnerId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'personId': serializer.toJson<int>(personId),
+      'partnerId': serializer.toJson<int>(partnerId),
+    };
+  }
+
+  PersonPartner copyWith({int? id, int? personId, int? partnerId}) =>
+      PersonPartner(
+        id: id ?? this.id,
+        personId: personId ?? this.personId,
+        partnerId: partnerId ?? this.partnerId,
+      );
+  PersonPartner copyWithCompanion(PersonPartnersCompanion data) {
+    return PersonPartner(
+      id: data.id.present ? data.id.value : this.id,
+      personId: data.personId.present ? data.personId.value : this.personId,
+      partnerId: data.partnerId.present ? data.partnerId.value : this.partnerId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PersonPartner(')
+          ..write('id: $id, ')
+          ..write('personId: $personId, ')
+          ..write('partnerId: $partnerId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, personId, partnerId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PersonPartner &&
+          other.id == this.id &&
+          other.personId == this.personId &&
+          other.partnerId == this.partnerId);
+}
+
+class PersonPartnersCompanion extends UpdateCompanion<PersonPartner> {
+  final Value<int> id;
+  final Value<int> personId;
+  final Value<int> partnerId;
+  const PersonPartnersCompanion({
+    this.id = const Value.absent(),
+    this.personId = const Value.absent(),
+    this.partnerId = const Value.absent(),
+  });
+  PersonPartnersCompanion.insert({
+    this.id = const Value.absent(),
+    required int personId,
+    required int partnerId,
+  }) : personId = Value(personId),
+       partnerId = Value(partnerId);
+  static Insertable<PersonPartner> custom({
+    Expression<int>? id,
+    Expression<int>? personId,
+    Expression<int>? partnerId,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (personId != null) 'person_id': personId,
+      if (partnerId != null) 'partner_id': partnerId,
+    });
+  }
+
+  PersonPartnersCompanion copyWith({
+    Value<int>? id,
+    Value<int>? personId,
+    Value<int>? partnerId,
+  }) {
+    return PersonPartnersCompanion(
+      id: id ?? this.id,
+      personId: personId ?? this.personId,
+      partnerId: partnerId ?? this.partnerId,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (personId.present) {
+      map['person_id'] = Variable<int>(personId.value);
+    }
+    if (partnerId.present) {
+      map['partner_id'] = Variable<int>(partnerId.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PersonPartnersCompanion(')
+          ..write('id: $id, ')
+          ..write('personId: $personId, ')
+          ..write('partnerId: $partnerId')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PersonVersesTable extends PersonVerses
+    with TableInfo<$PersonVersesTable, PersonVerse> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PersonVersesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _personIdMeta = const VerificationMeta(
+    'personId',
+  );
+  @override
+  late final GeneratedColumn<int> personId = GeneratedColumn<int>(
+    'person_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES bible_people (id)',
+    ),
+  );
+  static const VerificationMeta _bookNameMeta = const VerificationMeta(
+    'bookName',
+  );
+  @override
+  late final GeneratedColumn<String> bookName = GeneratedColumn<String>(
+    'book_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _chapterMeta = const VerificationMeta(
+    'chapter',
+  );
+  @override
+  late final GeneratedColumn<int> chapter = GeneratedColumn<int>(
+    'chapter',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _verseMeta = const VerificationMeta('verse');
+  @override
+  late final GeneratedColumn<int> verse = GeneratedColumn<int>(
+    'verse',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    personId,
+    bookName,
+    chapter,
+    verse,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'person_verses';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PersonVerse> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('person_id')) {
+      context.handle(
+        _personIdMeta,
+        personId.isAcceptableOrUnknown(data['person_id']!, _personIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_personIdMeta);
+    }
+    if (data.containsKey('book_name')) {
+      context.handle(
+        _bookNameMeta,
+        bookName.isAcceptableOrUnknown(data['book_name']!, _bookNameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_bookNameMeta);
+    }
+    if (data.containsKey('chapter')) {
+      context.handle(
+        _chapterMeta,
+        chapter.isAcceptableOrUnknown(data['chapter']!, _chapterMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_chapterMeta);
+    }
+    if (data.containsKey('verse')) {
+      context.handle(
+        _verseMeta,
+        verse.isAcceptableOrUnknown(data['verse']!, _verseMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_verseMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PersonVerse map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PersonVerse(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      personId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}person_id'],
+      )!,
+      bookName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}book_name'],
+      )!,
+      chapter: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}chapter'],
+      )!,
+      verse: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}verse'],
+      )!,
+    );
+  }
+
+  @override
+  $PersonVersesTable createAlias(String alias) {
+    return $PersonVersesTable(attachedDatabase, alias);
+  }
+}
+
+class PersonVerse extends DataClass implements Insertable<PersonVerse> {
+  final int id;
+  final int personId;
+  final String bookName;
+  final int chapter;
+  final int verse;
+  const PersonVerse({
+    required this.id,
+    required this.personId,
+    required this.bookName,
+    required this.chapter,
+    required this.verse,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['person_id'] = Variable<int>(personId);
+    map['book_name'] = Variable<String>(bookName);
+    map['chapter'] = Variable<int>(chapter);
+    map['verse'] = Variable<int>(verse);
+    return map;
+  }
+
+  PersonVersesCompanion toCompanion(bool nullToAbsent) {
+    return PersonVersesCompanion(
+      id: Value(id),
+      personId: Value(personId),
+      bookName: Value(bookName),
+      chapter: Value(chapter),
+      verse: Value(verse),
+    );
+  }
+
+  factory PersonVerse.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PersonVerse(
+      id: serializer.fromJson<int>(json['id']),
+      personId: serializer.fromJson<int>(json['personId']),
+      bookName: serializer.fromJson<String>(json['bookName']),
+      chapter: serializer.fromJson<int>(json['chapter']),
+      verse: serializer.fromJson<int>(json['verse']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'personId': serializer.toJson<int>(personId),
+      'bookName': serializer.toJson<String>(bookName),
+      'chapter': serializer.toJson<int>(chapter),
+      'verse': serializer.toJson<int>(verse),
+    };
+  }
+
+  PersonVerse copyWith({
+    int? id,
+    int? personId,
+    String? bookName,
+    int? chapter,
+    int? verse,
+  }) => PersonVerse(
+    id: id ?? this.id,
+    personId: personId ?? this.personId,
+    bookName: bookName ?? this.bookName,
+    chapter: chapter ?? this.chapter,
+    verse: verse ?? this.verse,
+  );
+  PersonVerse copyWithCompanion(PersonVersesCompanion data) {
+    return PersonVerse(
+      id: data.id.present ? data.id.value : this.id,
+      personId: data.personId.present ? data.personId.value : this.personId,
+      bookName: data.bookName.present ? data.bookName.value : this.bookName,
+      chapter: data.chapter.present ? data.chapter.value : this.chapter,
+      verse: data.verse.present ? data.verse.value : this.verse,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PersonVerse(')
+          ..write('id: $id, ')
+          ..write('personId: $personId, ')
+          ..write('bookName: $bookName, ')
+          ..write('chapter: $chapter, ')
+          ..write('verse: $verse')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, personId, bookName, chapter, verse);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PersonVerse &&
+          other.id == this.id &&
+          other.personId == this.personId &&
+          other.bookName == this.bookName &&
+          other.chapter == this.chapter &&
+          other.verse == this.verse);
+}
+
+class PersonVersesCompanion extends UpdateCompanion<PersonVerse> {
+  final Value<int> id;
+  final Value<int> personId;
+  final Value<String> bookName;
+  final Value<int> chapter;
+  final Value<int> verse;
+  const PersonVersesCompanion({
+    this.id = const Value.absent(),
+    this.personId = const Value.absent(),
+    this.bookName = const Value.absent(),
+    this.chapter = const Value.absent(),
+    this.verse = const Value.absent(),
+  });
+  PersonVersesCompanion.insert({
+    this.id = const Value.absent(),
+    required int personId,
+    required String bookName,
+    required int chapter,
+    required int verse,
+  }) : personId = Value(personId),
+       bookName = Value(bookName),
+       chapter = Value(chapter),
+       verse = Value(verse);
+  static Insertable<PersonVerse> custom({
+    Expression<int>? id,
+    Expression<int>? personId,
+    Expression<String>? bookName,
+    Expression<int>? chapter,
+    Expression<int>? verse,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (personId != null) 'person_id': personId,
+      if (bookName != null) 'book_name': bookName,
+      if (chapter != null) 'chapter': chapter,
+      if (verse != null) 'verse': verse,
+    });
+  }
+
+  PersonVersesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? personId,
+    Value<String>? bookName,
+    Value<int>? chapter,
+    Value<int>? verse,
+  }) {
+    return PersonVersesCompanion(
+      id: id ?? this.id,
+      personId: personId ?? this.personId,
+      bookName: bookName ?? this.bookName,
+      chapter: chapter ?? this.chapter,
+      verse: verse ?? this.verse,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (personId.present) {
+      map['person_id'] = Variable<int>(personId.value);
+    }
+    if (bookName.present) {
+      map['book_name'] = Variable<String>(bookName.value);
+    }
+    if (chapter.present) {
+      map['chapter'] = Variable<int>(chapter.value);
+    }
+    if (verse.present) {
+      map['verse'] = Variable<int>(verse.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PersonVersesCompanion(')
+          ..write('id: $id, ')
+          ..write('personId: $personId, ')
+          ..write('bookName: $bookName, ')
+          ..write('chapter: $chapter, ')
+          ..write('verse: $verse')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PeopleGroupsTable extends PeopleGroups
+    with TableInfo<$PeopleGroupsTable, PeopleGroup> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PeopleGroupsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, name];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'people_groups';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PeopleGroup> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PeopleGroup map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PeopleGroup(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+    );
+  }
+
+  @override
+  $PeopleGroupsTable createAlias(String alias) {
+    return $PeopleGroupsTable(attachedDatabase, alias);
+  }
+}
+
+class PeopleGroup extends DataClass implements Insertable<PeopleGroup> {
+  final int id;
+  final String name;
+  const PeopleGroup({required this.id, required this.name});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    return map;
+  }
+
+  PeopleGroupsCompanion toCompanion(bool nullToAbsent) {
+    return PeopleGroupsCompanion(id: Value(id), name: Value(name));
+  }
+
+  factory PeopleGroup.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PeopleGroup(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+    };
+  }
+
+  PeopleGroup copyWith({int? id, String? name}) =>
+      PeopleGroup(id: id ?? this.id, name: name ?? this.name);
+  PeopleGroup copyWithCompanion(PeopleGroupsCompanion data) {
+    return PeopleGroup(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PeopleGroup(')
+          ..write('id: $id, ')
+          ..write('name: $name')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PeopleGroup && other.id == this.id && other.name == this.name);
+}
+
+class PeopleGroupsCompanion extends UpdateCompanion<PeopleGroup> {
+  final Value<int> id;
+  final Value<String> name;
+  const PeopleGroupsCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+  });
+  PeopleGroupsCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+  }) : name = Value(name);
+  static Insertable<PeopleGroup> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+    });
+  }
+
+  PeopleGroupsCompanion copyWith({Value<int>? id, Value<String>? name}) {
+    return PeopleGroupsCompanion(id: id ?? this.id, name: name ?? this.name);
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PeopleGroupsCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PeopleGroupMembersTable extends PeopleGroupMembers
+    with TableInfo<$PeopleGroupMembersTable, PeopleGroupMember> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PeopleGroupMembersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _groupIdMeta = const VerificationMeta(
+    'groupId',
+  );
+  @override
+  late final GeneratedColumn<int> groupId = GeneratedColumn<int>(
+    'group_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES people_groups (id)',
+    ),
+  );
+  static const VerificationMeta _personIdMeta = const VerificationMeta(
+    'personId',
+  );
+  @override
+  late final GeneratedColumn<int> personId = GeneratedColumn<int>(
+    'person_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES bible_people (id)',
+    ),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, groupId, personId];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'people_group_members';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PeopleGroupMember> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('group_id')) {
+      context.handle(
+        _groupIdMeta,
+        groupId.isAcceptableOrUnknown(data['group_id']!, _groupIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_groupIdMeta);
+    }
+    if (data.containsKey('person_id')) {
+      context.handle(
+        _personIdMeta,
+        personId.isAcceptableOrUnknown(data['person_id']!, _personIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_personIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PeopleGroupMember map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PeopleGroupMember(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      groupId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}group_id'],
+      )!,
+      personId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}person_id'],
+      )!,
+    );
+  }
+
+  @override
+  $PeopleGroupMembersTable createAlias(String alias) {
+    return $PeopleGroupMembersTable(attachedDatabase, alias);
+  }
+}
+
+class PeopleGroupMember extends DataClass
+    implements Insertable<PeopleGroupMember> {
+  final int id;
+  final int groupId;
+  final int personId;
+  const PeopleGroupMember({
+    required this.id,
+    required this.groupId,
+    required this.personId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['group_id'] = Variable<int>(groupId);
+    map['person_id'] = Variable<int>(personId);
+    return map;
+  }
+
+  PeopleGroupMembersCompanion toCompanion(bool nullToAbsent) {
+    return PeopleGroupMembersCompanion(
+      id: Value(id),
+      groupId: Value(groupId),
+      personId: Value(personId),
+    );
+  }
+
+  factory PeopleGroupMember.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PeopleGroupMember(
+      id: serializer.fromJson<int>(json['id']),
+      groupId: serializer.fromJson<int>(json['groupId']),
+      personId: serializer.fromJson<int>(json['personId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'groupId': serializer.toJson<int>(groupId),
+      'personId': serializer.toJson<int>(personId),
+    };
+  }
+
+  PeopleGroupMember copyWith({int? id, int? groupId, int? personId}) =>
+      PeopleGroupMember(
+        id: id ?? this.id,
+        groupId: groupId ?? this.groupId,
+        personId: personId ?? this.personId,
+      );
+  PeopleGroupMember copyWithCompanion(PeopleGroupMembersCompanion data) {
+    return PeopleGroupMember(
+      id: data.id.present ? data.id.value : this.id,
+      groupId: data.groupId.present ? data.groupId.value : this.groupId,
+      personId: data.personId.present ? data.personId.value : this.personId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PeopleGroupMember(')
+          ..write('id: $id, ')
+          ..write('groupId: $groupId, ')
+          ..write('personId: $personId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, groupId, personId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PeopleGroupMember &&
+          other.id == this.id &&
+          other.groupId == this.groupId &&
+          other.personId == this.personId);
+}
+
+class PeopleGroupMembersCompanion extends UpdateCompanion<PeopleGroupMember> {
+  final Value<int> id;
+  final Value<int> groupId;
+  final Value<int> personId;
+  const PeopleGroupMembersCompanion({
+    this.id = const Value.absent(),
+    this.groupId = const Value.absent(),
+    this.personId = const Value.absent(),
+  });
+  PeopleGroupMembersCompanion.insert({
+    this.id = const Value.absent(),
+    required int groupId,
+    required int personId,
+  }) : groupId = Value(groupId),
+       personId = Value(personId);
+  static Insertable<PeopleGroupMember> custom({
+    Expression<int>? id,
+    Expression<int>? groupId,
+    Expression<int>? personId,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (groupId != null) 'group_id': groupId,
+      if (personId != null) 'person_id': personId,
+    });
+  }
+
+  PeopleGroupMembersCompanion copyWith({
+    Value<int>? id,
+    Value<int>? groupId,
+    Value<int>? personId,
+  }) {
+    return PeopleGroupMembersCompanion(
+      id: id ?? this.id,
+      groupId: groupId ?? this.groupId,
+      personId: personId ?? this.personId,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (groupId.present) {
+      map['group_id'] = Variable<int>(groupId.value);
+    }
+    if (personId.present) {
+      map['person_id'] = Variable<int>(personId.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PeopleGroupMembersCompanion(')
+          ..write('id: $id, ')
+          ..write('groupId: $groupId, ')
+          ..write('personId: $personId')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $TimelineEventsTable extends TimelineEvents
+    with TableInfo<$TimelineEventsTable, TimelineEvent> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TimelineEventsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sortKeyMeta = const VerificationMeta(
+    'sortKey',
+  );
+  @override
+  late final GeneratedColumn<double> sortKey = GeneratedColumn<double>(
+    'sort_key',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _startYearMeta = const VerificationMeta(
+    'startYear',
+  );
+  @override
+  late final GeneratedColumn<int> startYear = GeneratedColumn<int>(
+    'start_year',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, title, sortKey, startYear];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'timeline_events';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<TimelineEvent> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('sort_key')) {
+      context.handle(
+        _sortKeyMeta,
+        sortKey.isAcceptableOrUnknown(data['sort_key']!, _sortKeyMeta),
+      );
+    }
+    if (data.containsKey('start_year')) {
+      context.handle(
+        _startYearMeta,
+        startYear.isAcceptableOrUnknown(data['start_year']!, _startYearMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  TimelineEvent map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return TimelineEvent(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      sortKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}sort_key'],
+      ),
+      startYear: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}start_year'],
+      ),
+    );
+  }
+
+  @override
+  $TimelineEventsTable createAlias(String alias) {
+    return $TimelineEventsTable(attachedDatabase, alias);
+  }
+}
+
+class TimelineEvent extends DataClass implements Insertable<TimelineEvent> {
+  final int id;
+  final String title;
+
+  /// Chronological ordering key from the dataset (roughly the ISO start year
+  /// plus a fractional tiebreak).
+  final double? sortKey;
+
+  /// ISO start year (negative = BC), where known.
+  final int? startYear;
+  const TimelineEvent({
+    required this.id,
+    required this.title,
+    this.sortKey,
+    this.startYear,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['title'] = Variable<String>(title);
+    if (!nullToAbsent || sortKey != null) {
+      map['sort_key'] = Variable<double>(sortKey);
+    }
+    if (!nullToAbsent || startYear != null) {
+      map['start_year'] = Variable<int>(startYear);
+    }
+    return map;
+  }
+
+  TimelineEventsCompanion toCompanion(bool nullToAbsent) {
+    return TimelineEventsCompanion(
+      id: Value(id),
+      title: Value(title),
+      sortKey: sortKey == null && nullToAbsent
+          ? const Value.absent()
+          : Value(sortKey),
+      startYear: startYear == null && nullToAbsent
+          ? const Value.absent()
+          : Value(startYear),
+    );
+  }
+
+  factory TimelineEvent.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return TimelineEvent(
+      id: serializer.fromJson<int>(json['id']),
+      title: serializer.fromJson<String>(json['title']),
+      sortKey: serializer.fromJson<double?>(json['sortKey']),
+      startYear: serializer.fromJson<int?>(json['startYear']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'title': serializer.toJson<String>(title),
+      'sortKey': serializer.toJson<double?>(sortKey),
+      'startYear': serializer.toJson<int?>(startYear),
+    };
+  }
+
+  TimelineEvent copyWith({
+    int? id,
+    String? title,
+    Value<double?> sortKey = const Value.absent(),
+    Value<int?> startYear = const Value.absent(),
+  }) => TimelineEvent(
+    id: id ?? this.id,
+    title: title ?? this.title,
+    sortKey: sortKey.present ? sortKey.value : this.sortKey,
+    startYear: startYear.present ? startYear.value : this.startYear,
+  );
+  TimelineEvent copyWithCompanion(TimelineEventsCompanion data) {
+    return TimelineEvent(
+      id: data.id.present ? data.id.value : this.id,
+      title: data.title.present ? data.title.value : this.title,
+      sortKey: data.sortKey.present ? data.sortKey.value : this.sortKey,
+      startYear: data.startYear.present ? data.startYear.value : this.startYear,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TimelineEvent(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('sortKey: $sortKey, ')
+          ..write('startYear: $startYear')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, title, sortKey, startYear);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TimelineEvent &&
+          other.id == this.id &&
+          other.title == this.title &&
+          other.sortKey == this.sortKey &&
+          other.startYear == this.startYear);
+}
+
+class TimelineEventsCompanion extends UpdateCompanion<TimelineEvent> {
+  final Value<int> id;
+  final Value<String> title;
+  final Value<double?> sortKey;
+  final Value<int?> startYear;
+  const TimelineEventsCompanion({
+    this.id = const Value.absent(),
+    this.title = const Value.absent(),
+    this.sortKey = const Value.absent(),
+    this.startYear = const Value.absent(),
+  });
+  TimelineEventsCompanion.insert({
+    this.id = const Value.absent(),
+    required String title,
+    this.sortKey = const Value.absent(),
+    this.startYear = const Value.absent(),
+  }) : title = Value(title);
+  static Insertable<TimelineEvent> custom({
+    Expression<int>? id,
+    Expression<String>? title,
+    Expression<double>? sortKey,
+    Expression<int>? startYear,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (title != null) 'title': title,
+      if (sortKey != null) 'sort_key': sortKey,
+      if (startYear != null) 'start_year': startYear,
+    });
+  }
+
+  TimelineEventsCompanion copyWith({
+    Value<int>? id,
+    Value<String>? title,
+    Value<double?>? sortKey,
+    Value<int?>? startYear,
+  }) {
+    return TimelineEventsCompanion(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      sortKey: sortKey ?? this.sortKey,
+      startYear: startYear ?? this.startYear,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (sortKey.present) {
+      map['sort_key'] = Variable<double>(sortKey.value);
+    }
+    if (startYear.present) {
+      map['start_year'] = Variable<int>(startYear.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TimelineEventsCompanion(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('sortKey: $sortKey, ')
+          ..write('startYear: $startYear')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $EventParticipantsTable extends EventParticipants
+    with TableInfo<$EventParticipantsTable, EventParticipant> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $EventParticipantsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _eventIdMeta = const VerificationMeta(
+    'eventId',
+  );
+  @override
+  late final GeneratedColumn<int> eventId = GeneratedColumn<int>(
+    'event_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES timeline_events (id)',
+    ),
+  );
+  static const VerificationMeta _personIdMeta = const VerificationMeta(
+    'personId',
+  );
+  @override
+  late final GeneratedColumn<int> personId = GeneratedColumn<int>(
+    'person_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES bible_people (id)',
+    ),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, eventId, personId];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'event_participants';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<EventParticipant> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('event_id')) {
+      context.handle(
+        _eventIdMeta,
+        eventId.isAcceptableOrUnknown(data['event_id']!, _eventIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_eventIdMeta);
+    }
+    if (data.containsKey('person_id')) {
+      context.handle(
+        _personIdMeta,
+        personId.isAcceptableOrUnknown(data['person_id']!, _personIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_personIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  EventParticipant map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return EventParticipant(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      eventId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}event_id'],
+      )!,
+      personId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}person_id'],
+      )!,
+    );
+  }
+
+  @override
+  $EventParticipantsTable createAlias(String alias) {
+    return $EventParticipantsTable(attachedDatabase, alias);
+  }
+}
+
+class EventParticipant extends DataClass
+    implements Insertable<EventParticipant> {
+  final int id;
+  final int eventId;
+  final int personId;
+  const EventParticipant({
+    required this.id,
+    required this.eventId,
+    required this.personId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['event_id'] = Variable<int>(eventId);
+    map['person_id'] = Variable<int>(personId);
+    return map;
+  }
+
+  EventParticipantsCompanion toCompanion(bool nullToAbsent) {
+    return EventParticipantsCompanion(
+      id: Value(id),
+      eventId: Value(eventId),
+      personId: Value(personId),
+    );
+  }
+
+  factory EventParticipant.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return EventParticipant(
+      id: serializer.fromJson<int>(json['id']),
+      eventId: serializer.fromJson<int>(json['eventId']),
+      personId: serializer.fromJson<int>(json['personId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'eventId': serializer.toJson<int>(eventId),
+      'personId': serializer.toJson<int>(personId),
+    };
+  }
+
+  EventParticipant copyWith({int? id, int? eventId, int? personId}) =>
+      EventParticipant(
+        id: id ?? this.id,
+        eventId: eventId ?? this.eventId,
+        personId: personId ?? this.personId,
+      );
+  EventParticipant copyWithCompanion(EventParticipantsCompanion data) {
+    return EventParticipant(
+      id: data.id.present ? data.id.value : this.id,
+      eventId: data.eventId.present ? data.eventId.value : this.eventId,
+      personId: data.personId.present ? data.personId.value : this.personId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EventParticipant(')
+          ..write('id: $id, ')
+          ..write('eventId: $eventId, ')
+          ..write('personId: $personId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, eventId, personId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is EventParticipant &&
+          other.id == this.id &&
+          other.eventId == this.eventId &&
+          other.personId == this.personId);
+}
+
+class EventParticipantsCompanion extends UpdateCompanion<EventParticipant> {
+  final Value<int> id;
+  final Value<int> eventId;
+  final Value<int> personId;
+  const EventParticipantsCompanion({
+    this.id = const Value.absent(),
+    this.eventId = const Value.absent(),
+    this.personId = const Value.absent(),
+  });
+  EventParticipantsCompanion.insert({
+    this.id = const Value.absent(),
+    required int eventId,
+    required int personId,
+  }) : eventId = Value(eventId),
+       personId = Value(personId);
+  static Insertable<EventParticipant> custom({
+    Expression<int>? id,
+    Expression<int>? eventId,
+    Expression<int>? personId,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (eventId != null) 'event_id': eventId,
+      if (personId != null) 'person_id': personId,
+    });
+  }
+
+  EventParticipantsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? eventId,
+    Value<int>? personId,
+  }) {
+    return EventParticipantsCompanion(
+      id: id ?? this.id,
+      eventId: eventId ?? this.eventId,
+      personId: personId ?? this.personId,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (eventId.present) {
+      map['event_id'] = Variable<int>(eventId.value);
+    }
+    if (personId.present) {
+      map['person_id'] = Variable<int>(personId.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EventParticipantsCompanion(')
+          ..write('id: $id, ')
+          ..write('eventId: $eventId, ')
+          ..write('personId: $personId')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $EventVersesTable extends EventVerses
+    with TableInfo<$EventVersesTable, EventVerse> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $EventVersesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _eventIdMeta = const VerificationMeta(
+    'eventId',
+  );
+  @override
+  late final GeneratedColumn<int> eventId = GeneratedColumn<int>(
+    'event_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES timeline_events (id)',
+    ),
+  );
+  static const VerificationMeta _ordMeta = const VerificationMeta('ord');
+  @override
+  late final GeneratedColumn<int> ord = GeneratedColumn<int>(
+    'ord',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _bookNameMeta = const VerificationMeta(
+    'bookName',
+  );
+  @override
+  late final GeneratedColumn<String> bookName = GeneratedColumn<String>(
+    'book_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _chapterMeta = const VerificationMeta(
+    'chapter',
+  );
+  @override
+  late final GeneratedColumn<int> chapter = GeneratedColumn<int>(
+    'chapter',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _verseMeta = const VerificationMeta('verse');
+  @override
+  late final GeneratedColumn<int> verse = GeneratedColumn<int>(
+    'verse',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    eventId,
+    ord,
+    bookName,
+    chapter,
+    verse,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'event_verses';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<EventVerse> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('event_id')) {
+      context.handle(
+        _eventIdMeta,
+        eventId.isAcceptableOrUnknown(data['event_id']!, _eventIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_eventIdMeta);
+    }
+    if (data.containsKey('ord')) {
+      context.handle(
+        _ordMeta,
+        ord.isAcceptableOrUnknown(data['ord']!, _ordMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ordMeta);
+    }
+    if (data.containsKey('book_name')) {
+      context.handle(
+        _bookNameMeta,
+        bookName.isAcceptableOrUnknown(data['book_name']!, _bookNameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_bookNameMeta);
+    }
+    if (data.containsKey('chapter')) {
+      context.handle(
+        _chapterMeta,
+        chapter.isAcceptableOrUnknown(data['chapter']!, _chapterMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_chapterMeta);
+    }
+    if (data.containsKey('verse')) {
+      context.handle(
+        _verseMeta,
+        verse.isAcceptableOrUnknown(data['verse']!, _verseMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_verseMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  EventVerse map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return EventVerse(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      eventId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}event_id'],
+      )!,
+      ord: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ord'],
+      )!,
+      bookName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}book_name'],
+      )!,
+      chapter: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}chapter'],
+      )!,
+      verse: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}verse'],
+      )!,
+    );
+  }
+
+  @override
+  $EventVersesTable createAlias(String alias) {
+    return $EventVersesTable(attachedDatabase, alias);
+  }
+}
+
+class EventVerse extends DataClass implements Insertable<EventVerse> {
+  final int id;
+  final int eventId;
+
+  /// Position within the event's verse list (they're ordered canonically).
+  final int ord;
+  final String bookName;
+  final int chapter;
+  final int verse;
+  const EventVerse({
+    required this.id,
+    required this.eventId,
+    required this.ord,
+    required this.bookName,
+    required this.chapter,
+    required this.verse,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['event_id'] = Variable<int>(eventId);
+    map['ord'] = Variable<int>(ord);
+    map['book_name'] = Variable<String>(bookName);
+    map['chapter'] = Variable<int>(chapter);
+    map['verse'] = Variable<int>(verse);
+    return map;
+  }
+
+  EventVersesCompanion toCompanion(bool nullToAbsent) {
+    return EventVersesCompanion(
+      id: Value(id),
+      eventId: Value(eventId),
+      ord: Value(ord),
+      bookName: Value(bookName),
+      chapter: Value(chapter),
+      verse: Value(verse),
+    );
+  }
+
+  factory EventVerse.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return EventVerse(
+      id: serializer.fromJson<int>(json['id']),
+      eventId: serializer.fromJson<int>(json['eventId']),
+      ord: serializer.fromJson<int>(json['ord']),
+      bookName: serializer.fromJson<String>(json['bookName']),
+      chapter: serializer.fromJson<int>(json['chapter']),
+      verse: serializer.fromJson<int>(json['verse']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'eventId': serializer.toJson<int>(eventId),
+      'ord': serializer.toJson<int>(ord),
+      'bookName': serializer.toJson<String>(bookName),
+      'chapter': serializer.toJson<int>(chapter),
+      'verse': serializer.toJson<int>(verse),
+    };
+  }
+
+  EventVerse copyWith({
+    int? id,
+    int? eventId,
+    int? ord,
+    String? bookName,
+    int? chapter,
+    int? verse,
+  }) => EventVerse(
+    id: id ?? this.id,
+    eventId: eventId ?? this.eventId,
+    ord: ord ?? this.ord,
+    bookName: bookName ?? this.bookName,
+    chapter: chapter ?? this.chapter,
+    verse: verse ?? this.verse,
+  );
+  EventVerse copyWithCompanion(EventVersesCompanion data) {
+    return EventVerse(
+      id: data.id.present ? data.id.value : this.id,
+      eventId: data.eventId.present ? data.eventId.value : this.eventId,
+      ord: data.ord.present ? data.ord.value : this.ord,
+      bookName: data.bookName.present ? data.bookName.value : this.bookName,
+      chapter: data.chapter.present ? data.chapter.value : this.chapter,
+      verse: data.verse.present ? data.verse.value : this.verse,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EventVerse(')
+          ..write('id: $id, ')
+          ..write('eventId: $eventId, ')
+          ..write('ord: $ord, ')
+          ..write('bookName: $bookName, ')
+          ..write('chapter: $chapter, ')
+          ..write('verse: $verse')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, eventId, ord, bookName, chapter, verse);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is EventVerse &&
+          other.id == this.id &&
+          other.eventId == this.eventId &&
+          other.ord == this.ord &&
+          other.bookName == this.bookName &&
+          other.chapter == this.chapter &&
+          other.verse == this.verse);
+}
+
+class EventVersesCompanion extends UpdateCompanion<EventVerse> {
+  final Value<int> id;
+  final Value<int> eventId;
+  final Value<int> ord;
+  final Value<String> bookName;
+  final Value<int> chapter;
+  final Value<int> verse;
+  const EventVersesCompanion({
+    this.id = const Value.absent(),
+    this.eventId = const Value.absent(),
+    this.ord = const Value.absent(),
+    this.bookName = const Value.absent(),
+    this.chapter = const Value.absent(),
+    this.verse = const Value.absent(),
+  });
+  EventVersesCompanion.insert({
+    this.id = const Value.absent(),
+    required int eventId,
+    required int ord,
+    required String bookName,
+    required int chapter,
+    required int verse,
+  }) : eventId = Value(eventId),
+       ord = Value(ord),
+       bookName = Value(bookName),
+       chapter = Value(chapter),
+       verse = Value(verse);
+  static Insertable<EventVerse> custom({
+    Expression<int>? id,
+    Expression<int>? eventId,
+    Expression<int>? ord,
+    Expression<String>? bookName,
+    Expression<int>? chapter,
+    Expression<int>? verse,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (eventId != null) 'event_id': eventId,
+      if (ord != null) 'ord': ord,
+      if (bookName != null) 'book_name': bookName,
+      if (chapter != null) 'chapter': chapter,
+      if (verse != null) 'verse': verse,
+    });
+  }
+
+  EventVersesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? eventId,
+    Value<int>? ord,
+    Value<String>? bookName,
+    Value<int>? chapter,
+    Value<int>? verse,
+  }) {
+    return EventVersesCompanion(
+      id: id ?? this.id,
+      eventId: eventId ?? this.eventId,
+      ord: ord ?? this.ord,
+      bookName: bookName ?? this.bookName,
+      chapter: chapter ?? this.chapter,
+      verse: verse ?? this.verse,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (eventId.present) {
+      map['event_id'] = Variable<int>(eventId.value);
+    }
+    if (ord.present) {
+      map['ord'] = Variable<int>(ord.value);
+    }
+    if (bookName.present) {
+      map['book_name'] = Variable<String>(bookName.value);
+    }
+    if (chapter.present) {
+      map['chapter'] = Variable<int>(chapter.value);
+    }
+    if (verse.present) {
+      map['verse'] = Variable<int>(verse.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EventVersesCompanion(')
+          ..write('id: $id, ')
+          ..write('eventId: $eventId, ')
+          ..write('ord: $ord, ')
+          ..write('bookName: $bookName, ')
+          ..write('chapter: $chapter, ')
+          ..write('verse: $verse')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$ContentStore extends GeneratedDatabase {
   _$ContentStore(QueryExecutor e) : super(e);
   $ContentStoreManager get managers => $ContentStoreManager(this);
@@ -5816,6 +8640,16 @@ abstract class _$ContentStore extends GeneratedDatabase {
   );
   late final $PlacesTable places = $PlacesTable(this);
   late final $PlaceVersesTable placeVerses = $PlaceVersesTable(this);
+  late final $BiblePeopleTable biblePeople = $BiblePeopleTable(this);
+  late final $PersonPartnersTable personPartners = $PersonPartnersTable(this);
+  late final $PersonVersesTable personVerses = $PersonVersesTable(this);
+  late final $PeopleGroupsTable peopleGroups = $PeopleGroupsTable(this);
+  late final $PeopleGroupMembersTable peopleGroupMembers =
+      $PeopleGroupMembersTable(this);
+  late final $TimelineEventsTable timelineEvents = $TimelineEventsTable(this);
+  late final $EventParticipantsTable eventParticipants =
+      $EventParticipantsTable(this);
+  late final $EventVersesTable eventVerses = $EventVersesTable(this);
   late final Index idxTopicRefLocation = Index(
     'idx_topic_ref_location',
     'CREATE INDEX idx_topic_ref_location ON topic_references (book_name, chapter)',
@@ -5823,6 +8657,22 @@ abstract class _$ContentStore extends GeneratedDatabase {
   late final Index idxPlaceVerseLocation = Index(
     'idx_place_verse_location',
     'CREATE INDEX idx_place_verse_location ON place_verses (book_name, chapter)',
+  );
+  late final Index idxPersonVerseLocation = Index(
+    'idx_person_verse_location',
+    'CREATE INDEX idx_person_verse_location ON person_verses (book_name, chapter)',
+  );
+  late final Index idxPersonVersePerson = Index(
+    'idx_person_verse_person',
+    'CREATE INDEX idx_person_verse_person ON person_verses (person_id)',
+  );
+  late final Index idxPeopleGroupMemberPerson = Index(
+    'idx_people_group_member_person',
+    'CREATE INDEX idx_people_group_member_person ON people_group_members (person_id)',
+  );
+  late final Index idxEventParticipantPerson = Index(
+    'idx_event_participant_person',
+    'CREATE INDEX idx_event_participant_person ON event_participants (person_id)',
   );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
@@ -5845,8 +8695,20 @@ abstract class _$ContentStore extends GeneratedDatabase {
     topicReferences,
     places,
     placeVerses,
+    biblePeople,
+    personPartners,
+    personVerses,
+    peopleGroups,
+    peopleGroupMembers,
+    timelineEvents,
+    eventParticipants,
+    eventVerses,
     idxTopicRefLocation,
     idxPlaceVerseLocation,
+    idxPersonVerseLocation,
+    idxPersonVersePerson,
+    idxPeopleGroupMemberPerson,
+    idxEventParticipantPerson,
   ];
 }
 
@@ -11218,6 +14080,3063 @@ typedef $$PlaceVersesTableProcessedTableManager =
       PlaceVerse,
       PrefetchHooks Function({bool placeId})
     >;
+typedef $$BiblePeopleTableCreateCompanionBuilder =
+    BiblePeopleCompanion Function({
+      Value<int> id,
+      required String slug,
+      required String name,
+      required String displayTitle,
+      Value<String?> gender,
+      Value<String?> alsoCalled,
+      Value<int?> birthYear,
+      Value<int?> deathYear,
+      Value<int?> minYear,
+      Value<int?> maxYear,
+      Value<int?> fatherId,
+      Value<int?> motherId,
+      Value<String?> bio,
+      required int verseCount,
+    });
+typedef $$BiblePeopleTableUpdateCompanionBuilder =
+    BiblePeopleCompanion Function({
+      Value<int> id,
+      Value<String> slug,
+      Value<String> name,
+      Value<String> displayTitle,
+      Value<String?> gender,
+      Value<String?> alsoCalled,
+      Value<int?> birthYear,
+      Value<int?> deathYear,
+      Value<int?> minYear,
+      Value<int?> maxYear,
+      Value<int?> fatherId,
+      Value<int?> motherId,
+      Value<String?> bio,
+      Value<int> verseCount,
+    });
+
+final class $$BiblePeopleTableReferences
+    extends BaseReferences<_$ContentStore, $BiblePeopleTable, BiblePerson> {
+  $$BiblePeopleTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$PersonVersesTable, List<PersonVerse>>
+  _personVersesRefsTable(_$ContentStore db) => MultiTypedResultKey.fromTable(
+    db.personVerses,
+    aliasName: 'bible_people__id__person_verses__person_id',
+  );
+
+  $$PersonVersesTableProcessedTableManager get personVersesRefs {
+    final manager = $$PersonVersesTableTableManager(
+      $_db,
+      $_db.personVerses,
+    ).filter((f) => f.personId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_personVersesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$PeopleGroupMembersTable, List<PeopleGroupMember>>
+  _peopleGroupMembersRefsTable(_$ContentStore db) =>
+      MultiTypedResultKey.fromTable(
+        db.peopleGroupMembers,
+        aliasName: 'bible_people__id__people_group_members__person_id',
+      );
+
+  $$PeopleGroupMembersTableProcessedTableManager get peopleGroupMembersRefs {
+    final manager = $$PeopleGroupMembersTableTableManager(
+      $_db,
+      $_db.peopleGroupMembers,
+    ).filter((f) => f.personId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _peopleGroupMembersRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$EventParticipantsTable, List<EventParticipant>>
+  _eventParticipantsRefsTable(_$ContentStore db) =>
+      MultiTypedResultKey.fromTable(
+        db.eventParticipants,
+        aliasName: 'bible_people__id__event_participants__person_id',
+      );
+
+  $$EventParticipantsTableProcessedTableManager get eventParticipantsRefs {
+    final manager = $$EventParticipantsTableTableManager(
+      $_db,
+      $_db.eventParticipants,
+    ).filter((f) => f.personId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _eventParticipantsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$BiblePeopleTableFilterComposer
+    extends Composer<_$ContentStore, $BiblePeopleTable> {
+  $$BiblePeopleTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get slug => $composableBuilder(
+    column: $table.slug,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get displayTitle => $composableBuilder(
+    column: $table.displayTitle,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get gender => $composableBuilder(
+    column: $table.gender,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get alsoCalled => $composableBuilder(
+    column: $table.alsoCalled,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get birthYear => $composableBuilder(
+    column: $table.birthYear,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get deathYear => $composableBuilder(
+    column: $table.deathYear,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get minYear => $composableBuilder(
+    column: $table.minYear,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get maxYear => $composableBuilder(
+    column: $table.maxYear,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get fatherId => $composableBuilder(
+    column: $table.fatherId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get motherId => $composableBuilder(
+    column: $table.motherId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bio => $composableBuilder(
+    column: $table.bio,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get verseCount => $composableBuilder(
+    column: $table.verseCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> personVersesRefs(
+    Expression<bool> Function($$PersonVersesTableFilterComposer f) f,
+  ) {
+    final $$PersonVersesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.personVerses,
+      getReferencedColumn: (t) => t.personId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PersonVersesTableFilterComposer(
+            $db: $db,
+            $table: $db.personVerses,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> peopleGroupMembersRefs(
+    Expression<bool> Function($$PeopleGroupMembersTableFilterComposer f) f,
+  ) {
+    final $$PeopleGroupMembersTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.peopleGroupMembers,
+      getReferencedColumn: (t) => t.personId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PeopleGroupMembersTableFilterComposer(
+            $db: $db,
+            $table: $db.peopleGroupMembers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> eventParticipantsRefs(
+    Expression<bool> Function($$EventParticipantsTableFilterComposer f) f,
+  ) {
+    final $$EventParticipantsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.eventParticipants,
+      getReferencedColumn: (t) => t.personId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EventParticipantsTableFilterComposer(
+            $db: $db,
+            $table: $db.eventParticipants,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$BiblePeopleTableOrderingComposer
+    extends Composer<_$ContentStore, $BiblePeopleTable> {
+  $$BiblePeopleTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get slug => $composableBuilder(
+    column: $table.slug,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get displayTitle => $composableBuilder(
+    column: $table.displayTitle,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get gender => $composableBuilder(
+    column: $table.gender,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get alsoCalled => $composableBuilder(
+    column: $table.alsoCalled,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get birthYear => $composableBuilder(
+    column: $table.birthYear,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get deathYear => $composableBuilder(
+    column: $table.deathYear,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get minYear => $composableBuilder(
+    column: $table.minYear,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get maxYear => $composableBuilder(
+    column: $table.maxYear,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get fatherId => $composableBuilder(
+    column: $table.fatherId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get motherId => $composableBuilder(
+    column: $table.motherId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bio => $composableBuilder(
+    column: $table.bio,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get verseCount => $composableBuilder(
+    column: $table.verseCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$BiblePeopleTableAnnotationComposer
+    extends Composer<_$ContentStore, $BiblePeopleTable> {
+  $$BiblePeopleTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get slug =>
+      $composableBuilder(column: $table.slug, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get displayTitle => $composableBuilder(
+    column: $table.displayTitle,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get gender =>
+      $composableBuilder(column: $table.gender, builder: (column) => column);
+
+  GeneratedColumn<String> get alsoCalled => $composableBuilder(
+    column: $table.alsoCalled,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get birthYear =>
+      $composableBuilder(column: $table.birthYear, builder: (column) => column);
+
+  GeneratedColumn<int> get deathYear =>
+      $composableBuilder(column: $table.deathYear, builder: (column) => column);
+
+  GeneratedColumn<int> get minYear =>
+      $composableBuilder(column: $table.minYear, builder: (column) => column);
+
+  GeneratedColumn<int> get maxYear =>
+      $composableBuilder(column: $table.maxYear, builder: (column) => column);
+
+  GeneratedColumn<int> get fatherId =>
+      $composableBuilder(column: $table.fatherId, builder: (column) => column);
+
+  GeneratedColumn<int> get motherId =>
+      $composableBuilder(column: $table.motherId, builder: (column) => column);
+
+  GeneratedColumn<String> get bio =>
+      $composableBuilder(column: $table.bio, builder: (column) => column);
+
+  GeneratedColumn<int> get verseCount => $composableBuilder(
+    column: $table.verseCount,
+    builder: (column) => column,
+  );
+
+  Expression<T> personVersesRefs<T extends Object>(
+    Expression<T> Function($$PersonVersesTableAnnotationComposer a) f,
+  ) {
+    final $$PersonVersesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.personVerses,
+      getReferencedColumn: (t) => t.personId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PersonVersesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.personVerses,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> peopleGroupMembersRefs<T extends Object>(
+    Expression<T> Function($$PeopleGroupMembersTableAnnotationComposer a) f,
+  ) {
+    final $$PeopleGroupMembersTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.peopleGroupMembers,
+          getReferencedColumn: (t) => t.personId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$PeopleGroupMembersTableAnnotationComposer(
+                $db: $db,
+                $table: $db.peopleGroupMembers,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> eventParticipantsRefs<T extends Object>(
+    Expression<T> Function($$EventParticipantsTableAnnotationComposer a) f,
+  ) {
+    final $$EventParticipantsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.eventParticipants,
+          getReferencedColumn: (t) => t.personId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EventParticipantsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.eventParticipants,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$BiblePeopleTableTableManager
+    extends
+        RootTableManager<
+          _$ContentStore,
+          $BiblePeopleTable,
+          BiblePerson,
+          $$BiblePeopleTableFilterComposer,
+          $$BiblePeopleTableOrderingComposer,
+          $$BiblePeopleTableAnnotationComposer,
+          $$BiblePeopleTableCreateCompanionBuilder,
+          $$BiblePeopleTableUpdateCompanionBuilder,
+          (BiblePerson, $$BiblePeopleTableReferences),
+          BiblePerson,
+          PrefetchHooks Function({
+            bool personVersesRefs,
+            bool peopleGroupMembersRefs,
+            bool eventParticipantsRefs,
+          })
+        > {
+  $$BiblePeopleTableTableManager(_$ContentStore db, $BiblePeopleTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$BiblePeopleTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$BiblePeopleTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$BiblePeopleTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> slug = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> displayTitle = const Value.absent(),
+                Value<String?> gender = const Value.absent(),
+                Value<String?> alsoCalled = const Value.absent(),
+                Value<int?> birthYear = const Value.absent(),
+                Value<int?> deathYear = const Value.absent(),
+                Value<int?> minYear = const Value.absent(),
+                Value<int?> maxYear = const Value.absent(),
+                Value<int?> fatherId = const Value.absent(),
+                Value<int?> motherId = const Value.absent(),
+                Value<String?> bio = const Value.absent(),
+                Value<int> verseCount = const Value.absent(),
+              }) => BiblePeopleCompanion(
+                id: id,
+                slug: slug,
+                name: name,
+                displayTitle: displayTitle,
+                gender: gender,
+                alsoCalled: alsoCalled,
+                birthYear: birthYear,
+                deathYear: deathYear,
+                minYear: minYear,
+                maxYear: maxYear,
+                fatherId: fatherId,
+                motherId: motherId,
+                bio: bio,
+                verseCount: verseCount,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String slug,
+                required String name,
+                required String displayTitle,
+                Value<String?> gender = const Value.absent(),
+                Value<String?> alsoCalled = const Value.absent(),
+                Value<int?> birthYear = const Value.absent(),
+                Value<int?> deathYear = const Value.absent(),
+                Value<int?> minYear = const Value.absent(),
+                Value<int?> maxYear = const Value.absent(),
+                Value<int?> fatherId = const Value.absent(),
+                Value<int?> motherId = const Value.absent(),
+                Value<String?> bio = const Value.absent(),
+                required int verseCount,
+              }) => BiblePeopleCompanion.insert(
+                id: id,
+                slug: slug,
+                name: name,
+                displayTitle: displayTitle,
+                gender: gender,
+                alsoCalled: alsoCalled,
+                birthYear: birthYear,
+                deathYear: deathYear,
+                minYear: minYear,
+                maxYear: maxYear,
+                fatherId: fatherId,
+                motherId: motherId,
+                bio: bio,
+                verseCount: verseCount,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$BiblePeopleTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                personVersesRefs = false,
+                peopleGroupMembersRefs = false,
+                eventParticipantsRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (personVersesRefs) db.personVerses,
+                    if (peopleGroupMembersRefs) db.peopleGroupMembers,
+                    if (eventParticipantsRefs) db.eventParticipants,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (personVersesRefs)
+                        await $_getPrefetchedData<
+                          BiblePerson,
+                          $BiblePeopleTable,
+                          PersonVerse
+                        >(
+                          currentTable: table,
+                          referencedTable: $$BiblePeopleTableReferences
+                              ._personVersesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$BiblePeopleTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).personVersesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.personId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (peopleGroupMembersRefs)
+                        await $_getPrefetchedData<
+                          BiblePerson,
+                          $BiblePeopleTable,
+                          PeopleGroupMember
+                        >(
+                          currentTable: table,
+                          referencedTable: $$BiblePeopleTableReferences
+                              ._peopleGroupMembersRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$BiblePeopleTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).peopleGroupMembersRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.personId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (eventParticipantsRefs)
+                        await $_getPrefetchedData<
+                          BiblePerson,
+                          $BiblePeopleTable,
+                          EventParticipant
+                        >(
+                          currentTable: table,
+                          referencedTable: $$BiblePeopleTableReferences
+                              ._eventParticipantsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$BiblePeopleTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).eventParticipantsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.personId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$BiblePeopleTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ContentStore,
+      $BiblePeopleTable,
+      BiblePerson,
+      $$BiblePeopleTableFilterComposer,
+      $$BiblePeopleTableOrderingComposer,
+      $$BiblePeopleTableAnnotationComposer,
+      $$BiblePeopleTableCreateCompanionBuilder,
+      $$BiblePeopleTableUpdateCompanionBuilder,
+      (BiblePerson, $$BiblePeopleTableReferences),
+      BiblePerson,
+      PrefetchHooks Function({
+        bool personVersesRefs,
+        bool peopleGroupMembersRefs,
+        bool eventParticipantsRefs,
+      })
+    >;
+typedef $$PersonPartnersTableCreateCompanionBuilder =
+    PersonPartnersCompanion Function({
+      Value<int> id,
+      required int personId,
+      required int partnerId,
+    });
+typedef $$PersonPartnersTableUpdateCompanionBuilder =
+    PersonPartnersCompanion Function({
+      Value<int> id,
+      Value<int> personId,
+      Value<int> partnerId,
+    });
+
+final class $$PersonPartnersTableReferences
+    extends
+        BaseReferences<_$ContentStore, $PersonPartnersTable, PersonPartner> {
+  $$PersonPartnersTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $BiblePeopleTable _personIdTable(_$ContentStore db) => db.biblePeople
+      .createAlias('person_partners__person_id__bible_people__id');
+
+  $$BiblePeopleTableProcessedTableManager get personId {
+    final $_column = $_itemColumn<int>('person_id')!;
+
+    final manager = $$BiblePeopleTableTableManager(
+      $_db,
+      $_db.biblePeople,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_personIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $BiblePeopleTable _partnerIdTable(_$ContentStore db) => db.biblePeople
+      .createAlias('person_partners__partner_id__bible_people__id');
+
+  $$BiblePeopleTableProcessedTableManager get partnerId {
+    final $_column = $_itemColumn<int>('partner_id')!;
+
+    final manager = $$BiblePeopleTableTableManager(
+      $_db,
+      $_db.biblePeople,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_partnerIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$PersonPartnersTableFilterComposer
+    extends Composer<_$ContentStore, $PersonPartnersTable> {
+  $$PersonPartnersTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$BiblePeopleTableFilterComposer get personId {
+    final $$BiblePeopleTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personId,
+      referencedTable: $db.biblePeople,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BiblePeopleTableFilterComposer(
+            $db: $db,
+            $table: $db.biblePeople,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$BiblePeopleTableFilterComposer get partnerId {
+    final $$BiblePeopleTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.partnerId,
+      referencedTable: $db.biblePeople,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BiblePeopleTableFilterComposer(
+            $db: $db,
+            $table: $db.biblePeople,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PersonPartnersTableOrderingComposer
+    extends Composer<_$ContentStore, $PersonPartnersTable> {
+  $$PersonPartnersTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$BiblePeopleTableOrderingComposer get personId {
+    final $$BiblePeopleTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personId,
+      referencedTable: $db.biblePeople,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BiblePeopleTableOrderingComposer(
+            $db: $db,
+            $table: $db.biblePeople,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$BiblePeopleTableOrderingComposer get partnerId {
+    final $$BiblePeopleTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.partnerId,
+      referencedTable: $db.biblePeople,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BiblePeopleTableOrderingComposer(
+            $db: $db,
+            $table: $db.biblePeople,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PersonPartnersTableAnnotationComposer
+    extends Composer<_$ContentStore, $PersonPartnersTable> {
+  $$PersonPartnersTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  $$BiblePeopleTableAnnotationComposer get personId {
+    final $$BiblePeopleTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personId,
+      referencedTable: $db.biblePeople,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BiblePeopleTableAnnotationComposer(
+            $db: $db,
+            $table: $db.biblePeople,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$BiblePeopleTableAnnotationComposer get partnerId {
+    final $$BiblePeopleTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.partnerId,
+      referencedTable: $db.biblePeople,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BiblePeopleTableAnnotationComposer(
+            $db: $db,
+            $table: $db.biblePeople,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PersonPartnersTableTableManager
+    extends
+        RootTableManager<
+          _$ContentStore,
+          $PersonPartnersTable,
+          PersonPartner,
+          $$PersonPartnersTableFilterComposer,
+          $$PersonPartnersTableOrderingComposer,
+          $$PersonPartnersTableAnnotationComposer,
+          $$PersonPartnersTableCreateCompanionBuilder,
+          $$PersonPartnersTableUpdateCompanionBuilder,
+          (PersonPartner, $$PersonPartnersTableReferences),
+          PersonPartner,
+          PrefetchHooks Function({bool personId, bool partnerId})
+        > {
+  $$PersonPartnersTableTableManager(
+    _$ContentStore db,
+    $PersonPartnersTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PersonPartnersTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PersonPartnersTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PersonPartnersTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> personId = const Value.absent(),
+                Value<int> partnerId = const Value.absent(),
+              }) => PersonPartnersCompanion(
+                id: id,
+                personId: personId,
+                partnerId: partnerId,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int personId,
+                required int partnerId,
+              }) => PersonPartnersCompanion.insert(
+                id: id,
+                personId: personId,
+                partnerId: partnerId,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$PersonPartnersTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({personId = false, partnerId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (personId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.personId,
+                                referencedTable: $$PersonPartnersTableReferences
+                                    ._personIdTable(db),
+                                referencedColumn:
+                                    $$PersonPartnersTableReferences
+                                        ._personIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+                    if (partnerId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.partnerId,
+                                referencedTable: $$PersonPartnersTableReferences
+                                    ._partnerIdTable(db),
+                                referencedColumn:
+                                    $$PersonPartnersTableReferences
+                                        ._partnerIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$PersonPartnersTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ContentStore,
+      $PersonPartnersTable,
+      PersonPartner,
+      $$PersonPartnersTableFilterComposer,
+      $$PersonPartnersTableOrderingComposer,
+      $$PersonPartnersTableAnnotationComposer,
+      $$PersonPartnersTableCreateCompanionBuilder,
+      $$PersonPartnersTableUpdateCompanionBuilder,
+      (PersonPartner, $$PersonPartnersTableReferences),
+      PersonPartner,
+      PrefetchHooks Function({bool personId, bool partnerId})
+    >;
+typedef $$PersonVersesTableCreateCompanionBuilder =
+    PersonVersesCompanion Function({
+      Value<int> id,
+      required int personId,
+      required String bookName,
+      required int chapter,
+      required int verse,
+    });
+typedef $$PersonVersesTableUpdateCompanionBuilder =
+    PersonVersesCompanion Function({
+      Value<int> id,
+      Value<int> personId,
+      Value<String> bookName,
+      Value<int> chapter,
+      Value<int> verse,
+    });
+
+final class $$PersonVersesTableReferences
+    extends BaseReferences<_$ContentStore, $PersonVersesTable, PersonVerse> {
+  $$PersonVersesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $BiblePeopleTable _personIdTable(_$ContentStore db) =>
+      db.biblePeople.createAlias('person_verses__person_id__bible_people__id');
+
+  $$BiblePeopleTableProcessedTableManager get personId {
+    final $_column = $_itemColumn<int>('person_id')!;
+
+    final manager = $$BiblePeopleTableTableManager(
+      $_db,
+      $_db.biblePeople,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_personIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$PersonVersesTableFilterComposer
+    extends Composer<_$ContentStore, $PersonVersesTable> {
+  $$PersonVersesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bookName => $composableBuilder(
+    column: $table.bookName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get chapter => $composableBuilder(
+    column: $table.chapter,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get verse => $composableBuilder(
+    column: $table.verse,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$BiblePeopleTableFilterComposer get personId {
+    final $$BiblePeopleTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personId,
+      referencedTable: $db.biblePeople,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BiblePeopleTableFilterComposer(
+            $db: $db,
+            $table: $db.biblePeople,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PersonVersesTableOrderingComposer
+    extends Composer<_$ContentStore, $PersonVersesTable> {
+  $$PersonVersesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bookName => $composableBuilder(
+    column: $table.bookName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get chapter => $composableBuilder(
+    column: $table.chapter,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get verse => $composableBuilder(
+    column: $table.verse,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$BiblePeopleTableOrderingComposer get personId {
+    final $$BiblePeopleTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personId,
+      referencedTable: $db.biblePeople,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BiblePeopleTableOrderingComposer(
+            $db: $db,
+            $table: $db.biblePeople,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PersonVersesTableAnnotationComposer
+    extends Composer<_$ContentStore, $PersonVersesTable> {
+  $$PersonVersesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get bookName =>
+      $composableBuilder(column: $table.bookName, builder: (column) => column);
+
+  GeneratedColumn<int> get chapter =>
+      $composableBuilder(column: $table.chapter, builder: (column) => column);
+
+  GeneratedColumn<int> get verse =>
+      $composableBuilder(column: $table.verse, builder: (column) => column);
+
+  $$BiblePeopleTableAnnotationComposer get personId {
+    final $$BiblePeopleTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personId,
+      referencedTable: $db.biblePeople,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BiblePeopleTableAnnotationComposer(
+            $db: $db,
+            $table: $db.biblePeople,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PersonVersesTableTableManager
+    extends
+        RootTableManager<
+          _$ContentStore,
+          $PersonVersesTable,
+          PersonVerse,
+          $$PersonVersesTableFilterComposer,
+          $$PersonVersesTableOrderingComposer,
+          $$PersonVersesTableAnnotationComposer,
+          $$PersonVersesTableCreateCompanionBuilder,
+          $$PersonVersesTableUpdateCompanionBuilder,
+          (PersonVerse, $$PersonVersesTableReferences),
+          PersonVerse,
+          PrefetchHooks Function({bool personId})
+        > {
+  $$PersonVersesTableTableManager(_$ContentStore db, $PersonVersesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PersonVersesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PersonVersesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PersonVersesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> personId = const Value.absent(),
+                Value<String> bookName = const Value.absent(),
+                Value<int> chapter = const Value.absent(),
+                Value<int> verse = const Value.absent(),
+              }) => PersonVersesCompanion(
+                id: id,
+                personId: personId,
+                bookName: bookName,
+                chapter: chapter,
+                verse: verse,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int personId,
+                required String bookName,
+                required int chapter,
+                required int verse,
+              }) => PersonVersesCompanion.insert(
+                id: id,
+                personId: personId,
+                bookName: bookName,
+                chapter: chapter,
+                verse: verse,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$PersonVersesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({personId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (personId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.personId,
+                                referencedTable: $$PersonVersesTableReferences
+                                    ._personIdTable(db),
+                                referencedColumn: $$PersonVersesTableReferences
+                                    ._personIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$PersonVersesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ContentStore,
+      $PersonVersesTable,
+      PersonVerse,
+      $$PersonVersesTableFilterComposer,
+      $$PersonVersesTableOrderingComposer,
+      $$PersonVersesTableAnnotationComposer,
+      $$PersonVersesTableCreateCompanionBuilder,
+      $$PersonVersesTableUpdateCompanionBuilder,
+      (PersonVerse, $$PersonVersesTableReferences),
+      PersonVerse,
+      PrefetchHooks Function({bool personId})
+    >;
+typedef $$PeopleGroupsTableCreateCompanionBuilder =
+    PeopleGroupsCompanion Function({Value<int> id, required String name});
+typedef $$PeopleGroupsTableUpdateCompanionBuilder =
+    PeopleGroupsCompanion Function({Value<int> id, Value<String> name});
+
+final class $$PeopleGroupsTableReferences
+    extends BaseReferences<_$ContentStore, $PeopleGroupsTable, PeopleGroup> {
+  $$PeopleGroupsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$PeopleGroupMembersTable, List<PeopleGroupMember>>
+  _peopleGroupMembersRefsTable(_$ContentStore db) =>
+      MultiTypedResultKey.fromTable(
+        db.peopleGroupMembers,
+        aliasName: 'people_groups__id__people_group_members__group_id',
+      );
+
+  $$PeopleGroupMembersTableProcessedTableManager get peopleGroupMembersRefs {
+    final manager = $$PeopleGroupMembersTableTableManager(
+      $_db,
+      $_db.peopleGroupMembers,
+    ).filter((f) => f.groupId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _peopleGroupMembersRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$PeopleGroupsTableFilterComposer
+    extends Composer<_$ContentStore, $PeopleGroupsTable> {
+  $$PeopleGroupsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> peopleGroupMembersRefs(
+    Expression<bool> Function($$PeopleGroupMembersTableFilterComposer f) f,
+  ) {
+    final $$PeopleGroupMembersTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.peopleGroupMembers,
+      getReferencedColumn: (t) => t.groupId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PeopleGroupMembersTableFilterComposer(
+            $db: $db,
+            $table: $db.peopleGroupMembers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$PeopleGroupsTableOrderingComposer
+    extends Composer<_$ContentStore, $PeopleGroupsTable> {
+  $$PeopleGroupsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PeopleGroupsTableAnnotationComposer
+    extends Composer<_$ContentStore, $PeopleGroupsTable> {
+  $$PeopleGroupsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  Expression<T> peopleGroupMembersRefs<T extends Object>(
+    Expression<T> Function($$PeopleGroupMembersTableAnnotationComposer a) f,
+  ) {
+    final $$PeopleGroupMembersTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.peopleGroupMembers,
+          getReferencedColumn: (t) => t.groupId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$PeopleGroupMembersTableAnnotationComposer(
+                $db: $db,
+                $table: $db.peopleGroupMembers,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$PeopleGroupsTableTableManager
+    extends
+        RootTableManager<
+          _$ContentStore,
+          $PeopleGroupsTable,
+          PeopleGroup,
+          $$PeopleGroupsTableFilterComposer,
+          $$PeopleGroupsTableOrderingComposer,
+          $$PeopleGroupsTableAnnotationComposer,
+          $$PeopleGroupsTableCreateCompanionBuilder,
+          $$PeopleGroupsTableUpdateCompanionBuilder,
+          (PeopleGroup, $$PeopleGroupsTableReferences),
+          PeopleGroup,
+          PrefetchHooks Function({bool peopleGroupMembersRefs})
+        > {
+  $$PeopleGroupsTableTableManager(_$ContentStore db, $PeopleGroupsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PeopleGroupsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PeopleGroupsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PeopleGroupsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+              }) => PeopleGroupsCompanion(id: id, name: name),
+          createCompanionCallback:
+              ({Value<int> id = const Value.absent(), required String name}) =>
+                  PeopleGroupsCompanion.insert(id: id, name: name),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$PeopleGroupsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({peopleGroupMembersRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (peopleGroupMembersRefs) db.peopleGroupMembers,
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (peopleGroupMembersRefs)
+                    await $_getPrefetchedData<
+                      PeopleGroup,
+                      $PeopleGroupsTable,
+                      PeopleGroupMember
+                    >(
+                      currentTable: table,
+                      referencedTable: $$PeopleGroupsTableReferences
+                          ._peopleGroupMembersRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$PeopleGroupsTableReferences(
+                            db,
+                            table,
+                            p0,
+                          ).peopleGroupMembersRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where((e) => e.groupId == item.id),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$PeopleGroupsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ContentStore,
+      $PeopleGroupsTable,
+      PeopleGroup,
+      $$PeopleGroupsTableFilterComposer,
+      $$PeopleGroupsTableOrderingComposer,
+      $$PeopleGroupsTableAnnotationComposer,
+      $$PeopleGroupsTableCreateCompanionBuilder,
+      $$PeopleGroupsTableUpdateCompanionBuilder,
+      (PeopleGroup, $$PeopleGroupsTableReferences),
+      PeopleGroup,
+      PrefetchHooks Function({bool peopleGroupMembersRefs})
+    >;
+typedef $$PeopleGroupMembersTableCreateCompanionBuilder =
+    PeopleGroupMembersCompanion Function({
+      Value<int> id,
+      required int groupId,
+      required int personId,
+    });
+typedef $$PeopleGroupMembersTableUpdateCompanionBuilder =
+    PeopleGroupMembersCompanion Function({
+      Value<int> id,
+      Value<int> groupId,
+      Value<int> personId,
+    });
+
+final class $$PeopleGroupMembersTableReferences
+    extends
+        BaseReferences<
+          _$ContentStore,
+          $PeopleGroupMembersTable,
+          PeopleGroupMember
+        > {
+  $$PeopleGroupMembersTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $PeopleGroupsTable _groupIdTable(_$ContentStore db) => db.peopleGroups
+      .createAlias('people_group_members__group_id__people_groups__id');
+
+  $$PeopleGroupsTableProcessedTableManager get groupId {
+    final $_column = $_itemColumn<int>('group_id')!;
+
+    final manager = $$PeopleGroupsTableTableManager(
+      $_db,
+      $_db.peopleGroups,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_groupIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $BiblePeopleTable _personIdTable(_$ContentStore db) => db.biblePeople
+      .createAlias('people_group_members__person_id__bible_people__id');
+
+  $$BiblePeopleTableProcessedTableManager get personId {
+    final $_column = $_itemColumn<int>('person_id')!;
+
+    final manager = $$BiblePeopleTableTableManager(
+      $_db,
+      $_db.biblePeople,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_personIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$PeopleGroupMembersTableFilterComposer
+    extends Composer<_$ContentStore, $PeopleGroupMembersTable> {
+  $$PeopleGroupMembersTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$PeopleGroupsTableFilterComposer get groupId {
+    final $$PeopleGroupsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.groupId,
+      referencedTable: $db.peopleGroups,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PeopleGroupsTableFilterComposer(
+            $db: $db,
+            $table: $db.peopleGroups,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$BiblePeopleTableFilterComposer get personId {
+    final $$BiblePeopleTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personId,
+      referencedTable: $db.biblePeople,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BiblePeopleTableFilterComposer(
+            $db: $db,
+            $table: $db.biblePeople,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PeopleGroupMembersTableOrderingComposer
+    extends Composer<_$ContentStore, $PeopleGroupMembersTable> {
+  $$PeopleGroupMembersTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$PeopleGroupsTableOrderingComposer get groupId {
+    final $$PeopleGroupsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.groupId,
+      referencedTable: $db.peopleGroups,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PeopleGroupsTableOrderingComposer(
+            $db: $db,
+            $table: $db.peopleGroups,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$BiblePeopleTableOrderingComposer get personId {
+    final $$BiblePeopleTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personId,
+      referencedTable: $db.biblePeople,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BiblePeopleTableOrderingComposer(
+            $db: $db,
+            $table: $db.biblePeople,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PeopleGroupMembersTableAnnotationComposer
+    extends Composer<_$ContentStore, $PeopleGroupMembersTable> {
+  $$PeopleGroupMembersTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  $$PeopleGroupsTableAnnotationComposer get groupId {
+    final $$PeopleGroupsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.groupId,
+      referencedTable: $db.peopleGroups,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PeopleGroupsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.peopleGroups,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$BiblePeopleTableAnnotationComposer get personId {
+    final $$BiblePeopleTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personId,
+      referencedTable: $db.biblePeople,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BiblePeopleTableAnnotationComposer(
+            $db: $db,
+            $table: $db.biblePeople,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PeopleGroupMembersTableTableManager
+    extends
+        RootTableManager<
+          _$ContentStore,
+          $PeopleGroupMembersTable,
+          PeopleGroupMember,
+          $$PeopleGroupMembersTableFilterComposer,
+          $$PeopleGroupMembersTableOrderingComposer,
+          $$PeopleGroupMembersTableAnnotationComposer,
+          $$PeopleGroupMembersTableCreateCompanionBuilder,
+          $$PeopleGroupMembersTableUpdateCompanionBuilder,
+          (PeopleGroupMember, $$PeopleGroupMembersTableReferences),
+          PeopleGroupMember,
+          PrefetchHooks Function({bool groupId, bool personId})
+        > {
+  $$PeopleGroupMembersTableTableManager(
+    _$ContentStore db,
+    $PeopleGroupMembersTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PeopleGroupMembersTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PeopleGroupMembersTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PeopleGroupMembersTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> groupId = const Value.absent(),
+                Value<int> personId = const Value.absent(),
+              }) => PeopleGroupMembersCompanion(
+                id: id,
+                groupId: groupId,
+                personId: personId,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int groupId,
+                required int personId,
+              }) => PeopleGroupMembersCompanion.insert(
+                id: id,
+                groupId: groupId,
+                personId: personId,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$PeopleGroupMembersTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({groupId = false, personId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (groupId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.groupId,
+                                referencedTable:
+                                    $$PeopleGroupMembersTableReferences
+                                        ._groupIdTable(db),
+                                referencedColumn:
+                                    $$PeopleGroupMembersTableReferences
+                                        ._groupIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+                    if (personId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.personId,
+                                referencedTable:
+                                    $$PeopleGroupMembersTableReferences
+                                        ._personIdTable(db),
+                                referencedColumn:
+                                    $$PeopleGroupMembersTableReferences
+                                        ._personIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$PeopleGroupMembersTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ContentStore,
+      $PeopleGroupMembersTable,
+      PeopleGroupMember,
+      $$PeopleGroupMembersTableFilterComposer,
+      $$PeopleGroupMembersTableOrderingComposer,
+      $$PeopleGroupMembersTableAnnotationComposer,
+      $$PeopleGroupMembersTableCreateCompanionBuilder,
+      $$PeopleGroupMembersTableUpdateCompanionBuilder,
+      (PeopleGroupMember, $$PeopleGroupMembersTableReferences),
+      PeopleGroupMember,
+      PrefetchHooks Function({bool groupId, bool personId})
+    >;
+typedef $$TimelineEventsTableCreateCompanionBuilder =
+    TimelineEventsCompanion Function({
+      Value<int> id,
+      required String title,
+      Value<double?> sortKey,
+      Value<int?> startYear,
+    });
+typedef $$TimelineEventsTableUpdateCompanionBuilder =
+    TimelineEventsCompanion Function({
+      Value<int> id,
+      Value<String> title,
+      Value<double?> sortKey,
+      Value<int?> startYear,
+    });
+
+final class $$TimelineEventsTableReferences
+    extends
+        BaseReferences<_$ContentStore, $TimelineEventsTable, TimelineEvent> {
+  $$TimelineEventsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static MultiTypedResultKey<$EventParticipantsTable, List<EventParticipant>>
+  _eventParticipantsRefsTable(_$ContentStore db) =>
+      MultiTypedResultKey.fromTable(
+        db.eventParticipants,
+        aliasName: 'timeline_events__id__event_participants__event_id',
+      );
+
+  $$EventParticipantsTableProcessedTableManager get eventParticipantsRefs {
+    final manager = $$EventParticipantsTableTableManager(
+      $_db,
+      $_db.eventParticipants,
+    ).filter((f) => f.eventId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _eventParticipantsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$EventVersesTable, List<EventVerse>>
+  _eventVersesRefsTable(_$ContentStore db) => MultiTypedResultKey.fromTable(
+    db.eventVerses,
+    aliasName: 'timeline_events__id__event_verses__event_id',
+  );
+
+  $$EventVersesTableProcessedTableManager get eventVersesRefs {
+    final manager = $$EventVersesTableTableManager(
+      $_db,
+      $_db.eventVerses,
+    ).filter((f) => f.eventId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_eventVersesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$TimelineEventsTableFilterComposer
+    extends Composer<_$ContentStore, $TimelineEventsTable> {
+  $$TimelineEventsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get sortKey => $composableBuilder(
+    column: $table.sortKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get startYear => $composableBuilder(
+    column: $table.startYear,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> eventParticipantsRefs(
+    Expression<bool> Function($$EventParticipantsTableFilterComposer f) f,
+  ) {
+    final $$EventParticipantsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.eventParticipants,
+      getReferencedColumn: (t) => t.eventId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EventParticipantsTableFilterComposer(
+            $db: $db,
+            $table: $db.eventParticipants,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> eventVersesRefs(
+    Expression<bool> Function($$EventVersesTableFilterComposer f) f,
+  ) {
+    final $$EventVersesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.eventVerses,
+      getReferencedColumn: (t) => t.eventId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EventVersesTableFilterComposer(
+            $db: $db,
+            $table: $db.eventVerses,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$TimelineEventsTableOrderingComposer
+    extends Composer<_$ContentStore, $TimelineEventsTable> {
+  $$TimelineEventsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get sortKey => $composableBuilder(
+    column: $table.sortKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get startYear => $composableBuilder(
+    column: $table.startYear,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$TimelineEventsTableAnnotationComposer
+    extends Composer<_$ContentStore, $TimelineEventsTable> {
+  $$TimelineEventsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<double> get sortKey =>
+      $composableBuilder(column: $table.sortKey, builder: (column) => column);
+
+  GeneratedColumn<int> get startYear =>
+      $composableBuilder(column: $table.startYear, builder: (column) => column);
+
+  Expression<T> eventParticipantsRefs<T extends Object>(
+    Expression<T> Function($$EventParticipantsTableAnnotationComposer a) f,
+  ) {
+    final $$EventParticipantsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.eventParticipants,
+          getReferencedColumn: (t) => t.eventId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EventParticipantsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.eventParticipants,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> eventVersesRefs<T extends Object>(
+    Expression<T> Function($$EventVersesTableAnnotationComposer a) f,
+  ) {
+    final $$EventVersesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.eventVerses,
+      getReferencedColumn: (t) => t.eventId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EventVersesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.eventVerses,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$TimelineEventsTableTableManager
+    extends
+        RootTableManager<
+          _$ContentStore,
+          $TimelineEventsTable,
+          TimelineEvent,
+          $$TimelineEventsTableFilterComposer,
+          $$TimelineEventsTableOrderingComposer,
+          $$TimelineEventsTableAnnotationComposer,
+          $$TimelineEventsTableCreateCompanionBuilder,
+          $$TimelineEventsTableUpdateCompanionBuilder,
+          (TimelineEvent, $$TimelineEventsTableReferences),
+          TimelineEvent,
+          PrefetchHooks Function({
+            bool eventParticipantsRefs,
+            bool eventVersesRefs,
+          })
+        > {
+  $$TimelineEventsTableTableManager(
+    _$ContentStore db,
+    $TimelineEventsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TimelineEventsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TimelineEventsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TimelineEventsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<double?> sortKey = const Value.absent(),
+                Value<int?> startYear = const Value.absent(),
+              }) => TimelineEventsCompanion(
+                id: id,
+                title: title,
+                sortKey: sortKey,
+                startYear: startYear,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String title,
+                Value<double?> sortKey = const Value.absent(),
+                Value<int?> startYear = const Value.absent(),
+              }) => TimelineEventsCompanion.insert(
+                id: id,
+                title: title,
+                sortKey: sortKey,
+                startYear: startYear,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$TimelineEventsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({eventParticipantsRefs = false, eventVersesRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (eventParticipantsRefs) db.eventParticipants,
+                    if (eventVersesRefs) db.eventVerses,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (eventParticipantsRefs)
+                        await $_getPrefetchedData<
+                          TimelineEvent,
+                          $TimelineEventsTable,
+                          EventParticipant
+                        >(
+                          currentTable: table,
+                          referencedTable: $$TimelineEventsTableReferences
+                              ._eventParticipantsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$TimelineEventsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).eventParticipantsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.eventId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (eventVersesRefs)
+                        await $_getPrefetchedData<
+                          TimelineEvent,
+                          $TimelineEventsTable,
+                          EventVerse
+                        >(
+                          currentTable: table,
+                          referencedTable: $$TimelineEventsTableReferences
+                              ._eventVersesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$TimelineEventsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).eventVersesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.eventId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$TimelineEventsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ContentStore,
+      $TimelineEventsTable,
+      TimelineEvent,
+      $$TimelineEventsTableFilterComposer,
+      $$TimelineEventsTableOrderingComposer,
+      $$TimelineEventsTableAnnotationComposer,
+      $$TimelineEventsTableCreateCompanionBuilder,
+      $$TimelineEventsTableUpdateCompanionBuilder,
+      (TimelineEvent, $$TimelineEventsTableReferences),
+      TimelineEvent,
+      PrefetchHooks Function({bool eventParticipantsRefs, bool eventVersesRefs})
+    >;
+typedef $$EventParticipantsTableCreateCompanionBuilder =
+    EventParticipantsCompanion Function({
+      Value<int> id,
+      required int eventId,
+      required int personId,
+    });
+typedef $$EventParticipantsTableUpdateCompanionBuilder =
+    EventParticipantsCompanion Function({
+      Value<int> id,
+      Value<int> eventId,
+      Value<int> personId,
+    });
+
+final class $$EventParticipantsTableReferences
+    extends
+        BaseReferences<
+          _$ContentStore,
+          $EventParticipantsTable,
+          EventParticipant
+        > {
+  $$EventParticipantsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $TimelineEventsTable _eventIdTable(_$ContentStore db) => db
+      .timelineEvents
+      .createAlias('event_participants__event_id__timeline_events__id');
+
+  $$TimelineEventsTableProcessedTableManager get eventId {
+    final $_column = $_itemColumn<int>('event_id')!;
+
+    final manager = $$TimelineEventsTableTableManager(
+      $_db,
+      $_db.timelineEvents,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_eventIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $BiblePeopleTable _personIdTable(_$ContentStore db) => db.biblePeople
+      .createAlias('event_participants__person_id__bible_people__id');
+
+  $$BiblePeopleTableProcessedTableManager get personId {
+    final $_column = $_itemColumn<int>('person_id')!;
+
+    final manager = $$BiblePeopleTableTableManager(
+      $_db,
+      $_db.biblePeople,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_personIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$EventParticipantsTableFilterComposer
+    extends Composer<_$ContentStore, $EventParticipantsTable> {
+  $$EventParticipantsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$TimelineEventsTableFilterComposer get eventId {
+    final $$TimelineEventsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.eventId,
+      referencedTable: $db.timelineEvents,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TimelineEventsTableFilterComposer(
+            $db: $db,
+            $table: $db.timelineEvents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$BiblePeopleTableFilterComposer get personId {
+    final $$BiblePeopleTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personId,
+      referencedTable: $db.biblePeople,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BiblePeopleTableFilterComposer(
+            $db: $db,
+            $table: $db.biblePeople,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$EventParticipantsTableOrderingComposer
+    extends Composer<_$ContentStore, $EventParticipantsTable> {
+  $$EventParticipantsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$TimelineEventsTableOrderingComposer get eventId {
+    final $$TimelineEventsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.eventId,
+      referencedTable: $db.timelineEvents,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TimelineEventsTableOrderingComposer(
+            $db: $db,
+            $table: $db.timelineEvents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$BiblePeopleTableOrderingComposer get personId {
+    final $$BiblePeopleTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personId,
+      referencedTable: $db.biblePeople,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BiblePeopleTableOrderingComposer(
+            $db: $db,
+            $table: $db.biblePeople,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$EventParticipantsTableAnnotationComposer
+    extends Composer<_$ContentStore, $EventParticipantsTable> {
+  $$EventParticipantsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  $$TimelineEventsTableAnnotationComposer get eventId {
+    final $$TimelineEventsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.eventId,
+      referencedTable: $db.timelineEvents,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TimelineEventsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.timelineEvents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$BiblePeopleTableAnnotationComposer get personId {
+    final $$BiblePeopleTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personId,
+      referencedTable: $db.biblePeople,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BiblePeopleTableAnnotationComposer(
+            $db: $db,
+            $table: $db.biblePeople,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$EventParticipantsTableTableManager
+    extends
+        RootTableManager<
+          _$ContentStore,
+          $EventParticipantsTable,
+          EventParticipant,
+          $$EventParticipantsTableFilterComposer,
+          $$EventParticipantsTableOrderingComposer,
+          $$EventParticipantsTableAnnotationComposer,
+          $$EventParticipantsTableCreateCompanionBuilder,
+          $$EventParticipantsTableUpdateCompanionBuilder,
+          (EventParticipant, $$EventParticipantsTableReferences),
+          EventParticipant,
+          PrefetchHooks Function({bool eventId, bool personId})
+        > {
+  $$EventParticipantsTableTableManager(
+    _$ContentStore db,
+    $EventParticipantsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$EventParticipantsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$EventParticipantsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$EventParticipantsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> eventId = const Value.absent(),
+                Value<int> personId = const Value.absent(),
+              }) => EventParticipantsCompanion(
+                id: id,
+                eventId: eventId,
+                personId: personId,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int eventId,
+                required int personId,
+              }) => EventParticipantsCompanion.insert(
+                id: id,
+                eventId: eventId,
+                personId: personId,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$EventParticipantsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({eventId = false, personId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (eventId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.eventId,
+                                referencedTable:
+                                    $$EventParticipantsTableReferences
+                                        ._eventIdTable(db),
+                                referencedColumn:
+                                    $$EventParticipantsTableReferences
+                                        ._eventIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+                    if (personId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.personId,
+                                referencedTable:
+                                    $$EventParticipantsTableReferences
+                                        ._personIdTable(db),
+                                referencedColumn:
+                                    $$EventParticipantsTableReferences
+                                        ._personIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$EventParticipantsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ContentStore,
+      $EventParticipantsTable,
+      EventParticipant,
+      $$EventParticipantsTableFilterComposer,
+      $$EventParticipantsTableOrderingComposer,
+      $$EventParticipantsTableAnnotationComposer,
+      $$EventParticipantsTableCreateCompanionBuilder,
+      $$EventParticipantsTableUpdateCompanionBuilder,
+      (EventParticipant, $$EventParticipantsTableReferences),
+      EventParticipant,
+      PrefetchHooks Function({bool eventId, bool personId})
+    >;
+typedef $$EventVersesTableCreateCompanionBuilder =
+    EventVersesCompanion Function({
+      Value<int> id,
+      required int eventId,
+      required int ord,
+      required String bookName,
+      required int chapter,
+      required int verse,
+    });
+typedef $$EventVersesTableUpdateCompanionBuilder =
+    EventVersesCompanion Function({
+      Value<int> id,
+      Value<int> eventId,
+      Value<int> ord,
+      Value<String> bookName,
+      Value<int> chapter,
+      Value<int> verse,
+    });
+
+final class $$EventVersesTableReferences
+    extends BaseReferences<_$ContentStore, $EventVersesTable, EventVerse> {
+  $$EventVersesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $TimelineEventsTable _eventIdTable(_$ContentStore db) => db
+      .timelineEvents
+      .createAlias('event_verses__event_id__timeline_events__id');
+
+  $$TimelineEventsTableProcessedTableManager get eventId {
+    final $_column = $_itemColumn<int>('event_id')!;
+
+    final manager = $$TimelineEventsTableTableManager(
+      $_db,
+      $_db.timelineEvents,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_eventIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$EventVersesTableFilterComposer
+    extends Composer<_$ContentStore, $EventVersesTable> {
+  $$EventVersesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get ord => $composableBuilder(
+    column: $table.ord,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bookName => $composableBuilder(
+    column: $table.bookName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get chapter => $composableBuilder(
+    column: $table.chapter,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get verse => $composableBuilder(
+    column: $table.verse,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$TimelineEventsTableFilterComposer get eventId {
+    final $$TimelineEventsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.eventId,
+      referencedTable: $db.timelineEvents,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TimelineEventsTableFilterComposer(
+            $db: $db,
+            $table: $db.timelineEvents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$EventVersesTableOrderingComposer
+    extends Composer<_$ContentStore, $EventVersesTable> {
+  $$EventVersesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get ord => $composableBuilder(
+    column: $table.ord,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bookName => $composableBuilder(
+    column: $table.bookName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get chapter => $composableBuilder(
+    column: $table.chapter,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get verse => $composableBuilder(
+    column: $table.verse,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$TimelineEventsTableOrderingComposer get eventId {
+    final $$TimelineEventsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.eventId,
+      referencedTable: $db.timelineEvents,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TimelineEventsTableOrderingComposer(
+            $db: $db,
+            $table: $db.timelineEvents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$EventVersesTableAnnotationComposer
+    extends Composer<_$ContentStore, $EventVersesTable> {
+  $$EventVersesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get ord =>
+      $composableBuilder(column: $table.ord, builder: (column) => column);
+
+  GeneratedColumn<String> get bookName =>
+      $composableBuilder(column: $table.bookName, builder: (column) => column);
+
+  GeneratedColumn<int> get chapter =>
+      $composableBuilder(column: $table.chapter, builder: (column) => column);
+
+  GeneratedColumn<int> get verse =>
+      $composableBuilder(column: $table.verse, builder: (column) => column);
+
+  $$TimelineEventsTableAnnotationComposer get eventId {
+    final $$TimelineEventsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.eventId,
+      referencedTable: $db.timelineEvents,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TimelineEventsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.timelineEvents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$EventVersesTableTableManager
+    extends
+        RootTableManager<
+          _$ContentStore,
+          $EventVersesTable,
+          EventVerse,
+          $$EventVersesTableFilterComposer,
+          $$EventVersesTableOrderingComposer,
+          $$EventVersesTableAnnotationComposer,
+          $$EventVersesTableCreateCompanionBuilder,
+          $$EventVersesTableUpdateCompanionBuilder,
+          (EventVerse, $$EventVersesTableReferences),
+          EventVerse,
+          PrefetchHooks Function({bool eventId})
+        > {
+  $$EventVersesTableTableManager(_$ContentStore db, $EventVersesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$EventVersesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$EventVersesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$EventVersesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> eventId = const Value.absent(),
+                Value<int> ord = const Value.absent(),
+                Value<String> bookName = const Value.absent(),
+                Value<int> chapter = const Value.absent(),
+                Value<int> verse = const Value.absent(),
+              }) => EventVersesCompanion(
+                id: id,
+                eventId: eventId,
+                ord: ord,
+                bookName: bookName,
+                chapter: chapter,
+                verse: verse,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int eventId,
+                required int ord,
+                required String bookName,
+                required int chapter,
+                required int verse,
+              }) => EventVersesCompanion.insert(
+                id: id,
+                eventId: eventId,
+                ord: ord,
+                bookName: bookName,
+                chapter: chapter,
+                verse: verse,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$EventVersesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({eventId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (eventId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.eventId,
+                                referencedTable: $$EventVersesTableReferences
+                                    ._eventIdTable(db),
+                                referencedColumn: $$EventVersesTableReferences
+                                    ._eventIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$EventVersesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ContentStore,
+      $EventVersesTable,
+      EventVerse,
+      $$EventVersesTableFilterComposer,
+      $$EventVersesTableOrderingComposer,
+      $$EventVersesTableAnnotationComposer,
+      $$EventVersesTableCreateCompanionBuilder,
+      $$EventVersesTableUpdateCompanionBuilder,
+      (EventVerse, $$EventVersesTableReferences),
+      EventVerse,
+      PrefetchHooks Function({bool eventId})
+    >;
 
 class $ContentStoreManager {
   final _$ContentStore _db;
@@ -11254,4 +17173,20 @@ class $ContentStoreManager {
       $$PlacesTableTableManager(_db, _db.places);
   $$PlaceVersesTableTableManager get placeVerses =>
       $$PlaceVersesTableTableManager(_db, _db.placeVerses);
+  $$BiblePeopleTableTableManager get biblePeople =>
+      $$BiblePeopleTableTableManager(_db, _db.biblePeople);
+  $$PersonPartnersTableTableManager get personPartners =>
+      $$PersonPartnersTableTableManager(_db, _db.personPartners);
+  $$PersonVersesTableTableManager get personVerses =>
+      $$PersonVersesTableTableManager(_db, _db.personVerses);
+  $$PeopleGroupsTableTableManager get peopleGroups =>
+      $$PeopleGroupsTableTableManager(_db, _db.peopleGroups);
+  $$PeopleGroupMembersTableTableManager get peopleGroupMembers =>
+      $$PeopleGroupMembersTableTableManager(_db, _db.peopleGroupMembers);
+  $$TimelineEventsTableTableManager get timelineEvents =>
+      $$TimelineEventsTableTableManager(_db, _db.timelineEvents);
+  $$EventParticipantsTableTableManager get eventParticipants =>
+      $$EventParticipantsTableTableManager(_db, _db.eventParticipants);
+  $$EventVersesTableTableManager get eventVerses =>
+      $$EventVersesTableTableManager(_db, _db.eventVerses);
 }

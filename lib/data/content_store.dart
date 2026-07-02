@@ -28,13 +28,21 @@ part 'content_store.g.dart';
     TopicReferences,
     Places,
     PlaceVerses,
+    BiblePeople,
+    PersonPartners,
+    PersonVerses,
+    PeopleGroups,
+    PeopleGroupMembers,
+    TimelineEvents,
+    EventParticipants,
+    EventVerses,
   ],
 )
 class ContentStore extends _$ContentStore {
   ContentStore([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 10;
+  int get schemaVersion => 11;
 
   @override
   MigrationStrategy get migration {
@@ -122,6 +130,32 @@ class ContentStore extends _$ContentStore {
           await customStatement(
             'CREATE INDEX IF NOT EXISTS idx_place_verse_location '
             'ON place_verses (book_name, chapter)',
+          );
+        }
+        if (from < 11) {
+          await _createIfNotExists(m, biblePeople);
+          await _createIfNotExists(m, personPartners);
+          await _createIfNotExists(m, personVerses);
+          await _createIfNotExists(m, peopleGroups);
+          await _createIfNotExists(m, peopleGroupMembers);
+          await _createIfNotExists(m, timelineEvents);
+          await _createIfNotExists(m, eventParticipants);
+          await _createIfNotExists(m, eventVerses);
+          await customStatement(
+            'CREATE INDEX IF NOT EXISTS idx_person_verse_location '
+            'ON person_verses (book_name, chapter)',
+          );
+          await customStatement(
+            'CREATE INDEX IF NOT EXISTS idx_person_verse_person '
+            'ON person_verses (person_id)',
+          );
+          await customStatement(
+            'CREATE INDEX IF NOT EXISTS idx_people_group_member_person '
+            'ON people_group_members (person_id)',
+          );
+          await customStatement(
+            'CREATE INDEX IF NOT EXISTS idx_event_participant_person '
+            'ON event_participants (person_id)',
           );
         }
       },
@@ -264,6 +298,12 @@ class ContentStore extends _$ContentStore {
       await customStatement(
         "INSERT INTO content_search(type, reference_id, text_content) "
         "SELECT 'topic', id, name FROM topics",
+      );
+      // Keep in sync with TheographicImporter._indexSql.
+      await customStatement(
+        "INSERT INTO content_search(type, reference_id, text_content) "
+        "SELECT 'person', id, display_title || CASE WHEN also_called IS NULL "
+        "THEN '' ELSE ' ' || also_called END FROM bible_people",
       );
       // HTML types: strip markup before indexing.
       await _insertCleanedRows(

@@ -15,6 +15,7 @@ import 'reader/devotionals_panel.dart';
 import 'reader/topics_panel.dart';
 import 'reader/harmony_panel.dart';
 import 'reader/places_panel.dart';
+import 'reader/people_panel.dart';
 import 'reader/highlights_panel.dart';
 import 'reader/scratch_panel.dart';
 import '../ui/sermons/sermons_panel.dart';
@@ -308,6 +309,9 @@ class _DesktopLayout extends ConsumerWidget {
                   }
                   if (activeTool == ActiveTool.places) {
                     return const PlacesPanel();
+                  }
+                  if (activeTool == ActiveTool.people) {
+                    return const PeoplePanel();
                   }
                   if (activeTool == ActiveTool.highlights) {
                     return const HighlightsPanel();

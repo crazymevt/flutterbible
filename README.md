@@ -90,6 +90,7 @@ This project is made possible thanks to several upstream resources and formats:
 - **[Jesus Film Project](https://www.jesusfilm.org/)**: Sharing the story of Jesus through film.
 - **[OpenBible.info](https://www.openbible.info/)**: Crowdsourced cross-reference dataset and place geocoding (licensed under CC-BY).
 - **[Nave's Topical Bible](https://github.com/BradyStephenson/bible-data)**: Public-domain topical index, via the BradyStephenson/bible-data dataset (licensed under CC-BY 4.0).
+- **[Theographic Bible Metadata](https://github.com/robertrouse/theographic-bible-metadata)**: Knowledge graph of the people, groups, and timeline events of the Bible, by Robert Rouse / Viz.Bible (licensed under CC BY-SA 4.0; the bundled dataset derived from it remains CC BY-SA 4.0 — see NOTICE).
 - **A. T. Robertson** and **Stevens & Burton**: The Gospel Harmony tool's event arrangement is adapted from their public-domain harmonies (*A Harmony of the Gospels for Students of the Life of Christ*, 1922, and *A Harmony of the Gospels for Historical Study*, 1893).
 - **[Berean Study Bible](https://berean.bible/)**: Public domain Bible text and audio resources.
 - **Clojure/JavaFX Study Bible**: The original desktop application that inspired and provided the feature foundation for this Flutter reimplementation.

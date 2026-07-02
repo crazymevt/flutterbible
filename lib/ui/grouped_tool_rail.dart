@@ -7,7 +7,7 @@ import 'common/tool_groups.dart';
 /// The desktop tools rail: the reader's side tools in sections separated by
 /// dividers (see [toolGroups]). Hand-rolled to Material 3 rail metrics
 /// because [NavigationRail] has no notion of sections, which is what keeps
-/// 14 destinations scannable.
+/// 16 destinations scannable.
 class GroupedToolRail extends ConsumerWidget {
   const GroupedToolRail({super.key});
 
@@ -15,9 +15,9 @@ class GroupedToolRail extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final activeTool = ref.watch(activeToolProvider);
 
-    // Deliberately denser than NavigationRail's 72px-per-destination: 14
+    // Deliberately denser than NavigationRail's 72px-per-destination: 16
     // tools plus the group breaks must still fit a typical laptop window
-    // without scrolling.
+    // without scrolling (guarded by grouped_tool_rail_test).
     return SizedBox(
       width: 80,
       child: Column(
@@ -64,34 +64,31 @@ class _RailItem extends ConsumerWidget {
         // setTool toggles: tapping the active tool closes its panel, same as
         // the NavigationRail behaved.
         onTap: () => ref.read(activeToolProvider.notifier).setTool(item.tool),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 1),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 56,
-                height: 30,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: selected ? theme.colorScheme.secondaryContainer : null,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Icon(item.icon, color: iconColor),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 56,
+              height: 30,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: selected ? theme.colorScheme.secondaryContainer : null,
+                borderRadius: BorderRadius.circular(15),
               ),
-              const SizedBox(height: 2),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 2),
-                child: Text(
-                  item.railLabel,
-                  style: labelStyle,
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
+              child: Icon(item.icon, color: iconColor),
+            ),
+            const SizedBox(height: 1),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              child: Text(
+                item.railLabel,
+                style: labelStyle,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

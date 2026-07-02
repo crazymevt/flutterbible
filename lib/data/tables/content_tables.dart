@@ -137,6 +137,104 @@ class PlaceVerses extends Table {
   IntColumn get verse => integer()();
 }
 
+// --- Theographic Bible Metadata (people, groups, timeline events) ---
+// Loaded from assets/data/theographic.json by TheographicImporter; data is
+// CC BY-SA 4.0 (robertrouse/theographic-bible-metadata).
+
+@DataClassName('BiblePerson')
+class BiblePeople extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get slug => text()();
+  TextColumn get name => text()();
+
+  /// Name plus a disambiguator where several people share it,
+  /// e.g. "Abiel (Arbathite)".
+  TextColumn get displayTitle => text()();
+  TextColumn get gender => text().nullable()();
+
+  /// Other names this person goes by, comma-joined ("Ner, Jehiel").
+  TextColumn get alsoCalled => text().nullable()();
+
+  // Years are ISO years: negative = BC.
+  IntColumn get birthYear => integer().nullable()();
+  IntColumn get deathYear => integer().nullable()();
+  IntColumn get minYear => integer().nullable()();
+  IntColumn get maxYear => integer().nullable()();
+
+  IntColumn get fatherId => integer().nullable()();
+  IntColumn get motherId => integer().nullable()();
+
+  /// Easton's Bible Dictionary entry for this person (plain text), when one
+  /// exists.
+  TextColumn get bio => text().nullable()();
+  IntColumn get verseCount => integer()();
+}
+
+@DataClassName('PersonPartner')
+class PersonPartners extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get personId => integer().references(BiblePeople, #id)();
+  IntColumn get partnerId => integer().references(BiblePeople, #id)();
+}
+
+@DataClassName('PersonVerse')
+@TableIndex(name: 'idx_person_verse_location', columns: {#bookName, #chapter})
+@TableIndex(name: 'idx_person_verse_person', columns: {#personId})
+class PersonVerses extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get personId => integer().references(BiblePeople, #id)();
+  TextColumn get bookName => text()();
+  IntColumn get chapter => integer()();
+  IntColumn get verse => integer()();
+}
+
+@DataClassName('PeopleGroup')
+class PeopleGroups extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get name => text()();
+}
+
+@DataClassName('PeopleGroupMember')
+@TableIndex(name: 'idx_people_group_member_person', columns: {#personId})
+class PeopleGroupMembers extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get groupId => integer().references(PeopleGroups, #id)();
+  IntColumn get personId => integer().references(BiblePeople, #id)();
+}
+
+@DataClassName('TimelineEvent')
+class TimelineEvents extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get title => text()();
+
+  /// Chronological ordering key from the dataset (roughly the ISO start year
+  /// plus a fractional tiebreak).
+  RealColumn get sortKey => real().nullable()();
+
+  /// ISO start year (negative = BC), where known.
+  IntColumn get startYear => integer().nullable()();
+}
+
+@DataClassName('EventParticipant')
+@TableIndex(name: 'idx_event_participant_person', columns: {#personId})
+class EventParticipants extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get eventId => integer().references(TimelineEvents, #id)();
+  IntColumn get personId => integer().references(BiblePeople, #id)();
+}
+
+@DataClassName('EventVerse')
+class EventVerses extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get eventId => integer().references(TimelineEvents, #id)();
+
+  /// Position within the event's verse list (they're ordered canonically).
+  IntColumn get ord => integer()();
+  TextColumn get bookName => text()();
+  IntColumn get chapter => integer()();
+  IntColumn get verse => integer()();
+}
+
 @DataClassName('Devotional')
 class Devotionals extends Table {
   IntColumn get id => integer().autoIncrement()();

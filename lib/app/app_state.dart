@@ -19,6 +19,7 @@ enum ActiveTool {
   devotionals,
   topics,
   places,
+  people,
   highlights,
   scratch,
   harmony,
