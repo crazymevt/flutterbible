@@ -7,6 +7,7 @@ import '../../app/reader_state.dart';
 import '../../data/content_store.dart';
 import '../common/breakpoints.dart';
 import '../common/skeleton.dart';
+import 'people_timeline_screen.dart';
 
 /// Open [personId] in the People tool: the side panel on wide layouts, a
 /// bottom sheet on phones.
@@ -32,6 +33,29 @@ void openPersonInPanel(BuildContext context, WidgetRef ref, int personId) {
   }
 }
 
+/// Shows a person's profile in a modal bottom sheet, regardless of layout —
+/// used from fullscreen surfaces (e.g. the timeline) where the docked side
+/// panel would be hidden behind the route.
+void showPersonDetailSheet(BuildContext context, WidgetRef ref, int personId) {
+  ref.read(selectedPersonProvider.notifier).select(personId);
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (_) => Container(
+      height: MediaQuery.sizeOf(context).height * 0.85,
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      // No timeline button here: this sheet is opened from the timeline, and a
+      // second one would stack on top of the first.
+      child: const PeoplePanel(showTimelineButton: false),
+    ),
+  );
+}
+
 /// Formats an ISO year for display: negative years are BC.
 String formatIsoYear(int year) => year < 0 ? '${-year} BC' : 'AD $year';
 
@@ -39,7 +63,12 @@ String formatIsoYear(int year) => year < 0 ? '${-year} BC' : 'AD $year';
 /// searches all 3,000+ people, and drills into a person's family, biography,
 /// timeline, and appearances.
 class PeoplePanel extends ConsumerStatefulWidget {
-  const PeoplePanel({super.key});
+  const PeoplePanel({super.key, this.showTimelineButton = true});
+
+  /// Whether to show the header button that opens the fullscreen timeline.
+  /// Hidden when this panel is itself a detail sheet opened *from* the
+  /// timeline, so tapping it can't stack a second timeline on top.
+  final bool showTimelineButton;
 
   @override
   ConsumerState<PeoplePanel> createState() => _PeoplePanelState();
@@ -102,15 +131,29 @@ class _PeoplePanelState extends ConsumerState<PeoplePanel> {
                         ),
                       ],
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      tooltip: 'Close',
-                      onPressed: () {
-                        ref.read(activeToolProvider.notifier).close();
-                        if (Navigator.of(context).canPop()) {
-                          Navigator.of(context).pop();
-                        }
-                      },
+                    Row(
+                      children: [
+                        if (widget.showTimelineButton)
+                          IconButton(
+                            icon: const Icon(Icons.timeline),
+                            tooltip: 'Timeline',
+                            onPressed: () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const PeopleTimelineScreen(),
+                              ),
+                            ),
+                          ),
+                        IconButton(
+                          icon: const Icon(Icons.close),
+                          tooltip: 'Close',
+                          onPressed: () {
+                            ref.read(activeToolProvider.notifier).close();
+                            if (Navigator.of(context).canPop()) {
+                              Navigator.of(context).pop();
+                            }
+                          },
+                        ),
+                      ],
                     ),
                   ],
                 ),
