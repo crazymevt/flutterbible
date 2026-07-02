@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 import 'ui/main_shell.dart';
 import 'app/shared_prefs.dart';
+import 'app/user_providers.dart';
 import 'app/app_state.dart';
 import 'app/action_providers.dart';
 import 'app/highlight_palette.dart';
@@ -135,15 +136,57 @@ void main() {
       await autoUpdater.setScheduledCheckInterval(3600);
     }
 
+    // Own the ProviderContainer directly (rather than letting ProviderScope
+    // create it) so the user database can be opened and migrated once, up
+    // front, before any widget subscribes to it. See [_warmUpUserDatabase].
+    final container = ProviderContainer(
+      overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+    );
+    await _warmUpUserDatabase(container);
+
     runApp(
-      ProviderScope(
-        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+      UncontrolledProviderScope(
+        container: container,
         child: const StudyBibleApp(),
       ),
     );
   }, (Object error, StackTrace stack) {
     logError(error, stack, context: 'Uncaught');
   });
+}
+
+/// Opens the user database and runs any pending schema migration to completion
+/// *before* the UI mounts, so the migration executes on a single idle
+/// connection instead of racing the flood of concurrent stream reads the first
+/// screen issues.
+///
+/// The first launch after a schema bump is where that race bites: drift runs
+/// the migration lazily behind the first query, and if a transient failure
+/// (e.g. SQLITE_BUSY from a briefly double-opened WAL connection) rolls it
+/// back, every StreamProvider awaiting the open latches an error — Riverpod
+/// doesn't retry them — and the screen stays blank until a manual restart.
+/// Forcing the migration here, and retrying it on a fresh connection before
+/// anything subscribes, turns that permanent blank into an automatic recovery.
+///
+/// Bounded so a genuinely unopenable database (corruption, disk full) still
+/// falls through to the app, where the normal provider error states surface it.
+Future<void> _warmUpUserDatabase(ProviderContainer container) async {
+  const maxAttempts = 3;
+  for (var attempt = 1; attempt <= maxAttempts; attempt++) {
+    final store = container.read(userStoreProvider);
+    try {
+      // Any query forces the lazy connection open, which runs the migration.
+      await store.customSelect('SELECT 1').get();
+      return;
+    } catch (error, stack) {
+      logError(error, stack, context: 'DB warm-up (attempt $attempt)');
+      if (attempt == maxAttempts) return;
+      // Drop the connection (and its background isolate) so the retry re-opens
+      // cleanly and re-runs the rolled-back migration on a fresh executor.
+      container.invalidate(userStoreProvider);
+      await Future<void>.delayed(Duration(milliseconds: 200 * attempt));
+    }
+  }
 }
 
 class StudyBibleApp extends ConsumerStatefulWidget {
