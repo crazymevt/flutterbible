@@ -1,5 +1,23 @@
 [
   {
+    "version": "26.7.2+3",
+    "date": "2026-07-02",
+    "features": [
+      {
+        "category": "Bugfixes",
+        "title": "tag dialog keyboard overflow and colour picker clipped on Android",
+        "description": "",
+        "icon": "bug_report"
+      },
+      {
+        "category": "New Features",
+        "title": "add People of the Bible study tool (Theographic metadata)",
+        "description": "",
+        "icon": "star"
+      }
+    ]
+  },
+  {
     "version": "26.7.2+2",
     "date": "2026-07-02",
     "features": [
