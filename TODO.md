@@ -6,28 +6,7 @@ Running list of known issues and follow-ups.
 
 ## Enhancements
 
-- [x] **Sermon Print Button.** Dedicated print icon in the sermon editor (both
-  full-screen and side-panel layouts), next to Export. Prints the current sermon
-  straight to PDF, skipping the export dialog. Shipped 26.6.29+3.
-
-- [x] **Printing.** Print notes, journals, and sermons to a physical printer or
-  PDF (cross-platform, via `printing`/`pdf` with an embedded Noto Sans font).
-  Reader-chapter and search-results printing were intentionally left out — not
-  adding them unless requested.
-
 ## Research
-
-- [x] **Google Drive Sync.** Official sync to a hidden, app-private Google Drive
-  folder (`appDataFolder`) — no manual sync folder needed. Implemented as a
-  `GoogleDriveSyncStorage` backend (`lib/data/sync/`) with platform-appropriate
-  OAuth (desktop loopback + `google_sign_in` on mobile); takes precedence over
-  the file/SAF folder when connected. Shipped 26.6.29+3 (Android web-client fix
-  in +4), with verified end-to-end sync on desktop.
-  - **OAuth client IDs** come from `--dart-define-from-file=oauth.json` (gitignored);
-    release builds reconstruct it from the `OAUTH_JSON` CI secret. Android
-    additionally needs the **web** client id as `serverClientId` and the signing
-    keystore's **SHA-1** registered on the Android OAuth client.
-  - Full setup walkthrough in `docs/google-drive-sync-setup.md`.
 
 - [ ] **Import SWORD modules** (CrossWire format — translations, commentaries,
   dictionaries). Implementation lives in `lib/data/importer/sword/`. Phases
@@ -49,6 +28,28 @@ Running list of known issues and follow-ups.
     Needed for most non-English and Catholic modules. (Full per-phase research
     notes are in git history — see TODO.md prior to this condensation.)
 
+## Issues
+
+## Archive
+
+- [x] **Sermon ↔ verse chain linking.** "Navigate Scriptures" mode
+  (`5b0c13b`): the references written in a sermon become an ordered route the
+  reader steps through via a bar under the breadcrumb, each stop's verse range
+  getting a session-only highlight in all three reading views. Started from the
+  sermon editor or presentation screen.
+
+- [x] **Sermon list: sort & tag search.** Search box, tag filter, and
+  alphabetical / created-date sorting for the sermons list (`b8bd03e`).
+
+- [x] **Scratch space.** Device-local rich-text pad, promotable to a full
+  sermon and explicitly excluded from sync (`4c6175b`).
+
+- [x] **Colored tags.** Add a color to tags so notes/sermons/etc. can be
+  visually grouped and filtered by color. Shared tag model across content types.
+  Done: fixed palette picker in the tag editor (assign on create + recolor an
+  existing tag), colored chips everywhere, and a color filter in the Tags tab.
+  Deferred: tinting the reader's tagged-verse indicator by tag color.
+
 - [x] **Bookmarks / Bible ribbons.** Let users drop persistent bookmarks
   ("ribbons") at a verse and jump back to them, like the ribbon markers in a
   physical Bible. Done: one-tap Ribbon action in the verse action bar
@@ -59,24 +60,26 @@ Running list of known issues and follow-ups.
   chapters), swipe/✕ to remove. Rides the existing synced `bookmarks` table.
   Deferred: multiple named/colored ribbons per verse and chapter-level ribbons.
 
-- [ ] **Sermon ↔ verse chain linking.** Link a sermon to its cited verses so
-  users can navigate from the sermon to each passage (and ideally back). A
-  "chain" of linked verses with in-app navigation between them.
+- [x] **Google Drive Sync.** Official sync to a hidden, app-private Google Drive
+  folder (`appDataFolder`) — no manual sync folder needed. Implemented as a
+  `GoogleDriveSyncStorage` backend (`lib/data/sync/`) with platform-appropriate
+  OAuth (desktop loopback + `google_sign_in` on mobile); takes precedence over
+  the file/SAF folder when connected. Shipped 26.6.29+3 (Android web-client fix
+  in +4), with verified end-to-end sync on desktop.
+  - **OAuth client IDs** come from `--dart-define-from-file=oauth.json` (gitignored);
+    release builds reconstruct it from the `OAUTH_JSON` CI secret. Android
+    additionally needs the **web** client id as `serverClientId` and the signing
+    keystore's **SHA-1** registered on the Android OAuth client.
+  - Full setup walkthrough in `docs/google-drive-sync-setup.md`.
 
-- [x] **Colored tags.** Add a color to tags so notes/sermons/etc. can be
-  visually grouped and filtered by color. Shared tag model across content types.
-  Done: fixed palette picker in the tag editor (assign on create + recolor an
-  existing tag), colored chips everywhere, and a color filter in the Tags tab.
-  Deferred: tinting the reader's tagged-verse indicator by tag color.
+- [x] **Sermon Print Button.** Dedicated print icon in the sermon editor (both
+  full-screen and side-panel layouts), next to Export. Prints the current sermon
+  straight to PDF, skipping the export dialog. Shipped 26.6.29+3.
 
-- [ ] **Sermon list: sort & tag search.** Update the sermon list to sort
-  alphabetically and by created date, and make it searchable by tags.
-
-- [ ] **Scratch space.** A lightweight, non-syncing scratch/notes area that can
-  optionally be promoted/converted into a full sermon. Explicitly excluded from
-  sync.
-
-## Issues
+- [x] **Printing.** Print notes, journals, and sermons to a physical printer or
+  PDF (cross-platform, via `printing`/`pdf` with an embedded Noto Sans font).
+  Reader-chapter and search-results printing were intentionally left out — not
+  adding them unless requested.
 
 - [x] **com.example refs.** The Windows EXE version-info block
   (`windows/runner/Runner.rc`) still carried Flutter scaffold defaults —
@@ -91,8 +94,6 @@ Running list of known issues and follow-ups.
     `appDataDir()` now copies the old tree across on first run
     (`_migrateWindowsAppDataRelocation`) so existing Windows users keep their
     data. macOS is unaffected (keys off the bundle id).
-
-## Archive
 
 - [x] **Gesture navigation using PageView.** Swipe navigation in the Reader to
   change chapters by wrapping the content in a `PageView` with eagerly-loaded
